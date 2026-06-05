@@ -1,11 +1,10 @@
-import sys
 from dataclasses import dataclass
 
 import pygame
 
 from asteroid import Asteroid
 from asteroidfield import AsteroidField
-from constants import SCREEN_HEIGHT, SCREEN_WIDTH
+from constants import ASTEROIDS_SCORE, PLAYER_LIVES, SCREEN_HEIGHT, SCREEN_WIDTH
 from logger import log_event, log_state
 from player import Player
 from shot import Shot
@@ -27,6 +26,8 @@ class GameSession:
     drawable: pygame.sprite.Group
     player: Player
     asteroid_field: AsteroidField
+    score: int
+    lives: int
 
 
 def create_session(mode: GameMode) -> GameSession:
@@ -51,6 +52,8 @@ def create_session(mode: GameMode) -> GameSession:
         drawable=drawable,
         player=player,
         asteroid_field=asteroid_field,
+        score=0,
+        lives=PLAYER_LIVES,
     )
 
 
@@ -133,7 +136,9 @@ def draw_game_over(
     )
 
 
-def mode_label_from_value(modes: list[tuple[str, GameMode]], mode: GameMode | None) -> str:
+def mode_label_from_value(
+    modes: list[tuple[str, GameMode]], mode: GameMode | None
+) -> str:
     if mode is None:
         return "None"
 
@@ -178,9 +183,13 @@ def main():
                     if event.key == pygame.K_ESCAPE:
                         return
                     if event.key == pygame.K_UP:
-                        selected_mode_index = (selected_mode_index - 1) % len(mode_options)
+                        selected_mode_index = (selected_mode_index - 1) % len(
+                            mode_options
+                        )
                     if event.key == pygame.K_DOWN:
-                        selected_mode_index = (selected_mode_index + 1) % len(mode_options)
+                        selected_mode_index = (selected_mode_index + 1) % len(
+                            mode_options
+                        )
                     if event.key in (pygame.K_RETURN, pygame.K_KP_ENTER):
                         active_mode = mode_options[selected_mode_index][1]
                         session = create_session(active_mode)
@@ -233,14 +242,23 @@ def main():
 
         player_destroyed = False
         for asteroid in session.asteroids.copy():
-            if asteroid.collides_with(session.player):
+            if not session.player.is_invulnerable() and asteroid.collides_with(
+                session.player
+            ):
                 log_event("player_hit")
-                print("Game over!")
-                player_destroyed = True
+                session.lives -= 1
+
+                if session.lives <= 0:
+                    print("Game over!")
+                    player_destroyed = True
+                else:
+                    session.player.respawn(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
+
                 break
             for shot in session.shots.copy():
                 if asteroid.collides_with(shot):
                     log_event("asteroid_shot")
+                    session.score += int(asteroid.radius * 5)
                     asteroid.split()
                     shot.kill()
                     break

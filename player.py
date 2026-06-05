@@ -3,6 +3,7 @@ import pygame
 from circleshape import CircleShape
 from constants import (
     LINE_WIDTH,
+    PLAYER_INVULNERABLE_SECONDS,
     PLAYER_RADIUS,
     PLAYER_SHOOT_COOLDOWN_SECONDS,
     PLAYER_SHOOT_SPEED,
@@ -17,6 +18,7 @@ class Player(CircleShape):
         super().__init__(x, y, PLAYER_RADIUS)
         self.rotation = 0
         self.shoot_timer = 0.0
+        self.invulnerable_timer = 0.0
 
     def rotate(self, dt: float) -> None:
         self.rotation += PLAYER_TURN_SPEED * dt
@@ -60,11 +62,14 @@ class Player(CircleShape):
             LINE_WIDTH,
         )
 
-    def update(self, dt: float, keys: pygame.key.ScancodeWrapper | set[int] | None = None) -> None:
+    def update(
+        self, dt: float, keys: pygame.key.ScancodeWrapper | set[int] | None = None
+    ) -> None:
         if keys is None:
             keys = pygame.key.get_pressed()
 
-        self.shoot_timer -= dt
+        self.shoot_timer = max(0.0, self.shoot_timer - dt)
+        self.invulnerable_timer = max(0.0, self.invulnerable_timer - dt)
 
         if self._is_key_pressed(keys, pygame.K_a):
             self.rotate(-dt)
@@ -76,3 +81,12 @@ class Player(CircleShape):
             self.move(-dt)
         if self._is_key_pressed(keys, pygame.K_SPACE):
             self.shoot()
+
+    def respawn(self, x: float, y: float) -> None:
+        self.position = pygame.Vector2(x, y)
+        self.rotation = 0
+        self.velocity = pygame.Vector2(0, 0)
+        self.invulnerable_timer = PLAYER_INVULNERABLE_SECONDS
+
+    def is_invulnerable(self) -> bool:
+        return self.invulnerable_timer > 0
