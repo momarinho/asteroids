@@ -1,3 +1,4 @@
+from pathlib import Path
 from dataclasses import dataclass
 
 import pygame
@@ -148,13 +149,51 @@ def mode_label_from_value(
     return mode
 
 
+def draw_hud(
+    screen: pygame.Surface, font: pygame.font.Font, session: GameSession
+) -> None:
+    score_text = font.render(f"Score: {session.score}", True, "white")
+    lives_text = font.render(f"Lives: {session.lives}", True, "white")
+
+    if session.player.shoot_timer > 0:
+        cooldown_label = f"Cooldown: {session.player.shoot_timer:.2f}s"
+    else:
+        cooldown_label = "Cooldown: Ready"
+
+    cooldown_text = font.render(cooldown_label, True, "white")
+
+    screen.blit(score_text, (20, 20))
+    screen.blit(lives_text, (20, 55))
+    screen.blit(cooldown_text, (20, 90))
+
+
+def load_sound(path: str) -> pygame.mixer.Sound | None:
+    sound_path = Path(path)
+    if not sound_path.exists():
+        return None
+
+    try:
+        return pygame.mixer.Sound(sound_path)
+    except pygame.error:
+        return None
+
+
 def main():
     pygame.init()
+    try:
+        pygame.mixer.init()
+    except pygame.error:
+        pass
+
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     pygame.display.set_caption("Asteroids")
     clock = pygame.time.Clock()
     title_font = pygame.font.Font(None, 72)
     body_font = pygame.font.Font(None, 36)
+    shoot_sound = load_sound("assets/sounds/shoot.wav")
+    player_hit_sound = load_sound("assets/sounds/player_hit.wav")
+    asteroid_split_sound = load_sound("assets/sounds/asteroid_split.wav")
+    Player.shoot_sound = shoot_sound
 
     dt = 0.0
     pressed_keys: set[int] = set()
@@ -246,6 +285,8 @@ def main():
                 session.player
             ):
                 log_event("player_hit")
+                if player_hit_sound is not None:
+                    player_hit_sound.play()
                 session.lives -= 1
 
                 if session.lives <= 0:
@@ -258,6 +299,8 @@ def main():
             for shot in session.shots.copy():
                 if asteroid.collides_with(shot):
                     log_event("asteroid_shot")
+                    if asteroid_split_sound is not None:
+                        asteroid_split_sound.play()
                     session.score += int(asteroid.radius * 5)
                     asteroid.split()
                     shot.kill()
@@ -272,6 +315,8 @@ def main():
 
         for drawable_object in session.drawable:
             drawable_object.draw(screen)
+
+        draw_hud(screen, body_font, session)
         pygame.display.flip()
 
         dt = clock.tick(60) / 1000
