@@ -14,6 +14,7 @@ GameState = str
 GameMode = str
 
 STATE_MENU: GameState = "menu"
+STATE_SETTINGS: GameState = "settings"
 STATE_PLAYING: GameState = "playing"
 STATE_GAME_OVER: GameState = "game_over"
 
@@ -29,6 +30,14 @@ class GameSession:
     asteroid_field: AsteroidField
     score: int
     lives: int
+
+
+@dataclass(frozen=True)
+class MovementPreset:
+    label: str
+    acceleration: float
+    max_speed: float
+    friction: float
 
 
 def create_session(mode: GameMode) -> GameSession:
@@ -79,6 +88,7 @@ def draw_menu(
     body_font: pygame.font.Font,
     modes: list[tuple[str, GameMode]],
     selected_index: int,
+    movement_preset_label: str,
 ) -> None:
     screen.fill("black")
 
@@ -100,11 +110,50 @@ def draw_menu(
         screen,
         body_font,
         [
+            f"Movement preset: {movement_preset_label}",
+            "Tab to open settings",
             "Up/Down to select",
             "Enter to start",
             "Esc to quit",
         ],
-        470,
+        450,
+        gap=12,
+    )
+
+
+def draw_settings(
+    screen: pygame.Surface,
+    title_font: pygame.font.Font,
+    body_font: pygame.font.Font,
+    presets: list[MovementPreset],
+    selected_index: int,
+    active_index: int,
+) -> None:
+    screen.fill("black")
+    draw_centered_lines(
+        screen,
+        title_font,
+        ["Settings", "Movement Preset"],
+        150,
+        gap=8,
+    )
+
+    preset_lines = []
+    for index, preset in enumerate(presets):
+        selected_prefix = ">" if index == selected_index else " "
+        active_suffix = " (Active)" if index == active_index else ""
+        preset_lines.append(f"{selected_prefix} {preset.label}{active_suffix}")
+
+    draw_centered_lines(screen, body_font, preset_lines, 280, gap=16)
+    draw_centered_lines(
+        screen,
+        body_font,
+        [
+            "Up/Down to choose",
+            "Enter to apply",
+            "Esc to return",
+        ],
+        500,
         gap=12,
     )
 
@@ -191,6 +240,12 @@ def load_sound(path: str) -> pygame.mixer.Sound | None:
         return None
 
 
+def apply_movement_preset(preset: MovementPreset) -> None:
+    Player.movement_acceleration = preset.acceleration
+    Player.movement_max_speed = preset.max_speed
+    Player.movement_friction = preset.friction
+
+
 def main():
     pygame.init()
     try:
@@ -212,9 +267,17 @@ def main():
     pressed_keys: set[int] = set()
     game_state: GameState = STATE_MENU
     mode_options: list[tuple[str, GameMode]] = [("Classic", "classic")]
+    movement_presets = [
+        MovementPreset("Arcade Tight", 700, 220, 5.0),
+        MovementPreset("Balanced", 650, 250, 4.0),
+        MovementPreset("Floaty Classic", 450, 320, 2.0),
+    ]
     selected_mode_index = 0
+    selected_settings_index = 1
+    active_movement_preset_index = 1
     active_mode: GameMode | None = None
     session: GameSession | None = None
+    apply_movement_preset(movement_presets[active_movement_preset_index])
 
     print(f"Starting Asteroids with pygame version: {pygame.version.ver}")
     print(f"Screen width: {SCREEN_WIDTH}")
@@ -234,6 +297,9 @@ def main():
                 if game_state == STATE_MENU:
                     if event.key == pygame.K_ESCAPE:
                         return
+                    if event.key == pygame.K_TAB:
+                        selected_settings_index = active_movement_preset_index
+                        game_state = STATE_SETTINGS
                     if event.key == pygame.K_UP:
                         selected_mode_index = (selected_mode_index - 1) % len(
                             mode_options
@@ -248,6 +314,24 @@ def main():
                         pressed_keys.clear()
                         dt = 0.0
                         game_state = STATE_PLAYING
+
+                elif game_state == STATE_SETTINGS:
+                    if event.key == pygame.K_ESCAPE:
+                        game_state = STATE_MENU
+                    if event.key == pygame.K_UP:
+                        selected_settings_index = (
+                            selected_settings_index - 1
+                        ) % len(movement_presets)
+                    if event.key == pygame.K_DOWN:
+                        selected_settings_index = (
+                            selected_settings_index + 1
+                        ) % len(movement_presets)
+                    if event.key in (pygame.K_RETURN, pygame.K_KP_ENTER):
+                        active_movement_preset_index = selected_settings_index
+                        apply_movement_preset(
+                            movement_presets[active_movement_preset_index]
+                        )
+                        game_state = STATE_MENU
 
                 elif game_state == STATE_GAME_OVER:
                     if event.key == pygame.K_ESCAPE:
@@ -268,7 +352,27 @@ def main():
                 pressed_keys.discard(event.key)
 
         if game_state == STATE_MENU:
-            draw_menu(screen, title_font, body_font, mode_options, selected_mode_index)
+            draw_menu(
+                screen,
+                title_font,
+                body_font,
+                mode_options,
+                selected_mode_index,
+                movement_presets[active_movement_preset_index].label,
+            )
+            pygame.display.flip()
+            dt = clock.tick(60) / 1000
+            continue
+
+        if game_state == STATE_SETTINGS:
+            draw_settings(
+                screen,
+                title_font,
+                body_font,
+                movement_presets,
+                selected_settings_index,
+                active_movement_preset_index,
+            )
             pygame.display.flip()
             dt = clock.tick(60) / 1000
             continue

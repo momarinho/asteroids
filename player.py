@@ -3,11 +3,13 @@ import pygame
 from circleshape import CircleShape
 from constants import (
     LINE_WIDTH,
+    PLAYER_ACCELERATION,
+    PLAYER_FRICTION,
     PLAYER_INVULNERABLE_SECONDS,
+    PLAYER_MAX_SPEED,
     PLAYER_RADIUS,
     PLAYER_SHOOT_COOLDOWN_SECONDS,
     PLAYER_SHOOT_SPEED,
-    PLAYER_SPEED,
     PLAYER_TURN_SPEED,
 )
 from shot import Shot
@@ -15,6 +17,9 @@ from shot import Shot
 
 class Player(CircleShape):
     shoot_sound: pygame.mixer.Sound | None = None
+    movement_acceleration: float = PLAYER_ACCELERATION
+    movement_max_speed: float = PLAYER_MAX_SPEED
+    movement_friction: float = PLAYER_FRICTION
 
     def __init__(self, x: int, y: int) -> None:
         super().__init__(x, y, PLAYER_RADIUS)
@@ -25,11 +30,21 @@ class Player(CircleShape):
     def rotate(self, dt: float) -> None:
         self.rotation += PLAYER_TURN_SPEED * dt
 
+    def accelerate(self, dt: float, direction_multiplier: float = 1.0) -> None:
+        direction = pygame.Vector2(0, 1).rotate(self.rotation)
+        self.velocity += (
+            direction * self.movement_acceleration * direction_multiplier * dt
+        )
+
     def move(self, dt: float) -> None:
-        unit_vector = pygame.Vector2(0, 1)
-        rotated_vector = unit_vector.rotate(self.rotation)
-        rotated_with_speed_vector = rotated_vector * PLAYER_SPEED * dt
-        self.position += rotated_with_speed_vector
+        self.position += self.velocity * dt
+
+    def apply_friction(self, dt: float) -> None:
+        self.velocity *= max(0.0, 1 - self.movement_friction * dt)
+
+    def clamp_speed(self) -> None:
+        if self.velocity.length() > self.movement_max_speed:
+            self.velocity.scale_to_length(self.movement_max_speed)
 
     def shoot(self) -> None:
         if self.shoot_timer > 0:
@@ -82,10 +97,16 @@ class Player(CircleShape):
             self.rotate(-dt)
         if self._is_key_pressed(keys, pygame.K_d):
             self.rotate(dt)
+
         if self._is_key_pressed(keys, pygame.K_w):
-            self.move(dt)
+            self.accelerate(dt, 1.0)
         if self._is_key_pressed(keys, pygame.K_s):
-            self.move(-dt)
+            self.accelerate(dt, -1.0)
+
+        self.clamp_speed()
+        self.apply_friction(dt)
+        self.move(dt)
+
         if self._is_key_pressed(keys, pygame.K_SPACE):
             self.shoot()
 

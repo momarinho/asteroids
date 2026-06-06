@@ -119,7 +119,9 @@ Planned work:
 - Add a speed power-up.
 - Add unlockable ships with different stats.
 - Add ship classes with different strengths and weaknesses.
-- Add a between-wave shop.
+- Add a between-wave shop as a core progression system.
+- Add score or currency conversion for purchases between waves.
+- Add meaningful tradeoffs in the shop, such as offense vs defense vs mobility.
 - Add upgrade trees for weapons, movement, and defense.
 - Add achievements for survival time, accuracy, and combos.
 - Add persistent high scores saved to disk.
@@ -128,6 +130,7 @@ Stretch goals:
 
 - Add permanent unlocks across runs.
 - Add optional side objectives during a run.
+- Add reroll or limited-choice shop mechanics for stronger build identity.
 
 ## Sprint 7: UX, Accessibility, and Session Flow
 
