@@ -59,6 +59,9 @@ class Player(CircleShape):
         return [a, b, c]
 
     def draw(self, screen: pygame.Surface) -> None:
+        if self.is_invulnerable() and pygame.time.get_ticks() % 200 < 100:
+            return
+
         pygame.draw.polygon(
             screen,
             "white",

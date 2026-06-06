@@ -5,7 +5,7 @@ import pygame
 
 from asteroid import Asteroid
 from asteroidfield import AsteroidField
-from constants import ASTEROIDS_SCORE, PLAYER_LIVES, SCREEN_HEIGHT, SCREEN_WIDTH
+from constants import PLAYER_LIVES, SCREEN_HEIGHT, SCREEN_WIDTH
 from logger import log_event, log_state
 from player import Player
 from shot import Shot
@@ -154,17 +154,30 @@ def draw_hud(
 ) -> None:
     score_text = font.render(f"Score: {session.score}", True, "white")
     lives_text = font.render(f"Lives: {session.lives}", True, "white")
+    danger_text = font.render(
+        f"Danger: {session.asteroid_field.danger_level()}",
+        True,
+        "white",
+    )
 
     if session.player.shoot_timer > 0:
         cooldown_label = f"Cooldown: {session.player.shoot_timer:.2f}s"
     else:
         cooldown_label = "Cooldown: Ready"
 
+    if session.player.is_invulnerable():
+        invulnerable_label = f"Invulnerable: {session.player.invulnerable_timer:.1f}s"
+    else:
+        invulnerable_label = "Invulnerable: No"
+
     cooldown_text = font.render(cooldown_label, True, "white")
+    invulnerable_text = font.render(invulnerable_label, True, "white")
 
     screen.blit(score_text, (20, 20))
     screen.blit(lives_text, (20, 55))
     screen.blit(cooldown_text, (20, 90))
+    screen.blit(invulnerable_text, (20, 125))
+    screen.blit(danger_text, (20, 160))
 
 
 def load_sound(path: str) -> pygame.mixer.Sound | None:
