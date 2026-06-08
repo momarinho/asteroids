@@ -38,8 +38,10 @@ Planned work:
 
 - Add acceleration to the player movement.
 - Add thrust-based momentum with friction for a more arcade-like feel.
+- Make the objects wrap around the screen instead of disappearing (moved from Sprint 3).
 - Add a short dash move with cooldown.
 - Add collision damage states instead of instant game over.
+- Design an extensible weapon system framework to support future items/pickups.
 - Create different weapon types.
 - Add alternate fire modes like spread shot, laser, or charged shot.
 - Add bombs that can be dropped.
@@ -57,7 +59,6 @@ Goal: make each run last longer and become less predictable.
 
 Planned work:
 
-- Make the objects wrap around the screen instead of disappearing.
 - Add waves with brief breaks between them.
 - Add timed survival mode and endless mode.
 - Add asteroid sizes with different behaviors, not just different radii.
@@ -96,6 +97,7 @@ Goal: evolve the game beyond asteroid-only survival.
 
 Planned work:
 
+- Refactor entity structure to introduce a clean base class for AI/enemies.
 - Add enemy ships that shoot back.
 - Add small drones that chase the player.
 - Add enemies that spawn in formations.
@@ -138,6 +140,7 @@ Goal: make the game easier to use, revisit, and share.
 
 Planned work:
 
+- Refactor UI and state management into modular classes to keep main loop clean.
 - Add a main menu and pause menu.
 - Add a proper game state machine for menu, playing, paused, and game over.
 - Add a short playable tutorial.
@@ -176,7 +179,7 @@ Goal: prepare the codebase for larger features like online systems and multiplay
 
 Planned work:
 
-- Separate game logic into systems for input, movement, spawning, and collisions.
+- Consolidate game logic systems (input, movement, spawning, collisions) for multi-player readiness.
 - Add config constants for tuning difficulty without touching gameplay code.
 - Add automated tests for collision, splitting, and shot cooldown behavior.
 - Add debug overlays for FPS, sprite counts, and collision radii.

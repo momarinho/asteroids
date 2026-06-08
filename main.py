@@ -219,14 +219,22 @@ def draw_hud(
     else:
         invulnerable_label = "Invulnerable: No"
 
+    if session.player.dash_cooldown_timer > 0:
+        dash_label = f"Dash: {session.player.dash_cooldown_timer:.1f}s"
+    else:
+        dash_label = "Dash: Ready"
+
     cooldown_text = font.render(cooldown_label, True, "white")
     invulnerable_text = font.render(invulnerable_label, True, "white")
+    dash_text = font.render(dash_label, True, "white")
 
     screen.blit(score_text, (20, 20))
     screen.blit(lives_text, (20, 55))
     screen.blit(cooldown_text, (20, 90))
     screen.blit(invulnerable_text, (20, 125))
     screen.blit(danger_text, (20, 160))
+    screen.blit(dash_text, (20, 195))
+
 
 
 def load_sound(path: str) -> pygame.mixer.Sound | None:

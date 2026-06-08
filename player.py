@@ -11,6 +11,9 @@ from constants import (
     PLAYER_SHOOT_COOLDOWN_SECONDS,
     PLAYER_SHOOT_SPEED,
     PLAYER_TURN_SPEED,
+    PLAYER_DASH_SPEED,
+    PLAYER_DASH_DURATION_SECONDS,
+    PLAYER_DASH_COOLDOWN_SECONDS,
 )
 from shot import Shot
 
@@ -26,6 +29,11 @@ class Player(CircleShape):
         self.rotation = 0
         self.shoot_timer = 0.0
         self.invulnerable_timer = 0.0
+        self.dash_cooldown_timer = 0.0
+        self.dash_active_timer = 0.0
+        self.dash_direction = pygame.Vector2(0, 0)
+        self.dash_trail: list[list[pygame.Vector2]] = []
+
 
     def rotate(self, dt: float) -> None:
         self.rotation += PLAYER_TURN_SPEED * dt
@@ -73,7 +81,21 @@ class Player(CircleShape):
         c = self.position - forward * self.radius + right
         return [a, b, c]
 
+    def dash(self) -> None:
+        if self.dash_cooldown_timer > 0:
+            return
+
+        self.dash_active_timer = PLAYER_DASH_DURATION_SECONDS
+        self.dash_cooldown_timer = PLAYER_DASH_COOLDOWN_SECONDS
+        self.dash_direction = pygame.Vector2(0, 1).rotate(self.rotation).normalize()
+        self.invulnerable_timer = max(self.invulnerable_timer, PLAYER_DASH_DURATION_SECONDS)
+        self.dash_trail.clear()
+
     def draw(self, screen: pygame.Surface) -> None:
+        # Draw trailing dash ghosts
+        for points in self.dash_trail:
+            pygame.draw.polygon(screen, (80, 80, 80), points, 1)
+
         if self.is_invulnerable() and pygame.time.get_ticks() % 200 < 100:
             return
 
@@ -92,11 +114,31 @@ class Player(CircleShape):
 
         self.shoot_timer = max(0.0, self.shoot_timer - dt)
         self.invulnerable_timer = max(0.0, self.invulnerable_timer - dt)
+        self.dash_cooldown_timer = max(0.0, self.dash_cooldown_timer - dt)
+
+        # Handle active dash
+        if self.dash_active_timer > 0:
+            self.dash_active_timer = max(0.0, self.dash_active_timer - dt)
+            self.velocity = self.dash_direction * PLAYER_DASH_SPEED
+            self.move(dt)
+            self.wrap_around()
+            # Store the current triangle shape for the trail
+            self.dash_trail.append(self.triangle())
+            if len(self.dash_trail) > 5:
+                self.dash_trail.pop(0)
+            return
+
+        # Decay trail when not active
+        if self.dash_trail:
+            self.dash_trail.pop(0)
 
         if self._is_key_pressed(keys, pygame.K_a):
             self.rotate(-dt)
         if self._is_key_pressed(keys, pygame.K_d):
             self.rotate(dt)
+
+        if self._is_key_pressed(keys, pygame.K_LSHIFT):
+            self.dash()
 
         if self._is_key_pressed(keys, pygame.K_w):
             self.accelerate(dt, 1.0)
@@ -106,6 +148,7 @@ class Player(CircleShape):
         self.clamp_speed()
         self.apply_friction(dt)
         self.move(dt)
+        self.wrap_around()
 
         if self._is_key_pressed(keys, pygame.K_SPACE):
             self.shoot()

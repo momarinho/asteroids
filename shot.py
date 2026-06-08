@@ -20,6 +20,7 @@ class Shot(CircleShape):
 
     def update(self, dt: float, *_: object) -> None:
         self.position += self.velocity * dt
+        self.wrap_around()
         self.life_timer -= dt
 
         if self.life_timer <= 0:
