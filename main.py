@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from pathlib import Path
 from dataclasses import dataclass
 
@@ -244,7 +246,7 @@ def load_sound(path: str) -> pygame.mixer.Sound | None:
 
     try:
         return pygame.mixer.Sound(sound_path)
-    except pygame.error:
+    except (pygame.error, NotImplementedError):
         return None
 
 
