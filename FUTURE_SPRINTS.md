@@ -53,26 +53,41 @@ Stretch goals:
 - Add shotgun-style spread fire.
 - Add EMP blasts that slow or disable enemies.
 
-## Sprint 3: World Rules and Survival Depth
+## Sprint 3: Stage Mode & Level Progression
 
-Goal: make each run last longer and become less predictable.
+Goal: Move beyond a single endless mode and create the structural foundation for Campaign/Stage-based gameplay ("Modo Fases").
 
 Planned work:
 
-- Add waves with brief breaks between them.
-- Add timed survival mode and endless mode.
-- Add asteroid sizes with different behaviors, not just different radii.
-- Add rare special asteroids that split differently or drop power-ups.
-- Add explosive asteroids.
-- Add color variation by asteroid type or danger level.
+- Add a "Campaign/Stages" mode option to the menu.
+- Create a level management system (e.g., `LevelManager`) that loads level definitions (number/sizes of asteroids, target goals).
+- Implement level transition states (Victory/Level Clear screen) and level-clear conditions (e.g., all asteroids destroyed).
+- Support procedural level parameters (increasing asteroid count and speed per stage).
+- Add support for wave-based spawning within a single level.
 
 Stretch goals:
 
-- Add meteor showers that temporarily flood the map.
-- Add moving hazards like lasers, mines, or rotating barriers.
-- Add debris fields that block or absorb shots.
+- Add custom-tailored stage designs (e.g., starting with asteroids clustered in the corners).
+- Add stage-specific timers (e.g., survive for 60 seconds with rapid spawns).
 
-## Sprint 4: Visual and Audio Identity
+## Sprint 4: Inter-mission Shop & Power-Ups
+
+Goal: Build the progression loop by letting players spend currency earned during gameplay on weapons, upgrades, and power-ups between stages.
+
+Planned work:
+
+- Introduce game currency (e.g., space credits/scrap metal) dropped by asteroids or rewarded per level.
+- Build a Shop screen displayed between stages.
+- Support purchasing alternate weapons (Spread Shot, Rapid Fire, Bomb Launcher) in the shop.
+- Add upgrade trees for weapons (e.g., fire rate, shot speed, blast radius).
+- Add passive and active power-ups (e.g., Shield to absorb one hit, Scrap Magnet, Engine Overdrive for speed).
+
+Stretch goals:
+
+- Add shop reroll mechanics.
+- Add limited inventory slots or weight capacity to make build selection strategic.
+
+## Sprint 5: Visual and Audio Identity
 
 Goal: give the game a stronger look and clearer moment-to-moment feedback.
 
@@ -81,58 +96,31 @@ Planned work:
 - Add an explosion effect for the asteroids.
 - Add screen shake on large collisions or bomb detonations.
 - Add stars with parallax scrolling.
-- Add a background image.
 - Make the asteroids lumpy instead of perfectly round.
 - Add looping background music.
-- Add audio cues for low health, power-ups, and boss spawns.
+- Add audio cues for low health, power-ups, and shop purchases.
 
 Stretch goals:
 
 - Add a retro CRT shader or scanline overlay.
 - Add dynamic music intensity as the game gets harder.
 
-## Sprint 5: Enemies and PvE Expansion
+## Sprint 6: Enemies and PvE Hazards
 
 Goal: evolve the game beyond asteroid-only survival.
 
 Planned work:
 
 - Refactor entity structure to introduce a clean base class for AI/enemies.
-- Add enemy ships that shoot back.
-- Add small drones that chase the player.
-- Add enemies that spawn in formations.
-- Add elite enemies with unique movement patterns.
-- Add boss asteroids or mini-boss waves.
-- Add magnetic or gravity-based enemies that pull the player.
+- Add hostile alien ships that patrol and shoot back.
+- Add small chasing drones.
+- Add boss asteroids or mini-boss stages (e.g. Boss at Stage 5).
+- Add environmental hazards like space mines or laser gates.
 
 Stretch goals:
 
-- Add pirate ships that steal or destroy power-ups.
-- Add a defense mode where players protect a base or station.
 - Add boss rush mode.
-
-## Sprint 6: Power-Ups and Progression
-
-Goal: add build variety and reasons to keep playing.
-
-Planned work:
-
-- Add a shield power-up.
-- Add a speed power-up.
-- Add unlockable ships with different stats.
-- Add ship classes with different strengths and weaknesses.
-- Add a between-wave shop as a core progression system.
-- Add score or currency conversion for purchases between waves.
-- Add meaningful tradeoffs in the shop, such as offense vs defense vs mobility.
-- Add upgrade trees for weapons, movement, and defense.
-- Add achievements for survival time, accuracy, and combos.
-- Add persistent high scores saved to disk.
-
-Stretch goals:
-
-- Add permanent unlocks across runs.
-- Add optional side objectives during a run.
-- Add reroll or limited-choice shop mechanics for stronger build identity.
+- Add elite formations spawning randomly in stages.
 
 ## Sprint 7: UX, Accessibility, and Session Flow
 

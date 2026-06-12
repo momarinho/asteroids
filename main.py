@@ -11,6 +11,7 @@ from constants import PLAYER_LIVES, SCREEN_HEIGHT, SCREEN_WIDTH
 from logger import log_event, log_state
 from player import Player
 from shot import Shot
+from weapon import Weapon, Blaster, SpreadShot, RapidFire, BombLauncher
 
 GameState = str
 GameMode = str
@@ -42,18 +43,22 @@ class MovementPreset:
     friction: float
 
 
-def create_session(mode: GameMode) -> GameSession:
+def create_session(mode: GameMode, weapon_class: type[Weapon]) -> GameSession:
     asteroids = pygame.sprite.Group()
     shots = pygame.sprite.Group()
     updatable = pygame.sprite.Group()
     drawable = pygame.sprite.Group()
 
+    from bomb import Bomb, BombExplosion
     Player.containers = (updatable, drawable)
     Asteroid.containers = (asteroids, updatable, drawable)
     Shot.containers = (shots, updatable, drawable)
+    Bomb.containers = (updatable, drawable)
+    BombExplosion.containers = (updatable, drawable)
     AsteroidField.containers = updatable
 
     player = Player(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
+    player.set_weapon(weapon_class())
     asteroid_field = AsteroidField()
 
     return GameSession(
@@ -91,6 +96,7 @@ def draw_menu(
     modes: list[tuple[str, GameMode]],
     selected_index: int,
     movement_preset_label: str,
+    starting_weapon_label: str,
 ) -> None:
     screen.fill("black")
 
@@ -112,9 +118,10 @@ def draw_menu(
         screen,
         body_font,
         [
-            f"Movement preset: {movement_preset_label}",
+            f"Movement Preset: {movement_preset_label}",
+            f"Starting Weapon: {starting_weapon_label}",
             "Tab to open settings",
-            "Up/Down to select",
+            "Up/Down to select mode",
             "Enter to start",
             "Esc to quit",
         ],
@@ -128,32 +135,39 @@ def draw_settings(
     title_font: pygame.font.Font,
     body_font: pygame.font.Font,
     presets: list[MovementPreset],
-    selected_index: int,
-    active_index: int,
+    active_preset_index: int,
+    weapons: list[tuple[str, type[Weapon]]],
+    active_weapon_index: int,
+    selected_row: int,
 ) -> None:
     screen.fill("black")
     draw_centered_lines(
         screen,
         title_font,
-        ["Settings", "Movement Preset"],
+        ["Settings"],
         150,
         gap=8,
     )
 
-    preset_lines = []
-    for index, preset in enumerate(presets):
-        selected_prefix = ">" if index == selected_index else " "
-        active_suffix = " (Active)" if index == active_index else ""
-        preset_lines.append(f"{selected_prefix} {preset.label}{active_suffix}")
+    movement_label = presets[active_preset_index].label
+    weapon_label = weapons[active_weapon_index][0]
 
-    draw_centered_lines(screen, body_font, preset_lines, 280, gap=16)
+    row_0_prefix = "> " if selected_row == 0 else "  "
+    row_1_prefix = "> " if selected_row == 1 else "  "
+
+    settings_lines = [
+        f"{row_0_prefix}Movement Preset: < {movement_label} >",
+        f"{row_1_prefix}Starting Weapon: < {weapon_label} >",
+    ]
+
+    draw_centered_lines(screen, body_font, settings_lines, 280, gap=24)
     draw_centered_lines(
         screen,
         body_font,
         [
-            "Up/Down to choose",
-            "Enter to apply",
-            "Esc to return",
+            "Up/Down to select setting",
+            "Left/Right to change value",
+            "Esc to return to menu",
         ],
         500,
         gap=12,
@@ -273,6 +287,9 @@ def main():
     asteroid_split_sound = load_sound("assets/sounds/asteroid_split.wav")
     Player.shoot_sound = shoot_sound
 
+    from bomb import BombExplosion
+    BombExplosion.explosion_sound = player_hit_sound
+
     dt = 0.0
     pressed_keys: set[int] = set()
     game_state: GameState = STATE_MENU
@@ -282,9 +299,16 @@ def main():
         MovementPreset("Balanced", 650, 250, 4.0),
         MovementPreset("Floaty Classic", 450, 320, 2.0),
     ]
+    weapon_options: list[tuple[str, type[Weapon]]] = [
+        ("Blaster", Blaster),
+        ("Spread Shot", SpreadShot),
+        ("Rapid Fire", RapidFire),
+        ("Bomb Launcher", BombLauncher),
+    ]
     selected_mode_index = 0
-    selected_settings_index = 1
+    selected_settings_row = 0
     active_movement_preset_index = 1
+    active_weapon_index = 0
     active_mode: GameMode | None = None
     session: GameSession | None = None
     apply_movement_preset(movement_presets[active_movement_preset_index])
@@ -308,7 +332,7 @@ def main():
                     if event.key == pygame.K_ESCAPE:
                         return
                     if event.key == pygame.K_TAB:
-                        selected_settings_index = active_movement_preset_index
+                        selected_settings_row = 0
                         game_state = STATE_SETTINGS
                     if event.key == pygame.K_UP:
                         selected_mode_index = (selected_mode_index - 1) % len(
@@ -320,7 +344,7 @@ def main():
                         )
                     if event.key in (pygame.K_RETURN, pygame.K_KP_ENTER):
                         active_mode = mode_options[selected_mode_index][1]
-                        session = create_session(active_mode)
+                        session = create_session(active_mode, weapon_options[active_weapon_index][1])
                         pressed_keys.clear()
                         dt = 0.0
                         game_state = STATE_PLAYING
@@ -329,25 +353,39 @@ def main():
                     if event.key == pygame.K_ESCAPE:
                         game_state = STATE_MENU
                     if event.key == pygame.K_UP:
-                        selected_settings_index = (
-                            selected_settings_index - 1
-                        ) % len(movement_presets)
+                        selected_settings_row = (selected_settings_row - 1) % 2
                     if event.key == pygame.K_DOWN:
-                        selected_settings_index = (
-                            selected_settings_index + 1
-                        ) % len(movement_presets)
-                    if event.key in (pygame.K_RETURN, pygame.K_KP_ENTER):
-                        active_movement_preset_index = selected_settings_index
-                        apply_movement_preset(
-                            movement_presets[active_movement_preset_index]
-                        )
-                        game_state = STATE_MENU
+                        selected_settings_row = (selected_settings_row + 1) % 2
+                    if event.key == pygame.K_LEFT:
+                        if selected_settings_row == 0:
+                            active_movement_preset_index = (
+                                active_movement_preset_index - 1
+                            ) % len(movement_presets)
+                            apply_movement_preset(
+                                movement_presets[active_movement_preset_index]
+                            )
+                        elif selected_settings_row == 1:
+                            active_weapon_index = (
+                                active_weapon_index - 1
+                            ) % len(weapon_options)
+                    if event.key == pygame.K_RIGHT:
+                        if selected_settings_row == 0:
+                            active_movement_preset_index = (
+                                active_movement_preset_index + 1
+                            ) % len(movement_presets)
+                            apply_movement_preset(
+                                movement_presets[active_movement_preset_index]
+                            )
+                        elif selected_settings_row == 1:
+                            active_weapon_index = (
+                                active_weapon_index + 1
+                            ) % len(weapon_options)
 
                 elif game_state == STATE_GAME_OVER:
                     if event.key == pygame.K_ESCAPE:
                         return
                     if event.key == pygame.K_r and active_mode is not None:
-                        session = create_session(active_mode)
+                        session = create_session(active_mode, weapon_options[active_weapon_index][1])
                         pressed_keys.clear()
                         dt = 0.0
                         game_state = STATE_PLAYING
@@ -369,6 +407,7 @@ def main():
                 mode_options,
                 selected_mode_index,
                 movement_presets[active_movement_preset_index].label,
+                weapon_options[active_weapon_index][0],
             )
             pygame.display.flip()
             dt = clock.tick(60) / 1000
@@ -380,8 +419,10 @@ def main():
                 title_font,
                 body_font,
                 movement_presets,
-                selected_settings_index,
                 active_movement_preset_index,
+                weapon_options,
+                active_weapon_index,
+                selected_settings_row,
             )
             pygame.display.flip()
             dt = clock.tick(60) / 1000

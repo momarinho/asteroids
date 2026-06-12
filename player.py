@@ -18,6 +18,7 @@ from constants import (
     PLAYER_DASH_COOLDOWN_SECONDS,
 )
 from shot import Shot
+from weapon import Weapon, Blaster
 
 
 class Player(CircleShape):
@@ -35,6 +36,12 @@ class Player(CircleShape):
         self.dash_active_timer = 0.0
         self.dash_direction = pygame.Vector2(0, 0)
         self.dash_trail: list[list[pygame.Vector2]] = []
+        self.weapon: Weapon = Blaster()
+        self.muzzle_flash_timer = 0.0
+        self.muzzle_flash_size = 0.0
+
+    def set_weapon(self, weapon: Weapon) -> None:
+        self.weapon = weapon
 
 
     def rotate(self, dt: float) -> None:
@@ -60,11 +67,18 @@ class Player(CircleShape):
         if self.shoot_timer > 0:
             return
 
-        self.shoot_timer = PLAYER_SHOOT_COOLDOWN_SECONDS
-        shot = Shot(self.position.x, self.position.y)
-        shot.velocity = pygame.Vector2(0, 1).rotate(self.rotation) * PLAYER_SHOOT_SPEED
-        if self.shoot_sound is not None:
-            self.shoot_sound.play()
+        if self.weapon.fire(self):
+            self.shoot_timer = self.weapon.cooldown
+            # Apply physical recoil pushing the player backwards
+            direction = pygame.Vector2(0, 1).rotate(self.rotation)
+            self.velocity -= direction * self.weapon.recoil
+            
+            # Set muzzle flash visual effect
+            self.muzzle_flash_timer = 0.08
+            self.muzzle_flash_size = self.weapon.muzzle_flash_size
+
+            if self.shoot_sound is not None:
+                self.shoot_sound.play()
 
     def _is_key_pressed(
         self,
@@ -98,15 +112,21 @@ class Player(CircleShape):
         for points in self.dash_trail:
             pygame.draw.polygon(screen, (80, 80, 80), points, 1)
 
-        if self.is_invulnerable() and pygame.time.get_ticks() % 200 < 100:
-            return
+        # Draw ship if not blinking from invulnerability
+        if not (self.is_invulnerable() and pygame.time.get_ticks() % 200 < 100):
+            pygame.draw.polygon(
+                screen,
+                "white",
+                self.triangle(),
+                LINE_WIDTH,
+            )
 
-        pygame.draw.polygon(
-            screen,
-            "white",
-            self.triangle(),
-            LINE_WIDTH,
-        )
+        # Draw muzzle flash visual effect
+        if self.muzzle_flash_timer > 0:
+            forward = pygame.Vector2(0, 1).rotate(self.rotation)
+            tip = self.position + forward * self.radius
+            pygame.draw.circle(screen, "yellow", tip, self.muzzle_flash_size)
+            pygame.draw.circle(screen, "white", tip, self.muzzle_flash_size * 0.5)
 
     def update(
         self, dt: float, keys: pygame.key.ScancodeWrapper | set[int] | None = None
@@ -117,6 +137,7 @@ class Player(CircleShape):
         self.shoot_timer = max(0.0, self.shoot_timer - dt)
         self.invulnerable_timer = max(0.0, self.invulnerable_timer - dt)
         self.dash_cooldown_timer = max(0.0, self.dash_cooldown_timer - dt)
+        self.muzzle_flash_timer = max(0.0, self.muzzle_flash_timer - dt)
 
         # Handle active dash
         if self.dash_active_timer > 0:
