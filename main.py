@@ -1,7 +1,8 @@
 from __future__ import annotations
 
-from pathlib import Path
+from collections.abc import Callable
 from dataclasses import dataclass
+from pathlib import Path
 
 import pygame
 
@@ -11,7 +12,8 @@ from constants import PLAYER_LIVES, SCREEN_HEIGHT, SCREEN_WIDTH
 from logger import log_event, log_state
 from player import Player
 from shot import Shot
-from weapon import Weapon, Blaster, SpreadShot, RapidFire, BombLauncher
+from weapon import Blaster, BombLauncher, RapidFire, SpreadShot, Weapon
+from level_manager import LevelManager
 
 GameState = str
 GameMode = str
@@ -20,6 +22,7 @@ STATE_MENU: GameState = "menu"
 STATE_SETTINGS: GameState = "settings"
 STATE_PLAYING: GameState = "playing"
 STATE_GAME_OVER: GameState = "game_over"
+STATE_STAGE_CLEAR: GameState = "stage_clear"
 
 
 @dataclass
@@ -33,6 +36,8 @@ class GameSession:
     asteroid_field: AsteroidField
     score: int
     lives: int
+    current_level: int = 1
+    credits: int = 0
 
 
 @dataclass(frozen=True)
@@ -43,13 +48,14 @@ class MovementPreset:
     friction: float
 
 
-def create_session(mode: GameMode, weapon_class: type[Weapon]) -> GameSession:
+def create_session(mode: GameMode, weapon_class: Callable[[], Weapon]) -> GameSession:
     asteroids = pygame.sprite.Group()
     shots = pygame.sprite.Group()
     updatable = pygame.sprite.Group()
     drawable = pygame.sprite.Group()
 
     from bomb import Bomb, BombExplosion
+
     Player.containers = (updatable, drawable)
     Asteroid.containers = (asteroids, updatable, drawable)
     Shot.containers = (shots, updatable, drawable)
@@ -59,7 +65,7 @@ def create_session(mode: GameMode, weapon_class: type[Weapon]) -> GameSession:
 
     player = Player(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
     player.set_weapon(weapon_class())
-    asteroid_field = AsteroidField()
+    asteroid_field = AsteroidField(mode)
 
     return GameSession(
         mode=mode,
@@ -71,6 +77,8 @@ def create_session(mode: GameMode, weapon_class: type[Weapon]) -> GameSession:
         asteroid_field=asteroid_field,
         score=0,
         lives=PLAYER_LIVES,
+        current_level=1,
+        credits=0,
     )
 
 
@@ -136,7 +144,7 @@ def draw_settings(
     body_font: pygame.font.Font,
     presets: list[MovementPreset],
     active_preset_index: int,
-    weapons: list[tuple[str, type[Weapon]]],
+    weapons: list[tuple[str, Callable[[], Weapon]]],
     active_weapon_index: int,
     selected_row: int,
 ) -> None:
@@ -202,6 +210,38 @@ def draw_game_over(
     )
 
 
+def draw_stage_clear(
+    screen: pygame.Surface,
+    title_font: pygame.font.Font,
+    body_font: pygame.font.Font,
+    level_manager: LevelManager,
+) -> None:
+    screen.fill("black")
+    draw_centered_lines(
+        screen,
+        title_font,
+        [f"Stage {level_manager.current_level} Clear!"],
+        160,
+        gap=12,
+    )
+    draw_centered_lines(
+        screen,
+        body_font,
+        [
+            f"Current Score: {level_manager.session.score}",
+            f"Stage Clear Bonus: +{level_manager.stage_clear_bonus} credits",
+            f"Remaining Lives Bonus: +{level_manager.lives_bonus} credits",
+            f"Total Credits Earned: +{level_manager.bonus_credits} credits",
+            f"Total Credits: {level_manager.session.credits}",
+            "",
+            "Press Enter to proceed to the next stage",
+            "Press Esc to return to the menu",
+        ],
+        260,
+        gap=14,
+    )
+
+
 def mode_label_from_value(
     modes: list[tuple[str, GameMode]], mode: GameMode | None
 ) -> str:
@@ -251,6 +291,11 @@ def draw_hud(
     screen.blit(danger_text, (20, 160))
     screen.blit(dash_text, (20, 195))
 
+    if session.mode == "campaign":
+        stage_text = font.render(f"Stage: {session.current_level}", True, "white")
+        credits_text = font.render(f"Credits: {session.credits}", True, "white")
+        screen.blit(stage_text, (20, 230))
+        screen.blit(credits_text, (20, 265))
 
 
 def load_sound(path: str) -> pygame.mixer.Sound | None:
@@ -288,18 +333,22 @@ def main():
     Player.shoot_sound = shoot_sound
 
     from bomb import BombExplosion
+
     BombExplosion.explosion_sound = player_hit_sound
 
     dt = 0.0
     pressed_keys: set[int] = set()
     game_state: GameState = STATE_MENU
-    mode_options: list[tuple[str, GameMode]] = [("Classic", "classic")]
+    mode_options: list[tuple[str, GameMode]] = [
+        ("Classic", "classic"),
+        ("Campaign", "campaign"),
+    ]
     movement_presets = [
         MovementPreset("Arcade Tight", 700, 220, 5.0),
         MovementPreset("Balanced", 650, 250, 4.0),
         MovementPreset("Floaty Classic", 450, 320, 2.0),
     ]
-    weapon_options: list[tuple[str, type[Weapon]]] = [
+    weapon_options: list[tuple[str, Callable[[], Weapon]]] = [
         ("Blaster", Blaster),
         ("Spread Shot", SpreadShot),
         ("Rapid Fire", RapidFire),
@@ -311,6 +360,7 @@ def main():
     active_weapon_index = 0
     active_mode: GameMode | None = None
     session: GameSession | None = None
+    level_manager: LevelManager | None = None
     apply_movement_preset(movement_presets[active_movement_preset_index])
 
     print(f"Starting Asteroids with pygame version: {pygame.version.ver}")
@@ -344,7 +394,13 @@ def main():
                         )
                     if event.key in (pygame.K_RETURN, pygame.K_KP_ENTER):
                         active_mode = mode_options[selected_mode_index][1]
-                        session = create_session(active_mode, weapon_options[active_weapon_index][1])
+                        session = create_session(
+                            active_mode, weapon_options[active_weapon_index][1]
+                        )
+                        if active_mode == "campaign" and session is not None:
+                            level_manager = LevelManager(session)
+                        else:
+                            level_manager = None
                         pressed_keys.clear()
                         dt = 0.0
                         game_state = STATE_PLAYING
@@ -365,9 +421,9 @@ def main():
                                 movement_presets[active_movement_preset_index]
                             )
                         elif selected_settings_row == 1:
-                            active_weapon_index = (
-                                active_weapon_index - 1
-                            ) % len(weapon_options)
+                            active_weapon_index = (active_weapon_index - 1) % len(
+                                weapon_options
+                            )
                     if event.key == pygame.K_RIGHT:
                         if selected_settings_row == 0:
                             active_movement_preset_index = (
@@ -377,21 +433,51 @@ def main():
                                 movement_presets[active_movement_preset_index]
                             )
                         elif selected_settings_row == 1:
-                            active_weapon_index = (
-                                active_weapon_index + 1
-                            ) % len(weapon_options)
+                            active_weapon_index = (active_weapon_index + 1) % len(
+                                weapon_options
+                            )
+
+                elif game_state == STATE_PLAYING:
+                    if active_mode == "campaign" and event.key == pygame.K_k:
+                        # QA Cheat key to instantly kill all active asteroids
+                        if session is not None:
+                            for asteroid in list(session.asteroids):
+                                asteroid.kill()
+
+                elif game_state == STATE_STAGE_CLEAR:
+                    if event.key == pygame.K_ESCAPE:
+                        session = None
+                        active_mode = None
+                        level_manager = None
+                        pressed_keys.clear()
+                        dt = 0.0
+                        game_state = STATE_MENU
+                    elif event.key in (pygame.K_RETURN, pygame.K_KP_ENTER):
+                        if level_manager is not None and session is not None:
+                            level_manager.advance_level()
+                            session.player.respawn(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
+                            pressed_keys.clear()
+                            dt = 0.0
+                            game_state = STATE_PLAYING
 
                 elif game_state == STATE_GAME_OVER:
                     if event.key == pygame.K_ESCAPE:
                         return
                     if event.key == pygame.K_r and active_mode is not None:
-                        session = create_session(active_mode, weapon_options[active_weapon_index][1])
+                        session = create_session(
+                            active_mode, weapon_options[active_weapon_index][1]
+                        )
+                        if active_mode == "campaign" and session is not None:
+                            level_manager = LevelManager(session)
+                        else:
+                            level_manager = None
                         pressed_keys.clear()
                         dt = 0.0
                         game_state = STATE_PLAYING
                     if event.key == pygame.K_m:
                         session = None
                         active_mode = None
+                        level_manager = None
                         pressed_keys.clear()
                         dt = 0.0
                         game_state = STATE_MENU
@@ -439,6 +525,13 @@ def main():
             dt = clock.tick(60) / 1000
             continue
 
+        if game_state == STATE_STAGE_CLEAR:
+            if level_manager is not None:
+                draw_stage_clear(screen, title_font, body_font, level_manager)
+            pygame.display.flip()
+            dt = clock.tick(60) / 1000
+            continue
+
         if session is None:
             game_state = STATE_MENU
             dt = clock.tick(60) / 1000
@@ -446,6 +539,14 @@ def main():
 
         screen.fill("black")
         session.updatable.update(dt, pressed_keys)
+
+        if active_mode == "campaign" and level_manager is not None:
+            level_manager.update(dt)
+            if level_manager.state == "stage_clear":
+                game_state = STATE_STAGE_CLEAR
+                pressed_keys.clear()
+                dt = clock.tick(60) / 1000
+                continue
 
         player_destroyed = False
         for asteroid in session.asteroids.copy():

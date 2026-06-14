@@ -6,6 +6,9 @@ from circleshape import CircleShape
 from constants import (
     LINE_WIDTH,
     PLAYER_ACCELERATION,
+    PLAYER_DASH_COOLDOWN_SECONDS,
+    PLAYER_DASH_DURATION_SECONDS,
+    PLAYER_DASH_SPEED,
     PLAYER_FRICTION,
     PLAYER_INVULNERABLE_SECONDS,
     PLAYER_MAX_SPEED,
@@ -13,12 +16,9 @@ from constants import (
     PLAYER_SHOOT_COOLDOWN_SECONDS,
     PLAYER_SHOOT_SPEED,
     PLAYER_TURN_SPEED,
-    PLAYER_DASH_SPEED,
-    PLAYER_DASH_DURATION_SECONDS,
-    PLAYER_DASH_COOLDOWN_SECONDS,
 )
 from shot import Shot
-from weapon import Weapon, Blaster
+from weapon import Blaster, Weapon
 
 
 class Player(CircleShape):
@@ -42,7 +42,6 @@ class Player(CircleShape):
 
     def set_weapon(self, weapon: Weapon) -> None:
         self.weapon = weapon
-
 
     def rotate(self, dt: float) -> None:
         self.rotation += PLAYER_TURN_SPEED * dt
@@ -72,7 +71,7 @@ class Player(CircleShape):
             # Apply physical recoil pushing the player backwards
             direction = pygame.Vector2(0, 1).rotate(self.rotation)
             self.velocity -= direction * self.weapon.recoil
-            
+
             # Set muzzle flash visual effect
             self.muzzle_flash_timer = 0.08
             self.muzzle_flash_size = self.weapon.muzzle_flash_size
@@ -104,7 +103,9 @@ class Player(CircleShape):
         self.dash_active_timer = PLAYER_DASH_DURATION_SECONDS
         self.dash_cooldown_timer = PLAYER_DASH_COOLDOWN_SECONDS
         self.dash_direction = pygame.Vector2(0, 1).rotate(self.rotation).normalize()
-        self.invulnerable_timer = max(self.invulnerable_timer, PLAYER_DASH_DURATION_SECONDS)
+        self.invulnerable_timer = max(
+            self.invulnerable_timer, PLAYER_DASH_DURATION_SECONDS
+        )
         self.dash_trail.clear()
 
     def draw(self, screen: pygame.Surface) -> None:
@@ -155,17 +156,17 @@ class Player(CircleShape):
         if self.dash_trail:
             self.dash_trail.pop(0)
 
-        if self._is_key_pressed(keys, pygame.K_a):
+        if self._is_key_pressed(keys, pygame.K_LEFT):
             self.rotate(-dt)
-        if self._is_key_pressed(keys, pygame.K_d):
+        if self._is_key_pressed(keys, pygame.K_RIGHT):
             self.rotate(dt)
 
         if self._is_key_pressed(keys, pygame.K_LSHIFT):
             self.dash()
 
-        if self._is_key_pressed(keys, pygame.K_w):
+        if self._is_key_pressed(keys, pygame.K_UP):
             self.accelerate(dt, 1.0)
-        if self._is_key_pressed(keys, pygame.K_s):
+        if self._is_key_pressed(keys, pygame.K_DOWN):
             self.accelerate(dt, -1.0)
 
         self.clamp_speed()

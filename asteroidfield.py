@@ -46,8 +46,9 @@ class AsteroidField(pygame.sprite.Sprite):
         ),
     ]
 
-    def __init__(self) -> None:
+    def __init__(self, mode: str = "classic") -> None:
         pygame.sprite.Sprite.__init__(self, self.containers)
+        self.mode = mode
         self.spawn_timer = 0.0
         self.difficulty_timer = 0.0
         self.spawn_rate_multiplier = 1.0
@@ -60,6 +61,8 @@ class AsteroidField(pygame.sprite.Sprite):
         asteroid.velocity = velocity
 
     def update(self, dt: float, *_: object) -> None:
+        if self.mode == "campaign":
+            return
         self.spawn_timer += dt
         self.difficulty_timer += dt
 
