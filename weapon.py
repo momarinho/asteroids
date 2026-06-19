@@ -14,10 +14,24 @@ class Weapon:
         self.cooldown = cooldown
         self.recoil = recoil
         self.muzzle_flash_size = muzzle_flash_size
+        self.level = 1
+        self.max_level = 3
 
     def fire(self, player: Player) -> bool:
         """Fires the weapon. Returns True if successfully fired."""
         raise NotImplementedError
+
+    def upgrade(self) -> bool:
+        """Upgrades the weapon level. Returns True if successfully upgraded."""
+        if self.level >= self.max_level:
+            return False
+        self.level += 1
+        self.apply_upgrade_stats()
+        return True
+
+    def apply_upgrade_stats(self) -> None:
+        """Overridden by subclasses to apply stat boosts per level."""
+        pass
 
 
 class Blaster(Weapon):
@@ -28,6 +42,14 @@ class Blaster(Weapon):
         shot = Shot(player.position.x, player.position.y)
         shot.velocity = pygame.Vector2(0, 1).rotate(player.rotation) * PLAYER_SHOOT_SPEED
         return True
+
+    def apply_upgrade_stats(self) -> None:
+        if self.level == 2:
+            self.cooldown = PLAYER_SHOOT_COOLDOWN_SECONDS * 0.75
+            self.recoil = 18.0
+        elif self.level == 3:
+            self.cooldown = PLAYER_SHOOT_COOLDOWN_SECONDS * 0.5
+            self.recoil = 10.0
 
 
 class SpreadShot(Weapon):
@@ -41,8 +63,18 @@ class SpreadShot(Weapon):
             # Shotgun stats: smaller shots and half range (lifetime)
             shot.radius = 4
             shot.life_timer = 0.6
-            shot.velocity = pygame.Vector2(0, 1).rotate(player.rotation + angle) * (PLAYER_SHOOT_SPEED * 0.9)
+            # Scale shot speed slightly at higher levels
+            speed_multiplier = 1.0 + (self.level - 1) * 0.1
+            shot.velocity = pygame.Vector2(0, 1).rotate(player.rotation + angle) * (PLAYER_SHOOT_SPEED * 0.9 * speed_multiplier)
         return True
+
+    def apply_upgrade_stats(self) -> None:
+        if self.level == 2:
+            self.cooldown = 0.4
+            self.recoil = 40.0
+        elif self.level == 3:
+            self.cooldown = 0.3
+            self.recoil = 25.0
 
 
 class RapidFire(Weapon):
@@ -57,6 +89,14 @@ class RapidFire(Weapon):
         shot.velocity = pygame.Vector2(0, 1).rotate(player.rotation) * PLAYER_SHOOT_SPEED
         return True
 
+    def apply_upgrade_stats(self) -> None:
+        if self.level == 2:
+            self.cooldown = 0.10
+            self.recoil = 8.0
+        elif self.level == 3:
+            self.cooldown = 0.06
+            self.recoil = 4.0
+
 
 class BombLauncher(Weapon):
     def __init__(self) -> None:
@@ -66,3 +106,11 @@ class BombLauncher(Weapon):
         direction = pygame.Vector2(0, 1).rotate(player.rotation)
         Bomb(player.position.x, player.position.y, direction)
         return True
+
+    def apply_upgrade_stats(self) -> None:
+        if self.level == 2:
+            self.cooldown = 1.1
+            self.recoil = 90.0
+        elif self.level == 3:
+            self.cooldown = 0.8
+            self.recoil = 50.0

@@ -39,6 +39,7 @@ class Player(CircleShape):
         self.weapon: Weapon = Blaster()
         self.muzzle_flash_timer = 0.0
         self.muzzle_flash_size = 0.0
+        self.unlocked_weapons: dict[str, Weapon] = {"blaster": self.weapon}
 
     def set_weapon(self, weapon: Weapon) -> None:
         self.weapon = weapon
@@ -176,6 +177,16 @@ class Player(CircleShape):
 
         if self._is_key_pressed(keys, pygame.K_SPACE):
             self.shoot()
+
+        # Weapon switching controls
+        if self._is_key_pressed(keys, pygame.K_1) and "blaster" in self.unlocked_weapons:
+            self.set_weapon(self.unlocked_weapons["blaster"])
+        if self._is_key_pressed(keys, pygame.K_2) and "spread_shot" in self.unlocked_weapons:
+            self.set_weapon(self.unlocked_weapons["spread_shot"])
+        if self._is_key_pressed(keys, pygame.K_3) and "rapid_fire" in self.unlocked_weapons:
+            self.set_weapon(self.unlocked_weapons["rapid_fire"])
+        if self._is_key_pressed(keys, pygame.K_4) and "bomb_launcher" in self.unlocked_weapons:
+            self.set_weapon(self.unlocked_weapons["bomb_launcher"])
 
     def respawn(self, x: float, y: float) -> None:
         self.position = pygame.Vector2(x, y)

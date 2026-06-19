@@ -14,6 +14,7 @@ from player import Player
 from shot import Shot
 from weapon import Blaster, BombLauncher, RapidFire, SpreadShot, Weapon
 from level_manager import LevelManager
+from shop import Shop
 
 GameState = str
 GameMode = str
@@ -23,6 +24,7 @@ STATE_SETTINGS: GameState = "settings"
 STATE_PLAYING: GameState = "playing"
 STATE_GAME_OVER: GameState = "game_over"
 STATE_STAGE_CLEAR: GameState = "stage_clear"
+STATE_SHOP: GameState = "shop"
 
 
 @dataclass
@@ -361,6 +363,7 @@ def main():
     active_mode: GameMode | None = None
     session: GameSession | None = None
     level_manager: LevelManager | None = None
+    shop: Shop | None = None
     apply_movement_preset(movement_presets[active_movement_preset_index])
 
     print(f"Starting Asteroids with pygame version: {pygame.version.ver}")
@@ -394,8 +397,9 @@ def main():
                         )
                     if event.key in (pygame.K_RETURN, pygame.K_KP_ENTER):
                         active_mode = mode_options[selected_mode_index][1]
+                        starting_weapon = weapon_options[0][1] if active_mode == "campaign" else weapon_options[active_weapon_index][1]
                         session = create_session(
-                            active_mode, weapon_options[active_weapon_index][1]
+                            active_mode, starting_weapon
                         )
                         if active_mode == "campaign" and session is not None:
                             level_manager = LevelManager(session)
@@ -454,18 +458,39 @@ def main():
                         game_state = STATE_MENU
                     elif event.key in (pygame.K_RETURN, pygame.K_KP_ENTER):
                         if level_manager is not None and session is not None:
-                            level_manager.advance_level()
-                            session.player.respawn(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
+                            shop = Shop(session)
+                            game_state = STATE_SHOP
                             pressed_keys.clear()
                             dt = 0.0
-                            game_state = STATE_PLAYING
+
+                elif game_state == STATE_SHOP:
+                    if event.key == pygame.K_ESCAPE:
+                        session = None
+                        active_mode = None
+                        level_manager = None
+                        shop = None
+                        pressed_keys.clear()
+                        dt = 0.0
+                        game_state = STATE_MENU
+                    elif event.key in (pygame.K_UP, pygame.K_DOWN, pygame.K_RETURN, pygame.K_KP_ENTER, pygame.K_c):
+                        if shop is not None:
+                            action = shop.handle_input(event.key)
+                            if action == "proceed":
+                                if level_manager is not None and session is not None:
+                                    level_manager.advance_level()
+                                    session.player.respawn(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
+                                    shop = None
+                                    pressed_keys.clear()
+                                    dt = 0.0
+                                    game_state = STATE_PLAYING
 
                 elif game_state == STATE_GAME_OVER:
                     if event.key == pygame.K_ESCAPE:
                         return
                     if event.key == pygame.K_r and active_mode is not None:
+                        starting_weapon = weapon_options[0][1] if active_mode == "campaign" else weapon_options[active_weapon_index][1]
                         session = create_session(
-                            active_mode, weapon_options[active_weapon_index][1]
+                            active_mode, starting_weapon
                         )
                         if active_mode == "campaign" and session is not None:
                             level_manager = LevelManager(session)
@@ -478,6 +503,7 @@ def main():
                         session = None
                         active_mode = None
                         level_manager = None
+                        shop = None
                         pressed_keys.clear()
                         dt = 0.0
                         game_state = STATE_MENU
@@ -528,6 +554,13 @@ def main():
         if game_state == STATE_STAGE_CLEAR:
             if level_manager is not None:
                 draw_stage_clear(screen, title_font, body_font, level_manager)
+            pygame.display.flip()
+            dt = clock.tick(60) / 1000
+            continue
+
+        if game_state == STATE_SHOP:
+            if shop is not None:
+                shop.draw(screen, title_font, body_font)
             pygame.display.flip()
             dt = clock.tick(60) / 1000
             continue
