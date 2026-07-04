@@ -11,3 +11,22 @@ game_events.jsonl
 
 # Virtual environments
 .venv
+
+# Flutter/Dart files
+.dart_tool/
+.flutter-plugins-dependencies
+.metadata
+*.iml
+.idea/
+
+# Android/iOS/Desktop local build files
+build/
+linux/flutter/
+windows/flutter/
+macos/flutter/
+
+# Go backend binary & logs
+go-backend/go-backend
+go-backend.db
+go-backend.db-journal
+go-backend.log

@@ -55,8 +55,21 @@ class BombExplosion(CircleShape):
         if self.explosion_sound is not None:
             self.explosion_sound.play()
 
+        # Trigger screen shake!
+        from screen_shake import trigger_screen_shake
+        trigger_screen_shake(0.5, 15.0)
+
+        # Spawn fire/explosion particles!
+        import random
+        from particle import spawn_explosion
+        colors = ["red", "orange", "yellow", "gray"]
+        for _ in range(40):
+            color = random.choice(colors)
+            spawn_explosion(self.position.x, self.position.y, num_particles=1, color=color, size=random.uniform(3.0, 6.0), speed_range=(50, 300))
+
         # Split/destroy asteroids in radius immediately
         from asteroid import Asteroid
+
         if hasattr(Asteroid, "containers") and Asteroid.containers:
             asteroids_group = Asteroid.containers[0]
             for asteroid in list(asteroids_group):

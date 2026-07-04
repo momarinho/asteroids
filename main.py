@@ -57,12 +57,14 @@ def create_session(mode: GameMode, weapon_class: Callable[[], Weapon]) -> GameSe
     drawable = pygame.sprite.Group()
 
     from bomb import Bomb, BombExplosion
+    from particle import Particle
 
     Player.containers = (updatable, drawable)
     Asteroid.containers = (asteroids, updatable, drawable)
     Shot.containers = (shots, updatable, drawable)
     Bomb.containers = (updatable, drawable)
     BombExplosion.containers = (updatable, drawable)
+    Particle.containers = (updatable, drawable)
     AsteroidField.containers = updatable
 
     player = Player(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
@@ -311,6 +313,21 @@ def load_sound(path: str) -> pygame.mixer.Sound | None:
         return None
 
 
+def play_music() -> None:
+    try:
+        pygame.mixer.music.load("assets/sounds/music.wav")
+        pygame.mixer.music.play(-1)
+    except pygame.error:
+        pass
+
+
+def stop_music() -> None:
+    try:
+        pygame.mixer.music.stop()
+    except pygame.error:
+        pass
+
+
 def apply_movement_preset(preset: MovementPreset) -> None:
     Player.movement_acceleration = preset.acceleration
     Player.movement_max_speed = preset.max_speed
@@ -318,6 +335,9 @@ def apply_movement_preset(preset: MovementPreset) -> None:
 
 
 def main():
+    from sound_generator import generate_all_missing_sounds
+    generate_all_missing_sounds()
+
     pygame.init()
     try:
         pygame.mixer.init()
@@ -329,14 +349,24 @@ def main():
     clock = pygame.time.Clock()
     title_font = pygame.font.Font(None, 72)
     body_font = pygame.font.Font(None, 36)
+    
     shoot_sound = load_sound("assets/sounds/shoot.wav")
     player_hit_sound = load_sound("assets/sounds/player_hit.wav")
     asteroid_split_sound = load_sound("assets/sounds/asteroid_split.wav")
+    low_health_sound = load_sound("assets/sounds/low_health.wav")
+    purchase_sound = load_sound("assets/sounds/purchase.wav")
+    powerup_sound = load_sound("assets/sounds/powerup.wav")
+
     Player.shoot_sound = shoot_sound
+    Shop.purchase_sound = purchase_sound
+    Shop.powerup_sound = powerup_sound
 
     from bomb import BombExplosion
-
     BombExplosion.explosion_sound = player_hit_sound
+
+    from background import BackgroundStars
+    background_stars = BackgroundStars(80)
+    game_surface = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
 
     dt = 0.0
     pressed_keys: set[int] = set()
@@ -365,6 +395,9 @@ def main():
     level_manager: LevelManager | None = None
     shop: Shop | None = None
     apply_movement_preset(movement_presets[active_movement_preset_index])
+    
+    low_health_warn_timer = 0.0
+
 
     print(f"Starting Asteroids with pygame version: {pygame.version.ver}")
     print(f"Screen width: {SCREEN_WIDTH}")
@@ -408,6 +441,7 @@ def main():
                         pressed_keys.clear()
                         dt = 0.0
                         game_state = STATE_PLAYING
+                        play_music()
 
                 elif game_state == STATE_SETTINGS:
                     if event.key == pygame.K_ESCAPE:
@@ -456,6 +490,7 @@ def main():
                         pressed_keys.clear()
                         dt = 0.0
                         game_state = STATE_MENU
+                        stop_music()
                     elif event.key in (pygame.K_RETURN, pygame.K_KP_ENTER):
                         if level_manager is not None and session is not None:
                             shop = Shop(session)
@@ -472,6 +507,7 @@ def main():
                         pressed_keys.clear()
                         dt = 0.0
                         game_state = STATE_MENU
+                        stop_music()
                     elif event.key in (pygame.K_UP, pygame.K_DOWN, pygame.K_RETURN, pygame.K_KP_ENTER, pygame.K_c):
                         if shop is not None:
                             action = shop.handle_input(event.key)
@@ -499,6 +535,7 @@ def main():
                         pressed_keys.clear()
                         dt = 0.0
                         game_state = STATE_PLAYING
+                        play_music()
                     if event.key == pygame.K_m:
                         session = None
                         active_mode = None
@@ -507,11 +544,14 @@ def main():
                         pressed_keys.clear()
                         dt = 0.0
                         game_state = STATE_MENU
+                        stop_music()
 
             if event.type == pygame.KEYUP:
                 pressed_keys.discard(event.key)
 
         if game_state == STATE_MENU:
+            screen.fill("black")
+            background_stars.draw(screen)
             draw_menu(
                 screen,
                 title_font,
@@ -526,6 +566,8 @@ def main():
             continue
 
         if game_state == STATE_SETTINGS:
+            screen.fill("black")
+            background_stars.draw(screen)
             draw_settings(
                 screen,
                 title_font,
@@ -541,6 +583,8 @@ def main():
             continue
 
         if game_state == STATE_GAME_OVER:
+            screen.fill("black")
+            background_stars.draw(screen)
             draw_game_over(
                 screen,
                 title_font,
@@ -552,6 +596,8 @@ def main():
             continue
 
         if game_state == STATE_STAGE_CLEAR:
+            screen.fill("black")
+            background_stars.draw(screen)
             if level_manager is not None:
                 draw_stage_clear(screen, title_font, body_font, level_manager)
             pygame.display.flip()
@@ -559,6 +605,8 @@ def main():
             continue
 
         if game_state == STATE_SHOP:
+            screen.fill("black")
+            background_stars.draw(screen)
             if shop is not None:
                 shop.draw(screen, title_font, body_font)
             pygame.display.flip()
@@ -570,7 +618,34 @@ def main():
             dt = clock.tick(60) / 1000
             continue
 
-        screen.fill("black")
+        # Update background stars
+        player_vel = pygame.Vector2(0, 0)
+        if session is not None:
+            player_vel = session.player.velocity
+        background_stars.update(player_vel, dt)
+
+        # Update screen shake
+        import screen_shake
+        import random
+        shake_offset_x = 0
+        shake_offset_y = 0
+        if screen_shake.shake_timer > 0:
+            screen_shake.shake_timer -= dt
+            current_intensity = screen_shake.shake_intensity * (screen_shake.shake_timer / screen_shake.shake_duration)
+            shake_offset_x = random.uniform(-current_intensity, current_intensity)
+            shake_offset_y = random.uniform(-current_intensity, current_intensity)
+
+        # Low health sound chime loop
+        if session is not None and session.lives == 1:
+            low_health_warn_timer -= dt
+            if low_health_warn_timer <= 0:
+                low_health_warn_timer = 3.5
+                if low_health_sound is not None:
+                    low_health_sound.play()
+
+        game_surface.fill("black")
+        background_stars.draw(game_surface)
+
         session.updatable.update(dt, pressed_keys)
 
         if active_mode == "campaign" and level_manager is not None:
@@ -589,6 +664,25 @@ def main():
                 log_event("player_hit")
                 if player_hit_sound is not None:
                     player_hit_sound.play()
+
+                # Spawn player hit particles
+                from particle import spawn_explosion
+                colors = ["cyan", "white", "blue", "gray"]
+                for _ in range(30):
+                    color = random.choice(colors)
+                    spawn_explosion(
+                        session.player.position.x,
+                        session.player.position.y,
+                        num_particles=1,
+                        color=color,
+                        size=random.uniform(2.5, 5.0),
+                        speed_range=(80, 250),
+                    )
+
+                # Trigger screen shake!
+                from screen_shake import trigger_screen_shake
+                trigger_screen_shake(0.4, 12.0)
+
                 session.lives -= 1
 
                 if session.lives <= 0:
@@ -613,10 +707,14 @@ def main():
             pressed_keys.clear()
             dt = 0.0
             game_state = STATE_GAME_OVER
+            stop_music()
             continue
 
         for drawable_object in session.drawable:
-            drawable_object.draw(screen)
+            drawable_object.draw(game_surface)
+
+        screen.fill("black")
+        screen.blit(game_surface, (shake_offset_x, shake_offset_y))
 
         draw_hud(screen, body_font, session)
         pygame.display.flip()

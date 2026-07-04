@@ -16,10 +16,13 @@ class ShopItem:
         self.purchased = False
 
 class Shop:
+    purchase_sound: pygame.mixer.Sound | None = None
+    powerup_sound: pygame.mixer.Sound | None = None
+
     def __init__(self, session: GameSession) -> None:
         self.session = session
         self.selected_index = 0
-
+        
         # Define items for sale in the shop
         self.items = [
             ShopItem("blaster", "Weapon: Blaster", 250, "Standard issue single-shot blaster."),
@@ -73,6 +76,8 @@ class Shop:
 
             self.session.credits -= upgrade_cost
             weapon.upgrade()
+            if self.purchase_sound is not None:
+                self.purchase_sound.play()
             print(f"Melhorou {weapon.name} para o Lvl {weapon.level}!")
             return
 
@@ -100,6 +105,8 @@ class Shop:
 
             # Equip immediately
             player.set_weapon(player.unlocked_weapons[item.item_id])
+            if self.purchase_sound is not None:
+                self.purchase_sound.play()
             print(f"Adquiriu e equipou: {item.label}!")
 
         elif item.item_id == "speed_boost":
@@ -111,6 +118,8 @@ class Shop:
             item.purchased = True
             player.movement_acceleration += 150
             player.movement_max_speed += 50
+            if self.powerup_sound is not None:
+                self.powerup_sound.play()
             print("Motores aprimorados permanentemente!")
 
         elif item.item_id == "extra_life":
@@ -120,11 +129,11 @@ class Shop:
 
             self.session.credits -= item.cost
             self.session.lives += 1
+            if self.powerup_sound is not None:
+                self.powerup_sound.play()
             print("Vida extra adquirida!")
 
     def draw(self, screen: pygame.Surface, title_font: pygame.font.Font, body_font: pygame.font.Font) -> None:
-        screen.fill("black")
-        
         # Draw Shop Header
         title_surface = title_font.render("UPGRADE SHOP", True, "yellow")
         title_rect = title_surface.get_rect(center=(SCREEN_WIDTH // 2, 80))

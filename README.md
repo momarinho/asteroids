@@ -18,7 +18,12 @@ This project started as a course-driven foundation and has already grown beyond 
 - Shot lifetime cleanup
 - HUD with score, lives, cooldown, invulnerability, and danger level
 - Progressive difficulty over time
-- Basic gameplay sound effects
+- Drifting starfield with parallax scrolling
+- Lumpy, rotating asteroid shapes
+- Screen shake on collisions and bomb detonations
+- Spark/explosion particles for asteroids and player hits
+- Looping retro chiptune background music
+- Additional audio cues for low health, shop purchases, and powerups
 
 ## Controls
 
@@ -52,6 +57,7 @@ Completed so far:
 - Run systems and player recovery
 - Presentation pass for HUD and audio
 - First balancing pass for difficulty scaling
+- Visual and Audio Identity (parallax stars, lumpy rotating asteroids, screen shake, particles, music, and shop/low-health sounds)
 
 ## Roadmap
 
