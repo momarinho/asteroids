@@ -109,7 +109,7 @@ class GameJoystick extends PositionComponent with HasGameReference<AsteroidsGame
   void onDragUpdate(DragUpdateEvent event) {
     if (game.state != GameState.playing) return;
     super.onDragUpdate(event);
-    _updateKnobPosition(event.localPosition);
+    _updateKnobPosition(event.localEndPosition);
   }
 
   @override
