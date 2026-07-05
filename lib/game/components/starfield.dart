@@ -2,6 +2,7 @@ import 'dart:math' as math;
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
 import 'package:asteroids/game/asteroids_game.dart';
+import 'package:asteroids/constants.dart';
 
 class Star {
   Vector2 position;
