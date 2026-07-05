@@ -91,13 +91,13 @@ class AsteroidsGame extends FlameGame with HasCollisionDetection, KeyboardEvents
     FlameAudio.bgm.initialize();
 
     // Add StarfieldComponent first so it is rendered behind the player
-    add(StarfieldComponent());
+    world.add(StarfieldComponent());
 
     // Add PlayerComponent (starts off-screen or invisible in menu)
     player = PlayerComponent(
       position: Vector2(1280 / 2, 720 / 2),
     );
-    add(player);
+    world.add(player);
 
     // Add Joystick for mobile/touch/mouse controls
     joystick = GameJoystick();
@@ -229,14 +229,14 @@ class AsteroidsGame extends FlameGame with HasCollisionDetection, KeyboardEvents
       levelManager = LevelManager(this);
     } else {
       asteroidField = AsteroidField();
-      add(asteroidField!);
+      world.add(asteroidField!);
     }
 
     changeState(GameState.playing);
   }
 
   void _removeAllAsteroidsAndProjectiles() {
-    final childrenToRemove = children.where((child) =>
+    final childrenToRemove = world.children.where((child) =>
         child is AsteroidComponent ||
         child is BulletComponent ||
         child is BombComponent ||
@@ -320,7 +320,7 @@ class AsteroidsGame extends FlameGame with HasCollisionDetection, KeyboardEvents
       final size = minSize + random.nextDouble() * (maxSize - minSize);
       final lifetime = 0.3 + random.nextDouble() * 0.5; // 0.3 to 0.8 seconds
 
-      add(
+      world.add(
         ParticleComponent(
           position: position,
           velocity: velocity,

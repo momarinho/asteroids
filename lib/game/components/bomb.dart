@@ -51,7 +51,7 @@ class BombComponent extends PositionComponent with HasGameReference<AsteroidsGam
   }
 
   void explode() {
-    game.add(
+    game.world.add(
       BombExplosionComponent(
         position: position.clone(),
         maxRadius: explosionRadius,
@@ -115,7 +115,7 @@ class BombExplosionComponent extends PositionComponent with HasGameReference<Ast
     );
 
     // Instantly destroy/split asteroids in radius
-    final asteroids = game.children.whereType<AsteroidComponent>();
+    final asteroids = game.world.children.whereType<AsteroidComponent>();
     for (final asteroid in List<AsteroidComponent>.from(asteroids)) {
       final distance = position.distanceTo(asteroid.position);
       if (distance <= maxRadius + asteroid.radius) {

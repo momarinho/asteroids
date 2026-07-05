@@ -90,7 +90,7 @@ class AsteroidField extends Component with HasGameReference<AsteroidsGame> {
       position: position,
       velocity: velocity,
     );
-    game.add(asteroid);
+    game.world.add(asteroid);
   }
 
   String dangerLevel() {

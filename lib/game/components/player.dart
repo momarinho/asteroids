@@ -131,7 +131,7 @@ class PlayerComponent extends PositionComponent with HasGameReference<AsteroidsG
       wrapAround();
 
       // Spawn dash ghost trail
-      game.add(
+      game.world.add(
         DashGhost(
           position: position,
           initialAngle: angle,

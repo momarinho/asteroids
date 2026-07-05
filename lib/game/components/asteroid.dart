@@ -137,7 +137,7 @@ class AsteroidComponent extends PositionComponent with HasGameReference<Asteroid
       velocity: velocityB * 1.2,
     );
 
-    game.add(asteroidA);
-    game.add(asteroidB);
+    game.world.add(asteroidA);
+    game.world.add(asteroidB);
   }
 }

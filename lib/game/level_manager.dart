@@ -46,22 +46,22 @@ class LevelManager {
   }
 
   void cleanUp() {
-    final asteroids = game.children.whereType<AsteroidComponent>();
+    final asteroids = game.world.children.whereType<AsteroidComponent>();
     for (final asteroid in List<AsteroidComponent>.from(asteroids)) {
       asteroid.removeFromParent();
     }
     
-    final bullets = game.children.whereType<BulletComponent>();
+    final bullets = game.world.children.whereType<BulletComponent>();
     for (final bullet in List<BulletComponent>.from(bullets)) {
       bullet.removeFromParent();
     }
 
-    final bombs = game.children.whereType<BombComponent>();
+    final bombs = game.world.children.whereType<BombComponent>();
     for (final bomb in List<BombComponent>.from(bombs)) {
       bomb.removeFromParent();
     }
 
-    final explosions = game.children.whereType<BombExplosionComponent>();
+    final explosions = game.world.children.whereType<BombExplosionComponent>();
     for (final explosion in List<BombExplosionComponent>.from(explosions)) {
       explosion.removeFromParent();
     }
@@ -134,13 +134,13 @@ class LevelManager {
         position: position,
         velocity: velocity,
       );
-      game.add(asteroid);
+      game.world.add(asteroid);
     }
   }
 
   void update(double dt) {
     if (state == "playing") {
-      final asteroidsCount = game.children.whereType<AsteroidComponent>().length;
+      final asteroidsCount = game.world.children.whereType<AsteroidComponent>().length;
       if (asteroidsCount == 0) {
         if (asteroidsRemainingToSpawn > 0) {
           spawnWave();

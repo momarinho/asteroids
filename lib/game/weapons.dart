@@ -52,7 +52,7 @@ class Blaster extends Weapon {
       velocity: velocity,
       lifeTimer: GameConstants.shotLifetimeSeconds,
     );
-    player.game.add(bullet);
+    player.game.world.add(bullet);
     return true;
   }
 
@@ -98,7 +98,7 @@ class SpreadShot extends Weapon {
         velocity: direction * baseSpeed,
         lifeTimer: 0.6,
       );
-      player.game.add(bullet);
+      player.game.world.add(bullet);
     }
     return true;
   }
@@ -133,7 +133,7 @@ class RapidFire extends Weapon {
       velocity: velocity,
       lifeTimer: 0.8,
     );
-    player.game.add(bullet);
+    player.game.world.add(bullet);
     return true;
   }
 
@@ -165,7 +165,7 @@ class BombLauncher extends Weapon {
       position: player.position + player.forward * player.radius,
       velocity: velocity,
     );
-    player.game.add(bomb);
+    player.game.world.add(bomb);
     return true;
   }
 
