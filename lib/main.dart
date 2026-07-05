@@ -1,5 +1,6 @@
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'game/asteroids_game.dart';
 import 'ui/menu_overlay.dart';
 import 'ui/settings_overlay.dart';
@@ -10,8 +11,12 @@ import 'ui/game_over_overlay.dart';
 import 'ui/leaderboard_overlay.dart';
 import 'ui/weapon_selection_overlay.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.landscapeLeft,
+    DeviceOrientation.landscapeRight,
+  ]);
   runApp(const MyApp());
 }
 

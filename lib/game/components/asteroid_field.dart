@@ -42,8 +42,8 @@ class AsteroidField extends Component with HasGameReference<AsteroidsGame> {
 
   void _spawnAsteroid() {
     final random = math.Random();
-    final screenWidth = game.size.x;
-    final screenHeight = game.size.y;
+    final screenWidth = GameConstants.screenWidth;
+    final screenHeight = GameConstants.screenHeight;
     final maxRadius = GameConstants.asteroidMaxRadius;
 
     // Pick a random edge: 0 = Left, 1 = Right, 2 = Top, 3 = Bottom

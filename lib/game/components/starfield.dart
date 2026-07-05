@@ -25,8 +25,8 @@ class StarfieldComponent extends Component with HasGameReference<AsteroidsGame> 
 
   void _initializeStars() {
     final random = math.Random();
-    final width = game.size.x;
-    final height = game.size.y;
+    final width = GameConstants.screenWidth;
+    final height = GameConstants.screenHeight;
 
     stars.clear();
     for (var i = 0; i < numStars; i++) {
@@ -48,8 +48,8 @@ class StarfieldComponent extends Component with HasGameReference<AsteroidsGame> 
     if (stars.isEmpty) return;
 
     final playerVelocity = game.player.velocity;
-    final width = game.size.x;
-    final height = game.size.y;
+    final width = GameConstants.screenWidth;
+    final height = GameConstants.screenHeight;
 
     for (final star in stars) {
       final multiplier = star.layer * 0.05;

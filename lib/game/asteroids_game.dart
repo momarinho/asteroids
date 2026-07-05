@@ -181,7 +181,7 @@ class AsteroidsGame extends FlameGame with HasCollisionDetection, KeyboardEvents
     }
 
     // Reset player states, stats, and unlocked weapons
-    player.respawn(size.x / 2, size.y / 2);
+    player.respawn(GameConstants.screenWidth / 2, GameConstants.screenHeight / 2);
     player.unlockedWeapons.clear();
     
     // Set starting weapon

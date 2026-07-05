@@ -50,8 +50,8 @@ class AsteroidComponent extends PositionComponent with HasGameReference<Asteroid
   }
 
   void wrapAround() {
-    final sizeX = game.size.x;
-    final sizeY = game.size.y;
+    final sizeX = GameConstants.screenWidth;
+    final sizeY = GameConstants.screenHeight;
 
     if (position.x < -radius) {
       position.x = sizeX + radius;

@@ -21,6 +21,13 @@ class GameJoystick extends PositionComponent with HasGameReference<AsteroidsGame
   }
 
   @override
+  void onGameResize(Vector2 size) {
+    super.onGameResize(size);
+    // Dynamically position at the bottom-left corner of the physical screen
+    position = Vector2(120, size.y - 120);
+  }
+
+  @override
   void render(Canvas canvas) {
     if (game.state != GameState.playing) return;
     
