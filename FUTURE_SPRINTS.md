@@ -4,97 +4,57 @@ This document outlines the roadmap for migrating the Python/Pygame Asteroids gam
 
 ---
 
-## Migration Phase 1: Flutter & Flame client foundation
+## Migration Phase 1: Flutter & Flame client foundation [COMPLETED]
 
-### Sprint 1: Project Setup & Core Movement
-**Goal:** Establish the Flutter + Flame codebase and port the basic movement mechanics.
+### Sprint 1: Project Setup & Core Movement [COMPLETED]
+* **Goals:** Establish the Flutter + Flame codebase and port the basic movement mechanics.
+* **Status:** Complete. Basic Flame loop setup, scaling, canvas bounds, and physics presetting are functional. Joystick and Keyboard inputs are operational.
 
-* **Planned Work:**
-  - Initialize the Flutter project and configure dependencies (`flame`, `flame_audio`, `flutter_bloc` or `riverpod`).
-  - Create the main `FlameGame` instance and setup the game canvas loop.
-  - Implement canvas scaling, resizing, and coordinate translation.
-  - Port the `Player` movement: rotation, acceleration, friction, momentum, and wrapping.
-  - Support basic keyboard input controls.
-* **Stretch Goals:**
-  - Add virtual joystick/button overlays for mobile touchscreens.
-  - Port basic thrust particle effects.
+### Sprint 2: Core Gameplay & Physics [COMPLETED]
+* **Goals:** Migrate game entities, shooting mechanics, and basic collisions.
+* **Status:** Complete. Asteroids draw irregular polygons, split into smaller components, 4 weapon systems are complete with screen shake, recoil, and sound triggers.
 
-### Sprint 2: Core Gameplay & Physics
-**Goal:** Migrate game entities, shooting mechanics, and basic collisions.
-
-* **Planned Work:**
-  - Implement `AsteroidComponent` with random lumpy polygon shapes and spin.
-  - Port asteroid splitting logic.
-  - Implement the weapon framework and weapon types: `Blaster`, `SpreadShot`, `RapidFire`, `BombLauncher`.
-  - Implement shots and bombs components.
-  - Implement collision detection using Flame's hitbox system and port scoring/lives systems.
-  - Add screen shake on asteroid destruction and bomb detonations.
-* **Stretch Goals:**
-  - Port detailed spark/dust particle systems on asteroid hits.
-  - Implement damage states.
-
-### Sprint 3: UI, Audio & Shop Integration
-**Goal:** Use Flutter widgets to create rich menus, the HUD, and the upgrade shop.
-
-* **Planned Work:**
-  - Build the main menu, settings (movement presets), and game-over overlays using native Flutter widgets.
-  - Build the HUD overlay (lives, score, cooldown meters, invulnerability flash) in Flutter.
-  - Build a beautiful, responsive Shop screen between stages using Flutter's layout engine.
-  - Port chiptunes and sfx playback using `flame_audio`.
-* **Stretch Goals:**
-  - Add dynamic animations to the shop cards (purchasing effects, hover states).
-  - Support sound options (volume sliders, audio toggle) in settings.
+### Sprint 3: UI, Audio & Shop Integration [COMPLETED]
+* **Goals:** Use Flutter widgets to create rich menus, the HUD, and the upgrade shop.
+* **Status:** Complete. Shop overlays, HUD, Game Over overlays, Leaderboard overlay, and low-health warning sound loop are all built using native Flutter widgets integrated on top of Flame.
 
 ---
 
-## Migration Phase 2: Online Services (Go Backend)
+## Migration Phase 2: Online Services (Go Backend) [COMPLETED]
 
-### Sprint 4: Go Backend API & Persistence
-**Goal:** Create a lightweight Go service to support online features.
+### Sprint 4: Go Backend API & Persistence [COMPLETED]
+* **Goals:** Create a lightweight Go service to support online features.
+* **Status:** Complete. Built REST API in Go using Gin, GORM, and pure-Go SQLite. Added anti-cheat HMAC-SHA256 signature verification.
 
-* **Planned Work:**
-  - Create the `go-backend/` project directory.
-  - Implement a REST API using Go (e.g. Fiber or Gin) for high scores and player profiles.
-  - Integrate a database (SQLite for local testing/simplicity, PostgreSQL-ready) to store scores.
-  - Add secure endpoints for submitting high scores with anti-cheat checks (validation of scores).
-* **Stretch Goals:**
-  - Create a simple healthcheck and metrics dashboard endpoint.
-  - Build a basic containerization configuration (`Dockerfile` + `compose.yaml`).
-
-### Sprint 5: Connected Features & Leaderboards
-**Goal:** Connect the Flutter app to the Go backend and display online rankings.
-
-* **Planned Work:**
-  - Add HTTP client integrations in the Flutter app to connect to the Go API.
-  - Build the **Global Leaderboard UI** in the Flutter app using `FutureBuilder` or state management.
-  - Implement anonymous account registration / player profiles in the game on first run.
-  - Synchronize local settings and high scores with the backend.
-* **Stretch Goals:**
-  - Show a notification in-game when a player beats a global high score.
-  - Add profile customization (avatars, titles purchased with space credits).
+### Sprint 5: Connected Features & Leaderboards [COMPLETED]
+* **Goals:** Connect the Flutter app to the Go backend and display online rankings.
+* **Status:** Complete. Integrated network client with SharedPreferences fallback. Leaderboards list scores dynamically by fetching data from the Go API.
 
 ---
 
-## Migration Phase 3: Game Expansion & Multiplayer
+## Migration Phase 3: Game Expansion & Multiplayer [ACTIVE]
 
-### Sprint 6: PvE Hazards & Level progression
-**Goal:** Port phase management and add new enemy behaviors.
+### Sprint 6: PvE Hazards & Level Progression [COMPLETED]
+* **Goals:** Port phase management and add waves.
+* **Status:** Complete. Level manager drives waves, scaling asteroid count and speeds, and handles campaign progression.
 
-* **Planned Work:**
-  - Port `LevelManager` to control asteroid count, speed, and waves.
-  - Implement hostile alien ships and chasing drones using Flame's component system.
-  - Add custom stage modifiers (e.g., gravity fields, portal gates).
+### Sprint 7: Real-Time Online Multiplayer (Go WebSockets) [ACTIVE]
+**Goal:** Introduce online co-op / versus multiplayer using WebSockets.
+
+* **Planned Work (Server-Side Go):**
+  - Integrate a WebSocket server (e.g. using `github.com/gorilla/websocket` or Gin websockets).
+  - Design a **Lobby/Room System**: Players can create a room, receive a 4-digit code (e.g., `ABCD`), and share it.
+  - Implement a real-time game loop on the server (30 ticks/second) that runs the physics simulation authoritative.
+  - Broadcast the game state (player positions, angles, active bullets, and asteroid states) to all clients in the room.
+
+* **Planned Work (Client-Side Flutter):**
+  - Implement WebSocket client connection in `ApiService`.
+  - Create a **Lobby Selection Overlay**: UI to choose "Create Room" or "Join Room" (with a code input keyboard).
+  - Adapt `AsteroidsGame` and `PlayerComponent` to support rendering other players (represented by custom colored ships).
+  - Synchronize inputs: Client sends joystick/keyboard inputs and firing commands to the server; receives and interpolates positions of other entities.
+  - Sfx & particles replication on network events (shooting, hitting, explosions).
+
 * **Stretch Goals:**
-  - Add mini-boss fight encounters on specific waves.
-
-### Sprint 7: Multiplayer & Sync (Go WebSockets)
-**Goal:** Introduce online multiplayer elements.
-
-* **Planned Work:**
-  - Expand Go backend to support WebSockets for real-time communication.
-  - Design a lightweight lobby/matchmaking system in Go.
-  - Synchronize player positions, bullets, and asteroid states across clients.
-  - Implement local or online co-op mode.
-* **Stretch Goals:**
-  - Add chat/ping system in lobby and during play.
-  - Spectator mode.
+  - Friendly Fire setting togglable in Lobby.
+  - Quick chat/ping system in game (emojis/messages).
+  - Spectator mode for rooms that have already started.
