@@ -48,10 +48,11 @@ class _HudOverlayState extends State<HudOverlay> with SingleTickerProviderStateM
     final dashCooldown = player.dashCooldownTimer;
     final currentWeapon = player.weapon;
 
-    return Container(
-      padding: const EdgeInsets.all(20.0),
-      child: Stack(
-        children: [
+    return IgnorePointer(
+      child: Container(
+        padding: const EdgeInsets.all(20.0),
+        child: Stack(
+          children: [
           // Top Left: Score, Mode, Level
           Positioned(
             top: 0,
@@ -263,6 +264,7 @@ class _HudOverlayState extends State<HudOverlay> with SingleTickerProviderStateM
           ),
         ],
       ),
-    );
+    ),
+  );
   }
 }
