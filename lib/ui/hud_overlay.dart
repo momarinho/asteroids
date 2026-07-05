@@ -263,9 +263,10 @@ class _HudOverlayState extends State<HudOverlay> with SingleTickerProviderStateM
                     ],
                   ),
                 ),
-              ),
+              ],
             ),
-          ), // Ends IgnorePointer of Bottom Left card
+          ),
+        ),
 
           // Bottom Right: Mobile touch action buttons (Shoot & Dash)
           if (game.isMobile)
