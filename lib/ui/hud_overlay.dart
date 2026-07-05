@@ -48,16 +48,16 @@ class _HudOverlayState extends State<HudOverlay> with SingleTickerProviderStateM
     final dashCooldown = player.dashCooldownTimer;
     final currentWeapon = player.weapon;
 
-    return IgnorePointer(
-      child: Container(
-        padding: const EdgeInsets.all(20.0),
-        child: Stack(
-          children: [
-          // Top Left: Score, Mode, Level
+    return Container(
+      padding: const EdgeInsets.all(20.0),
+      child: Stack(
+        children: [
+          // Top Left: Score, Mode, Level (Ignore Pointer so click-through works)
           Positioned(
             top: 0,
             left: 0,
-            child: Column(
+            child: IgnorePointer(
+              child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
@@ -106,12 +106,14 @@ class _HudOverlayState extends State<HudOverlay> with SingleTickerProviderStateM
               ],
             ),
           ),
+          ), // Ends IgnorePointer of Top Left card
 
-          // Top Right: Lives and Invulnerability Status
+          // Top Right: Lives and Invulnerability Status (Ignore Pointer so click-through works)
           Positioned(
             top: 0,
             right: 0,
-            child: Column(
+            child: IgnorePointer(
+              child: Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 // Lives Indicator (Ship icons)
@@ -150,12 +152,14 @@ class _HudOverlayState extends State<HudOverlay> with SingleTickerProviderStateM
               ],
             ),
           ),
+          ), // Ends IgnorePointer of Top Right card
 
-          // Bottom Left: Weapon Stats and Dash Cooldown
+          // Bottom Left: Weapon Stats and Dash Cooldown (Ignore Pointer so click-through works)
           Positioned(
             bottom: 0,
             left: 0,
-            child: Row(
+            child: IgnorePointer(
+              child: Row(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 // Active Weapon Card
@@ -259,12 +263,97 @@ class _HudOverlayState extends State<HudOverlay> with SingleTickerProviderStateM
                     ],
                   ),
                 ),
-              ],
+              ),
             ),
-          ),
+          ), // Ends IgnorePointer of Bottom Left card
+
+          // Bottom Right: Mobile touch action buttons (Shoot & Dash)
+          if (game.isMobile)
+            Positioned(
+              bottom: 10,
+              right: 10,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  // Dash Button (smaller, blue/cyan glowing icon button)
+                  GestureDetector(
+                    onTapDown: (_) {
+                      game.mobileDashPressed = true;
+                    },
+                    child: Container(
+                      width: 56,
+                      height: 56,
+                      decoration: BoxDecoration(
+                        color: Colors.cyan.withOpacity(0.15),
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: player.dashCooldownTimer <= 0
+                              ? Colors.cyanAccent
+                              : Colors.white24,
+                          width: 2,
+                        ),
+                        boxShadow: player.dashCooldownTimer <= 0
+                            ? [
+                                BoxShadow(
+                                  color: Colors.cyan.withOpacity(0.3),
+                                  blurRadius: 8,
+                                  spreadRadius: 1,
+                                )
+                              ]
+                            : [],
+                      ),
+                      child: Icon(
+                        Icons.bolt,
+                        color: player.dashCooldownTimer <= 0
+                            ? Colors.cyanAccent
+                            : Colors.white24,
+                        size: 28,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 20),
+
+                  // Shoot Button (larger, red/orange glowing icon button)
+                  GestureDetector(
+                    onTapDown: (_) {
+                      game.mobileShootPressed = true;
+                    },
+                    onTapUp: (_) {
+                      game.mobileShootPressed = false;
+                    },
+                    onTapCancel: () {
+                      game.mobileShootPressed = false;
+                    },
+                    child: Container(
+                      width: 76,
+                      height: 76,
+                      decoration: BoxDecoration(
+                        color: Colors.redAccent.withOpacity(0.15),
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: Colors.redAccent,
+                          width: 2,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.redAccent.withOpacity(0.3),
+                            blurRadius: 12,
+                            spreadRadius: 2,
+                          )
+                        ],
+                      ),
+                      child: const Icon(
+                        Icons.gps_fixed,
+                        color: Colors.redAccent,
+                        size: 38,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
         ],
       ),
-    ),
-  );
+    );
   }
 }

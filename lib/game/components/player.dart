@@ -179,8 +179,11 @@ class PlayerComponent extends PositionComponent with HasGameReference<AsteroidsG
       }
     }
 
-    if (keys.contains(LogicalKeyboardKey.shiftLeft) || keys.contains(LogicalKeyboardKey.shiftRight)) {
+    if (keys.contains(LogicalKeyboardKey.shiftLeft) ||
+        keys.contains(LogicalKeyboardKey.shiftRight) ||
+        game.mobileDashPressed) {
       dash();
+      game.mobileDashPressed = false;
     }
 
     clampSpeed();
@@ -188,7 +191,7 @@ class PlayerComponent extends PositionComponent with HasGameReference<AsteroidsG
     position += velocity * dt;
     wrapAround();
 
-    if (keys.contains(LogicalKeyboardKey.space)) {
+    if (keys.contains(LogicalKeyboardKey.space) || game.mobileShootPressed) {
       shoot();
     }
 

@@ -18,6 +18,8 @@ import 'components/joystick.dart';
 import 'weapons.dart';
 import 'level_manager.dart';
 import 'package:asteroids/services/api_service.dart';
+import 'dart:io' as io;
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 enum GameState {
   menu,
@@ -38,6 +40,10 @@ class AsteroidsGame extends FlameGame with HasCollisionDetection, KeyboardEvents
   FocusNode? gameFocusNode;
 
   final Set<LogicalKeyboardKey> keysPressed = {};
+
+  bool get isMobile => !kIsWeb && (io.Platform.isAndroid || io.Platform.isIOS);
+  bool mobileShootPressed = false;
+  bool mobileDashPressed = false;
 
   GameState state = GameState.menu;
   String activeMode = 'classic'; // 'classic' or 'campaign'
