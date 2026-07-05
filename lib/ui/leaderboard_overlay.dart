@@ -26,9 +26,9 @@ class _LeaderboardOverlayState extends State<LeaderboardOverlay> {
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 6.0, sigmaY: 6.0),
             child: Container(
-              width: 600,
-              height: 500,
-              padding: const EdgeInsets.all(25.0),
+              width: MediaQuery.of(context).size.width > 600 ? 600 : MediaQuery.of(context).size.width * 0.92,
+              height: MediaQuery.of(context).size.height > 500 ? 500 : MediaQuery.of(context).size.height * 0.9,
+              padding: const EdgeInsets.all(20.0),
               decoration: BoxDecoration(
                 color: Colors.black.withOpacity(0.8),
                 borderRadius: BorderRadius.circular(20),

@@ -62,8 +62,8 @@ class _WeaponSelectionOverlayState extends State<WeaponSelectionOverlay> {
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 8.0, sigmaY: 8.0),
             child: Container(
-              width: 750,
-              padding: const EdgeInsets.all(30.0),
+              width: MediaQuery.of(context).size.width > 750 ? 750 : MediaQuery.of(context).size.width * 0.92,
+              padding: const EdgeInsets.all(20.0),
               decoration: BoxDecoration(
                 color: Colors.black.withOpacity(0.85),
                 borderRadius: BorderRadius.circular(20),
@@ -79,10 +79,11 @@ class _WeaponSelectionOverlayState extends State<WeaponSelectionOverlay> {
                   ),
                 ],
               ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
                   // Title
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -300,8 +301,9 @@ class _WeaponSelectionOverlayState extends State<WeaponSelectionOverlay> {
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildSpec({
     required String label,

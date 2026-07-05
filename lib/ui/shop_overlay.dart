@@ -20,9 +20,9 @@ class ShopOverlay extends StatelessWidget {
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 6.0, sigmaY: 6.0),
             child: Container(
-              width: 800,
-              constraints: const BoxConstraints(maxHeight: 600),
-              padding: const EdgeInsets.all(25.0),
+              width: MediaQuery.of(context).size.width > 800 ? 800 : MediaQuery.of(context).size.width * 0.92,
+              constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.92),
+              padding: const EdgeInsets.all(20.0),
               decoration: BoxDecoration(
                 color: Colors.black.withOpacity(0.85),
                 borderRadius: BorderRadius.circular(20),

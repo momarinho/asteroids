@@ -16,8 +16,8 @@ class SettingsOverlay extends StatelessWidget {
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 6.0, sigmaY: 6.0),
             child: Container(
-              width: 550,
-              padding: const EdgeInsets.all(30.0),
+              width: MediaQuery.of(context).size.width > 550 ? 550 : MediaQuery.of(context).size.width * 0.92,
+              padding: const EdgeInsets.all(20.0),
               decoration: BoxDecoration(
                 color: Colors.black.withOpacity(0.8),
                 borderRadius: BorderRadius.circular(20),
@@ -33,10 +33,11 @@ class SettingsOverlay extends StatelessWidget {
                   ),
                 ],
               ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
                   // Title
                   const Row(
                     children: [
@@ -148,6 +149,7 @@ class SettingsOverlay extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 }

@@ -70,8 +70,8 @@ class _MenuOverlayState extends State<MenuOverlay> {
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 6.0, sigmaY: 6.0),
             child: Container(
-              width: 500,
-              padding: const EdgeInsets.symmetric(vertical: 40.0, horizontal: 30.0),
+              width: MediaQuery.of(context).size.width > 500 ? 500 : MediaQuery.of(context).size.width * 0.92,
+              padding: const EdgeInsets.symmetric(vertical: 24.0, horizontal: 20.0),
               decoration: BoxDecoration(
                 color: Colors.black.withOpacity(0.75),
                 borderRadius: BorderRadius.circular(20),
@@ -87,9 +87,10 @@ class _MenuOverlayState extends State<MenuOverlay> {
                   ),
                 ],
               ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
                   // Title
                   const Text(
                     'ASTEROIDS',
@@ -333,8 +334,9 @@ class _MenuOverlayState extends State<MenuOverlay> {
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildModeOption({
     required String title,
