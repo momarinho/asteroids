@@ -4,8 +4,15 @@ import 'package:crypto/crypto.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/foundation.dart';
 
+import 'dart:io' as io;
+
 class ApiService {
-  static const String baseUrl = 'http://localhost:8080';
+  static String get baseUrl {
+    if (!kIsWeb && io.Platform.isAndroid) {
+      return 'http://10.0.2.2:8080';
+    }
+    return 'http://localhost:8080';
+  }
   static const String secretKey = 'asteroids-secret-token-key-2026';
 
   // Shared preferences keys
