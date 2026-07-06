@@ -38,7 +38,24 @@ This document outlines the roadmap for migrating the Python/Pygame Asteroids gam
 * **Goals:** Port phase management and add waves.
 * **Status:** Complete. Level manager drives waves, scaling asteroid count and speeds, and handles campaign progression.
 
-### Sprint 7: Real-Time Online Multiplayer (Go WebSockets) [ACTIVE]
+### Sprint 7: Gameplay Polish & Visual Juice [ACTIVE]
+* **Goals:** Add feedback animations, implement dynamic in-game power-ups, introduce active UFO enemies, and expand asteroid variety to make the game feel premium and highly polished before implementing networking.
+* **Planned Work:**
+  - **Visual Juice & Effects:**
+    - Animated thrust flame visual emerging from the player's engine on acceleration.
+    - Fade/particle effects during wrap-around screen traversal.
+    - Bullet trails/effects for blaster, spread shot, and bomb projectiles.
+  - **Active Hazards & Enemies:**
+    - Classic UFO enemy ship spawning at random intervals, pursuing and shooting at the player.
+    - Specialized Asteroid Types: Armored (high durability), Explosive (detonates dealing AoE damage), and Golden/Resource (fast-moving, high credit drop).
+  - **Dynamic In-game Power-ups:**
+    - Shield bubble drop (absorbs one collision hit).
+    - Time distortion/freeze drop (temporarily slows down all asteroids).
+    - Credit magnet/double credit drop.
+  - **Score Multiplier & Combo System:**
+    - Accumulative combo score multiplier for rapid consecutive asteroid destructions, resetting upon taking damage or going idle.
+
+### Sprint 8: Real-Time Online Multiplayer (Go WebSockets) [PLANNED]
 **Goal:** Introduce online co-op / versus multiplayer using WebSockets.
 
 * **Planned Work (Server-Side Go):**

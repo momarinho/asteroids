@@ -1,4 +1,10 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
+# Auto-detect NixOS and re-run inside nix-shell if not already in one
+if [ -z "$IN_NIX_SHELL" ] && [ -f shell.nix ] && command -v nix-shell &> /dev/null; then
+    echo "-> Nix environment detected. Relaunching inside nix-shell..."
+    exec nix-shell --run "$0 $*"
+fi
 
 # Configuration
 LOG_FILE="go-backend.log"
