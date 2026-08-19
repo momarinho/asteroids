@@ -1,66 +1,59 @@
 # Asteroids
 
-A small Asteroids-style arcade game built with Python and Pygame.
+A real-time multiplayer arcade game built with Go (backend) and Flutter/Dart (frontend) using WebSockets for authoritative physics simulation and game state replication.
 
-This project started as a course-driven foundation and has already grown beyond the base tutorial into a more complete playable prototype with its own game flow, HUD, balancing, and roadmap.
+## 🎮 Features
 
-## Current Features
+- **Real-Time Multiplayer**: Go backend server handling 30 ticks/second authoritative physics
+- **WebSocket Integration**: Low-latency game state synchronization across clients
+- **Anti-Cheat Protection**: HMAC-SHA256 signature verification on all client inputs
+- **Flutter Cross-Platform**: Native support for iOS, Android, and Web
+- **Responsive Gameplay**: Optimized rendering and input handling for mobile devices
 
-- Mode selection screen
-- Settings screen for movement presets
-- Gameplay and game over states
-- Player movement and rotation
-- Shooting with cooldown
-- Asteroid spawning, collisions, and splitting
-- Score system
-- Multiple lives and respawn
-- Temporary invulnerability after respawn
-- Shot lifetime cleanup
-- HUD with score, lives, cooldown, invulnerability, and danger level
-- Progressive difficulty over time
-- Drifting starfield with parallax scrolling
-- Lumpy, rotating asteroid shapes
-- Screen shake on collisions and bomb detonations
-- Spark/explosion particles for asteroids and player hits
-- Looping retro chiptune background music
-- Additional audio cues for low health, shop purchases, and powerups
+## 🏗️ Architecture
 
-## Controls
-
-- `W`: move forward
-- `S`: move backward
-- `A`: rotate left
-- `D`: rotate right
-- `Space`: shoot
-- `Tab`: open movement settings from the main menu
-- `Enter`: start selected mode
-- `R`: restart after game over
-- `M`: return to menu after game over
-- `Esc`: quit
-
-## Run
-
-Make sure your environment has Python and the project dependencies installed, then run:
-
-```bash
-python main.py
+```
+┌─────────────────────┐
+│  Flutter Client     │
+│  (iOS/Android/Web)  │
+└──────────┬──────────┘
+           │
+     WebSocket (JSON)
+           │
+┌──────────▼──────────┐
+│   Go Backend        │
+│ (Physics @ 30 Hz)   │
+└─────────────────────┘
 ```
 
-## Project Status
+## 🛠️ Tech Stack
 
-This is currently a playable prototype and is under active iteration.
+- **Backend**: Go, WebSocket server, physics engine
+- **Frontend**: Flutter 3.x, Dart, WebSocket client
+- **Protocol**: Real-time game state JSON over WebSocket
+- **Security**: HMAC-SHA256 for input validation
 
-Completed so far:
+## 🎯 Key Implementation Details
 
-- Core arcade loop
-- Session flow and menu structure
-- Run systems and player recovery
-- Presentation pass for HUD and audio
-- First balancing pass for difficulty scaling
-- Visual and Audio Identity (parallax stars, lumpy rotating asteroids, screen shake, particles, music, and shop/low-health sounds)
+- **Authoritative Physics**: Server computes all physics calculations; clients receive authoritative updates
+- **Tick Rate**: 30 server ticks per second for smooth gameplay
+- **Anti-Cheat**: Client inputs signed with HMAC-SHA256; server validates all mutations
+- **Latency Handling**: Optimistic client-side prediction with server corrections
 
-## Roadmap
+## 📱 Running Locally
 
-The public roadmap lives in [FUTURE_SPRINTS.md](/home/mateus/Documents/asteroids-python/FUTURE_SPRINTS.md:1).
+### Backend (Go)
+```bash
+# Coming soon: Full setup instructions
+go run ./cmd/server
+```
 
-Detailed per-sprint planning is kept separately in `.planning/` and is intentionally not tracked by Git.
+### Frontend (Flutter)
+```bash
+flutter pub get
+flutter run
+```
+
+## 📄 License
+
+MIT License — See LICENSE file for details.
