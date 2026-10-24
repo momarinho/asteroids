@@ -1,7 +1,6 @@
 # Python-generated files
 __pycache__/
 *.py[oc]
-build/
 dist/
 wheels/
 *.egg-info
@@ -20,7 +19,8 @@ game_events.jsonl
 .idea/
 
 # Android/iOS/Desktop local build files
-build/
+build/*
+!build/web/
 linux/flutter/ephemeral/
 windows/flutter/
 macos/Flutter/ephemeral/

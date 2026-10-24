@@ -51,18 +51,25 @@ func main() {
 	r.GET("/ranking", handleLiveLeaderboard)
 
 	// Serve Flutter Web if build/web exists
+	webDir := ""
 	if _, err := os.Stat("../build/web/index.html"); err == nil {
-		r.Static("/assets", "../build/web/assets")
-		r.Static("/canvaskit", "../build/web/canvaskit")
-		r.Static("/icons", "../build/web/icons")
-		r.StaticFile("/favicon.png", "../build/web/favicon.png")
-		r.StaticFile("/flutter.js", "../build/web/flutter.js")
-		r.StaticFile("/flutter_bootstrap.js", "../build/web/flutter_bootstrap.js")
-		r.StaticFile("/flutter_service_worker.js", "../build/web/flutter_service_worker.js")
-		r.StaticFile("/main.dart.js", "../build/web/main.dart.js")
-		r.StaticFile("/manifest.json", "../build/web/manifest.json")
-		r.StaticFile("/version.json", "../build/web/version.json")
-		r.StaticFile("/", "../build/web/index.html")
+		webDir = "../build/web"
+	} else if _, err := os.Stat("build/web/index.html"); err == nil {
+		webDir = "build/web"
+	}
+
+	if webDir != "" {
+		r.Static("/assets", webDir+"/assets")
+		r.Static("/canvaskit", webDir+"/canvaskit")
+		r.Static("/icons", webDir+"/icons")
+		r.StaticFile("/favicon.png", webDir+"/favicon.png")
+		r.StaticFile("/flutter.js", webDir+"/flutter.js")
+		r.StaticFile("/flutter_bootstrap.js", webDir+"/flutter_bootstrap.js")
+		r.StaticFile("/flutter_service_worker.js", webDir+"/flutter_service_worker.js")
+		r.StaticFile("/main.dart.js", webDir+"/main.dart.js")
+		r.StaticFile("/manifest.json", webDir+"/manifest.json")
+		r.StaticFile("/version.json", webDir+"/version.json")
+		r.StaticFile("/", webDir+"/index.html")
 	}
 
 	fmt.Println("Asteroids backend listening on port 8080...")
