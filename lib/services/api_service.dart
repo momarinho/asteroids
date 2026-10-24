@@ -101,7 +101,66 @@ class ApiService {
     return false;
   }
 
-  // 5. Get leaderboards list
+  // 5. Fair Leaderboard: Local + Online Dual-Persistence
+  static const String _keyFairLeaderboard = 'fair_leaderboard';
+
+  static Future<void> saveFairScore({
+    required String playerName,
+    required String scientistName,
+    required int score,
+  }) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final existingJson = prefs.getString(_keyFairLeaderboard);
+      List<dynamic> list = [];
+      if (existingJson != null) {
+        list = jsonDecode(existingJson);
+      }
+      list.add({
+        'username': playerName,
+        'scientist': scientistName,
+        'score': score,
+        'level': 1,
+        'created_at': DateTime.now().toIso8601String(),
+      });
+      // Sort descending by score
+      list.sort((a, b) => (b['score'] as int).compareTo(a['score'] as int));
+      await prefs.setString(_keyFairLeaderboard, jsonEncode(list));
+
+      // Also try registering player and submitting score to Go backend asynchronously if online
+      final safeUsername = playerName.length >= 2 ? playerName : '$playerName ';
+      final registered = await registerPlayer(safeUsername);
+      if (registered != null) {
+        await submitScore(
+          playerId: registered['id']!,
+          score: score,
+          level: 1,
+          mode: 'arcade',
+        );
+      }
+    } catch (e) {
+      debugPrint('Error saving fair score: $e');
+    }
+  }
+
+  static Future<List<Map<String, dynamic>>> getFairLeaderboard({int limit = 10}) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final existingJson = prefs.getString(_keyFairLeaderboard);
+      if (existingJson != null) {
+        final List<dynamic> list = jsonDecode(existingJson);
+        list.sort((a, b) => (b['score'] as int).compareTo(a['score'] as int));
+        return list.take(limit).map((e) => Map<String, dynamic>.from(e as Map)).toList();
+      }
+    } catch (e) {
+      debugPrint('Error reading local fair leaderboard: $e');
+    }
+
+    // Fallback to backend
+    return getLeaderboard('arcade', limit: limit);
+  }
+
+  // 6. Get leaderboards list
   static Future<List<Map<String, dynamic>>> getLeaderboard(String mode, {int limit = 10}) async {
     try {
       final response = await http.get(

@@ -35,12 +35,11 @@ class _HudOverlayState extends State<HudOverlay> with SingleTickerProviderStateM
   Widget build(BuildContext context) {
     final game = widget.game;
     final player = game.player;
+    final scientist = game.selectedScientist;
 
     final livesLeft = game.lives;
     final score = game.score;
-    final credits = game.credits;
-    final currentLevel = game.currentLevel;
-    final activeMode = game.activeMode;
+    final timeRemaining = game.timeRemaining;
 
     final isInvulnerable = player.isInvulnerable();
     final invulTime = player.invulnerableTimer;
@@ -52,107 +51,157 @@ class _HudOverlayState extends State<HudOverlay> with SingleTickerProviderStateM
       padding: const EdgeInsets.all(20.0),
       child: Stack(
         children: [
-          // Top Left: Score, Mode, Level (Ignore Pointer so click-through works)
+          // Top Left: Score, Scientist Badge & Ship Name
           Positioned(
             top: 0,
             left: 0,
             child: IgnorePointer(
               child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'SCORE: $score',
-                  style: const TextStyle(
-                    fontFamily: 'Courier',
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                    shadows: [Shadow(color: Colors.cyan, blurRadius: 4)],
-                  ),
-                ),
-                const SizedBox(height: 5),
-                Text(
-                  activeMode == 'campaign' ? 'STAGE: $currentLevel' : 'MODE: CLASSIC',
-                  style: const TextStyle(
-                    fontFamily: 'Courier',
-                    fontSize: 12,
-                    color: Colors.cyanAccent,
-                  ),
-                ),
-                if (activeMode == 'campaign') ...[
-                  const SizedBox(height: 5),
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
                   Text(
-                    'CREDITS: ${credits}C',
+                    'PONTOS: $score',
                     style: const TextStyle(
                       fontFamily: 'Courier',
-                      fontSize: 12,
-                      color: Colors.amberAccent,
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      shadows: [Shadow(color: Colors.cyan, blurRadius: 4)],
                     ),
                   ),
-                ],
-                if (activeMode == 'classic' && game.asteroidField != null) ...[
-                  const SizedBox(height: 5),
+                  const SizedBox(height: 6),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: scientist.primaryColor.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(6),
+                      border: Border.all(color: scientist.primaryColor.withOpacity(0.6)),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.science, color: scientist.primaryColor, size: 14),
+                        const SizedBox(width: 5),
+                        Text(
+                          scientist.name.toUpperCase(),
+                          style: TextStyle(
+                            fontFamily: 'Courier',
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                            color: scientist.primaryColor,
+                            letterSpacing: 1,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 4),
                   Text(
-                    'DANGER: ${game.asteroidField!.dangerLevel().toUpperCase()}',
+                    'NAVE: ${scientist.shipName}',
                     style: TextStyle(
                       fontFamily: 'Courier',
-                      fontSize: 12,
-                      color: game.asteroidField!.dangerLevel() == 'High'
-                          ? Colors.redAccent
-                          : (game.asteroidField!.dangerLevel() == 'Medium' ? Colors.orangeAccent : Colors.greenAccent),
+                      fontSize: 10,
+                      color: scientist.accentColor,
                     ),
                   ),
                 ],
-              ],
+              ),
             ),
           ),
-          ), // Ends IgnorePointer of Top Left card
 
-          // Top Right: Lives and Invulnerability Status (Ignore Pointer so click-through works)
+          // Top Center: Mission Timer Countdown
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: IgnorePointer(
+              child: Center(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.75),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: timeRemaining < 30 ? Colors.redAccent : scientist.primaryColor.withOpacity(0.7),
+                      width: 1.5,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: (timeRemaining < 30 ? Colors.red : scientist.primaryColor).withOpacity(0.2),
+                        blurRadius: 12,
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.timer_outlined,
+                        color: timeRemaining < 30 ? Colors.redAccent : scientist.primaryColor,
+                        size: 20,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        '${(timeRemaining ~/ 60).toString().padLeft(2, '0')}:${(timeRemaining.toInt() % 60).toString().padLeft(2, '0')}',
+                        style: TextStyle(
+                          fontFamily: 'Courier',
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 2,
+                          color: timeRemaining < 30 ? Colors.redAccent : Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+
+          // Top Right: 3 Lives & Shield Indicator
           Positioned(
             top: 0,
             right: 0,
             child: IgnorePointer(
               child: Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                // Lives Indicator (Ship icons)
-                Row(
-                  children: List.generate(5, (index) {
-                    final isActive = index < livesLeft;
-                    return Padding(
-                      padding: const EdgeInsets.only(left: 4.0),
-                      child: Icon(
-                        Icons.navigation,
-                        color: isActive ? Colors.white : Colors.white24,
-                        size: 20,
-                      ),
-                    );
-                  }),
-                ),
-                const SizedBox(height: 10),
-                if (isInvulnerable)
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: Colors.blue.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(4),
-                      border: Border.all(color: Colors.blueAccent),
-                    ),
-                    child: Text(
-                      'SHIELD: ${invulTime.toStringAsFixed(1)}s',
-                      style: const TextStyle(
-                        fontFamily: 'Courier',
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.blueAccent,
-                      ),
-                    ),
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Row(
+                    children: List.generate(3, (index) {
+                      final isActive = index < livesLeft;
+                      return Padding(
+                        padding: const EdgeInsets.only(left: 6.0),
+                        child: Icon(
+                          Icons.favorite,
+                          color: isActive ? scientist.primaryColor : Colors.white24,
+                          size: 22,
+                        ),
+                      );
+                    }),
                   ),
-              ],
+                  const SizedBox(height: 8),
+                  if (isInvulnerable)
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.blue.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(4),
+                        border: Border.all(color: Colors.blueAccent),
+                      ),
+                      child: Text(
+                        'ESCUDO: ${invulTime.toStringAsFixed(1)}s',
+                        style: const TextStyle(
+                          fontFamily: 'Courier',
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.blueAccent,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
             ),
           ),
-          ), // Ends IgnorePointer of Top Right card
 
           // Bottom Left: Weapon Stats and Dash Cooldown (Ignore Pointer so click-through works)
           Positioned(

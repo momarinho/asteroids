@@ -17,6 +17,7 @@ import 'components/starfield.dart';
 import 'components/joystick.dart';
 import 'weapons.dart';
 import 'level_manager.dart';
+import 'scientist.dart';
 import 'package:asteroids/services/api_service.dart';
 import 'dart:io' as io;
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -24,6 +25,8 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 enum GameState {
   menu,
   settings,
+  scienceIntro,
+  scientistSelection,
   playing,
   gameOver,
   stageClear,
@@ -45,9 +48,16 @@ class AsteroidsGame extends FlameGame with HasCollisionDetection, KeyboardEvents
   bool mobileShootPressed = false;
   bool mobileDashPressed = false;
 
-  GameState state = GameState.menu;
-  String activeMode = 'classic'; // 'classic' or 'campaign'
+  GameState state = GameState.scienceIntro;
+  String activeMode = 'arcade'; // 'arcade', 'classic' or 'campaign'
   
+  // Science Fair mode properties
+  Scientist selectedScientist = Scientist.defaultScientist;
+  static const double fairRoundDuration = 120.0; // 2 minutes
+  double timeRemaining = fairRoundDuration;
+  bool missionSurvived = false;
+  String? participantName;
+
   // Settings selections
   int selectedMovementPresetIndex = 1; // 1 = Balanced
   int selectedWeaponIndex = 0; // 0 = Blaster
@@ -116,8 +126,8 @@ class AsteroidsGame extends FlameGame with HasCollisionDetection, KeyboardEvents
       playerUsername = profile['username'];
     }
 
-    // Initial state set
-    changeState(GameState.menu);
+    // Initial state set for Science Fair
+    changeState(GameState.scienceIntro);
   }
 
   void changeState(GameState newState) {
@@ -127,6 +137,20 @@ class AsteroidsGame extends FlameGame with HasCollisionDetection, KeyboardEvents
     overlays.clear();
 
     switch (newState) {
+      case GameState.scienceIntro:
+        overlays.add('scienceIntro');
+        try {
+          FlameAudio.bgm.stop();
+        } catch (_) {}
+        _removeAllAsteroidsAndProjectiles();
+        break;
+      case GameState.scientistSelection:
+        overlays.add('scientistSelection');
+        try {
+          FlameAudio.bgm.stop();
+        } catch (_) {}
+        _removeAllAsteroidsAndProjectiles();
+        break;
       case GameState.menu:
         overlays.add('menu');
         try {
@@ -260,6 +284,15 @@ class AsteroidsGame extends FlameGame with HasCollisionDetection, KeyboardEvents
       shakeTimer = math.max(0.0, shakeTimer - dt);
     }
 
+    // Science Fair 120-second countdown timer
+    if (state == GameState.playing) {
+      timeRemaining -= dt;
+      if (timeRemaining <= 0) {
+        timeRemaining = 0;
+        completeMission(survived: true);
+      }
+    }
+
     // If campaign is active, run the level manager update
     if (state == GameState.playing && activeMode == 'campaign' && levelManager != null) {
       levelManager!.update(dt);
@@ -390,17 +423,50 @@ class AsteroidsGame extends FlameGame with HasCollisionDetection, KeyboardEvents
   }
 
   void gameOver() {
-    changeState(GameState.gameOver);
+    completeMission(survived: false);
+  }
 
-    // Submit high score to backend automatically if registered
-    if (playerId != null && score > 0) {
-      ApiService.submitScore(
-        playerId: playerId!,
-        score: score,
-        level: currentLevel,
-        mode: activeMode,
-      );
+  void startFairGame(Scientist scientist) {
+    selectedScientist = scientist;
+    score = 0;
+    lives = GameConstants.playerLives;
+    currentLevel = 1;
+    timeRemaining = fairRoundDuration;
+    missionSurvived = false;
+
+    if (levelManager != null) {
+      levelManager = null;
     }
+    if (asteroidField != null) {
+      asteroidField!.removeFromParent();
+      asteroidField = null;
+    }
+
+    _removeAllAsteroidsAndProjectiles();
+
+    player.respawn(GameConstants.screenWidth / 2, GameConstants.screenHeight / 2);
+    player.configureScientist(scientist);
+
+    final preset = movementPresets[selectedMovementPresetIndex];
+    player.movementAcceleration = preset.acceleration;
+    player.movementMaxSpeed = preset.maxSpeed;
+    player.movementFriction = preset.friction;
+
+    asteroidField = AsteroidField();
+    world.add(asteroidField!);
+
+    changeState(GameState.playing);
+  }
+
+  void completeMission({required bool survived}) {
+    missionSurvived = survived;
+    if (survived) {
+      score += 500; // Survival bonus
+      playSfx('powerup.wav');
+    } else {
+      playSfx('player_hit.wav');
+    }
+    changeState(GameState.gameOver);
   }
 }
 

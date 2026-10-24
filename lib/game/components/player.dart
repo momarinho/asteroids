@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:asteroids/constants.dart';
 import 'package:asteroids/game/asteroids_game.dart';
 import 'package:asteroids/game/weapons.dart';
+import 'package:asteroids/game/scientist.dart';
 import 'asteroid.dart';
 
 class PlayerComponent extends PositionComponent with HasGameReference<AsteroidsGame>, CollisionCallbacks {
@@ -26,6 +27,8 @@ class PlayerComponent extends PositionComponent with HasGameReference<AsteroidsG
 
   late Weapon weapon;
   late final Map<String, Weapon> unlockedWeapons;
+  Scientist? scientist;
+  bool isThrusting = false;
 
   PlayerComponent({required Vector2 position}) {
     this.position = position;
@@ -34,6 +37,13 @@ class PlayerComponent extends PositionComponent with HasGameReference<AsteroidsG
     size = Vector2.all(radius * 2);
     weapon = Blaster();
     unlockedWeapons = {'blaster': weapon};
+  }
+
+  void configureScientist(Scientist newScientist) {
+    scientist = newScientist;
+    weapon = newScientist.createWeapon();
+    unlockedWeapons.clear();
+    unlockedWeapons[newScientist.weaponId] = weapon;
   }
 
   @override
@@ -50,9 +60,12 @@ class PlayerComponent extends PositionComponent with HasGameReference<AsteroidsG
         game.playSfx('player_hit.wav');
         game.triggerScreenShake(duration: 0.4, intensity: 12.0);
 
+        final pColor = scientist?.primaryColor ?? Colors.cyan;
+        final aColor = scientist?.accentColor ?? Colors.white;
+
         game.spawnExplosionParticles(
           position: position,
-          colorChoices: [Colors.cyan, Colors.white, Colors.blue, Colors.grey],
+          colorChoices: [pColor, aColor, Colors.white, Colors.grey],
           count: 30,
           minSize: 2.5,
           maxSize: 5.0,
@@ -62,7 +75,7 @@ class PlayerComponent extends PositionComponent with HasGameReference<AsteroidsG
 
         game.lives -= 1;
         if (game.lives <= 0) {
-          game.gameOver();
+          game.completeMission(survived: false);
         } else {
           respawn(game.size.x / 2, game.size.y / 2);
         }
@@ -158,6 +171,7 @@ class PlayerComponent extends PositionComponent with HasGameReference<AsteroidsG
       }
 
       accelerate(dt, stick.length);
+      isThrusting = true;
     } else {
       // Standard Keyboard Input Handling
       double rotateDirection = 0.0;
@@ -173,6 +187,9 @@ class PlayerComponent extends PositionComponent with HasGameReference<AsteroidsG
 
       if (keys.contains(LogicalKeyboardKey.arrowUp) || keys.contains(LogicalKeyboardKey.keyW)) {
         accelerate(dt, 1.0);
+        isThrusting = true;
+      } else {
+        isThrusting = false;
       }
       if (keys.contains(LogicalKeyboardKey.arrowDown) || keys.contains(LogicalKeyboardKey.keyS)) {
         accelerate(dt, -1.0);
@@ -261,18 +278,7 @@ class PlayerComponent extends PositionComponent with HasGameReference<AsteroidsG
 
     canvas.translate(radius, radius);
 
-    final paint = Paint()
-      ..color = Colors.white
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = GameConstants.lineWidth;
-
-    final path = Path()
-      ..moveTo(0, -radius)
-      ..lineTo(-radius / 1.5, radius)
-      ..lineTo(radius / 1.5, radius)
-      ..close();
-
-    canvas.drawPath(path, paint);
+    _renderShip(canvas);
 
     // Muzzle flash rendering
     if (muzzleFlashTimer > 0) {
@@ -281,6 +287,147 @@ class PlayerComponent extends PositionComponent with HasGameReference<AsteroidsG
       
       final innerFlashPaint = Paint()..color = Colors.white;
       canvas.drawCircle(Offset(0, -radius), muzzleFlashSize * 0.5, innerFlashPaint);
+    }
+  }
+
+  void _renderShip(Canvas canvas) {
+    final design = scientist?.shipDesign ?? ShipDesign.deltaJet;
+    final primary = scientist?.primaryColor ?? Colors.white;
+    final accent = scientist?.accentColor ?? Colors.cyanAccent;
+
+    final primaryPaint = Paint()
+      ..color = primary
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = GameConstants.lineWidth;
+
+    final accentPaint = Paint()
+      ..color = accent
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.5;
+
+    final fillPaint = Paint()
+      ..color = primary.withOpacity(0.12)
+      ..style = PaintingStyle.fill;
+
+    // Thruster flames if accelerating forward
+    if (isThrusting) {
+      final flameFlicker = (DateTime.now().millisecondsSinceEpoch % 150) / 150.0;
+      final flameLength = radius * (0.6 + flameFlicker * 0.5);
+      final flamePaint = Paint()
+        ..color = accent.withOpacity(0.8)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2.0;
+
+      final flamePath = Path()
+        ..moveTo(-radius * 0.25, radius * 0.7)
+        ..lineTo(0, radius * 0.7 + flameLength)
+        ..lineTo(radius * 0.25, radius * 0.7);
+      canvas.drawPath(flamePath, flamePaint);
+    }
+
+    switch (design) {
+      case ShipDesign.deltaJet:
+        // Mae Jemison: Endeavour Bio-Jet (Aerodynamic delta wings)
+        final path = Path()
+          ..moveTo(0, -radius) // Nose tip
+          ..lineTo(-radius * 0.85, radius * 0.85) // Left wing tip
+          ..lineTo(-radius * 0.35, radius * 0.5) // Left wing inner notch
+          ..lineTo(-radius * 0.2, radius * 0.75) // Left engine
+          ..lineTo(0, radius * 0.55) // Center aft
+          ..lineTo(radius * 0.2, radius * 0.75) // Right engine
+          ..lineTo(radius * 0.35, radius * 0.5) // Right wing inner notch
+          ..lineTo(radius * 0.85, radius * 0.85) // Right wing tip
+          ..close();
+
+        canvas.drawPath(path, fillPaint);
+        canvas.drawPath(path, primaryPaint);
+
+        // Cockpit canopy
+        final cockpit = Path()
+          ..moveTo(0, -radius * 0.55)
+          ..lineTo(-radius * 0.18, 0)
+          ..lineTo(0, radius * 0.2)
+          ..lineTo(radius * 0.18, 0)
+          ..close();
+        canvas.drawPath(cockpit, accentPaint);
+        break;
+
+      case ShipDesign.codeApollo:
+        // Margaret Hamilton: Apollo Code-1 (Precision angular wedge with antenna probe)
+        final path = Path()
+          ..moveTo(0, -radius * 1.1) // Nose probe
+          ..lineTo(-radius * 0.65, radius * 0.85) // Left aft
+          ..lineTo(-radius * 0.25, radius * 0.6) // Inset
+          ..lineTo(0, radius * 0.75) // Center
+          ..lineTo(radius * 0.25, radius * 0.6) // Inset
+          ..lineTo(radius * 0.65, radius * 0.85) // Right aft
+          ..close();
+
+        canvas.drawPath(path, fillPaint);
+        canvas.drawPath(path, primaryPaint);
+
+        // Outer data wings / stabilizer struts
+        final wingLines = Path()
+          ..moveTo(-radius * 0.35, -radius * 0.1)
+          ..lineTo(-radius * 0.85, radius * 0.35)
+          ..lineTo(-radius * 0.7, radius * 0.7)
+          ..moveTo(radius * 0.35, -radius * 0.1)
+          ..lineTo(radius * 0.85, radius * 0.35)
+          ..lineTo(radius * 0.7, radius * 0.7);
+        canvas.drawPath(wingLines, accentPaint);
+
+        // Core data module
+        canvas.drawRect(
+          Rect.fromCenter(center: Offset(0, -radius * 0.05), width: radius * 0.35, height: radius * 0.35),
+          accentPaint,
+        );
+        break;
+
+      case ShipDesign.hubbleScout:
+        // Nancy Grace Roman: Hubble Scout (Telescope barrel + solar panel wings)
+        final barrel = RRect.fromRectAndRadius(
+          Rect.fromCenter(center: const Offset(0, 0), width: radius * 0.7, height: radius * 1.8),
+          const Radius.circular(3),
+        );
+        canvas.drawRRect(barrel, fillPaint);
+        canvas.drawRRect(barrel, primaryPaint);
+
+        // Optical aperture at top
+        canvas.drawCircle(Offset(0, -radius * 0.8), radius * 0.26, accentPaint);
+
+        // Left solar panel
+        final leftPanel = Rect.fromLTRB(-radius * 1.25, -radius * 0.35, -radius * 0.35, radius * 0.35);
+        canvas.drawRect(leftPanel, accentPaint);
+        canvas.drawLine(Offset(-radius * 0.8, -radius * 0.35), Offset(-radius * 0.8, radius * 0.35), accentPaint);
+        canvas.drawLine(Offset(-radius * 1.25, 0), Offset(-radius * 0.35, 0), accentPaint);
+
+        // Right solar panel
+        final rightPanel = Rect.fromLTRB(radius * 0.35, -radius * 0.35, radius * 1.25, radius * 0.35);
+        canvas.drawRect(rightPanel, accentPaint);
+        canvas.drawLine(Offset(radius * 0.8, -radius * 0.35), Offset(radius * 0.8, radius * 0.35), accentPaint);
+        canvas.drawLine(Offset(radius * 0.35, 0), Offset(radius * 1.25, 0), accentPaint);
+        break;
+
+      case ShipDesign.orbitalTitan:
+        // Peggy Whitson: Orbital Station-X (Modular station hull with heavy thrusters)
+        final path = Path()
+          ..moveTo(0, -radius) // Heavy front ram
+          ..lineTo(-radius * 0.45, -radius * 0.5)
+          ..lineTo(-radius * 0.85, radius * 0.15) // Heavy shoulder
+          ..lineTo(-radius * 0.65, radius * 0.85) // Left booster pod
+          ..lineTo(-radius * 0.2, radius * 0.6)
+          ..lineTo(radius * 0.2, radius * 0.6)
+          ..lineTo(radius * 0.65, radius * 0.85) // Right booster pod
+          ..lineTo(radius * 0.85, radius * 0.15) // Heavy shoulder
+          ..lineTo(radius * 0.45, -radius * 0.5)
+          ..close();
+
+        canvas.drawPath(path, fillPaint);
+        canvas.drawPath(path, primaryPaint);
+
+        // Central science module
+        canvas.drawCircle(Offset(0, radius * 0.05), radius * 0.28, accentPaint);
+        break;
     }
   }
 }
