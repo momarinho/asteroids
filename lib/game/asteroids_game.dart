@@ -103,9 +103,13 @@ class AsteroidsGame extends FlameGame with HasCollisionDetection, KeyboardEvents
     camera.viewfinder.position = Vector2(1280 / 2, 720 / 2);
     camera.viewfinder.anchor = Anchor.center;
 
-    // Setup FlameAudio asset folder configuration
+    // Setup FlameAudio asset folder configuration and silence native warning spam on Linux
+    AudioLogger.logLevel = AudioLogLevel.none;
     FlameAudio.audioCache.prefix = 'assets/sounds/';
-    FlameAudio.bgm.initialize();
+    try {
+      FlameAudio.bgm.initialize();
+    } catch (_) {}
+    _initAudioPools();
 
     // Add StarfieldComponent first so it is rendered behind the player
     world.add(StarfieldComponent());
@@ -176,7 +180,7 @@ class AsteroidsGame extends FlameGame with HasCollisionDetection, KeyboardEvents
         _safeAddOverlay('hud');
         // Play loop background music
         try {
-          FlameAudio.bgm.play('music.wav').catchError((_) {});
+          FlameAudio.bgm.play('music.wav');
         } catch (_) {}
         gameFocusNode?.requestFocus();
         break;
@@ -189,7 +193,7 @@ class AsteroidsGame extends FlameGame with HasCollisionDetection, KeyboardEvents
       case GameState.gameOver:
         _safeAddOverlay('gameOver');
         try {
-          FlameAudio.bgm.stop().catchError((_) {});
+          FlameAudio.bgm.stop();
         } catch (_) {}
         break;
       case GameState.leaderboard:
@@ -348,19 +352,54 @@ class AsteroidsGame extends FlameGame with HasCollisionDetection, KeyboardEvents
   }
 
   final Map<String, int> _lastPlayedSfxTime = {};
+  final Map<String, AudioPool> _audioPools = {};
 
-  void playSfx(String name) {
-    // Throttle rapid duplicate audio triggers (e.g. multiple asteroid split sounds in the same frame)
-    // to prevent Linux GStreamer audio pipeline saturation and pad crashes
+  Future<void> _initAudioPools() async {
+    final poolConfigs = {
+      'shoot.wav': 2,
+      'asteroid_split.wav': 2,
+      'player_hit.wav': 2,
+      'powerup.wav': 2,
+      'menu_select.wav': 2,
+    };
+
+    for (final entry in poolConfigs.entries) {
+      try {
+        final pool = await FlameAudio.createPool(
+          entry.key,
+          minPlayers: 1,
+          maxPlayers: entry.value,
+        );
+        _audioPools[entry.key] = pool;
+      } catch (_) {}
+    }
+  }
+
+  void playSfx(String name) async {
     final now = DateTime.now().millisecondsSinceEpoch;
+    final minInterval = (name == 'shoot.wav') ? 70 : 85;
     final lastTime = _lastPlayedSfxTime[name] ?? 0;
-    if (now - lastTime < 65) {
-      return; // Skip if played within the last 65ms
+    if (now - lastTime < minInterval) {
+      return;
     }
     _lastPlayedSfxTime[name] = now;
 
+    // Use pre-allocated AudioPool if available to avoid creating dynamic GStreamer pipelines
+    final pool = _audioPools[name];
+    if (pool != null) {
+      try {
+        await pool.start();
+        return;
+      } catch (_) {}
+    }
+
     try {
-      FlameAudio.play(name).then<void>((_) {}).catchError((_) {});
+      final player = await FlameAudio.play(name);
+      player.onPlayerComplete.listen((_) {
+        try {
+          player.dispose();
+        } catch (_) {}
+      });
     } catch (_) {}
   }
 
