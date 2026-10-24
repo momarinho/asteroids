@@ -25,30 +25,34 @@ class AsteroidField extends Component with HasGameReference<AsteroidsGame> {
     difficultyTimer += dt;
 
     double spawnInterval;
-    if (difficultyTimer < 60.0) {
-      // Phase 1 (0-60s): Calm & welcoming for learning controls
-      final p = difficultyTimer / 60.0;
-      spawnInterval = 2.4 - (p * 0.7); // 2.4s -> 1.7s
-      speedMultiplier = 0.75 + (p * 0.3); // 0.75x -> 1.05x
-    } else if (difficultyTimer < 115.0) {
-      // Phase 2 (60-115s): Active progressive arcade
-      final p = (difficultyTimer - 60.0) / 55.0;
-      spawnInterval = 1.7 - (p * 0.7); // 1.7s -> 1.0s
-      speedMultiplier = 1.05 + (p * 0.45); // 1.05x -> 1.5x
+    if (difficultyTimer < 45.0) {
+      // Fase 1 (0-45s): Introdução suave e tranquila (onboarding para crianças)
+      final p = difficultyTimer / 45.0;
+      spawnInterval = 3.2 - (p * 1.0); // 3.2s -> 2.2s
+      speedMultiplier = 0.55 + (p * 0.30); // 0.55x -> 0.85x
+    } else if (difficultyTimer < 90.0) {
+      // Fase 2 (45-90s): Ritmo Arcade progressivo equilibrado
+      final p = (difficultyTimer - 45.0) / 45.0;
+      spawnInterval = 2.2 - (p * 0.90); // 2.2s -> 1.30s
+      speedMultiplier = 0.85 + (p * 0.40); // 0.85x -> 1.25x
+    } else if (difficultyTimer < 125.0) {
+      // Fase 3 (90-125s): Pressão Crescente
+      final p = (difficultyTimer - 90.0) / 35.0;
+      spawnInterval = 1.30 - (p * 0.60); // 1.30s -> 0.70s
+      speedMultiplier = 1.25 + (p * 0.50); // 1.25x -> 1.75x
     } else {
-      // Phase 3 (115-150s - FINAL 35s): METEOR STORM!
-      // Extremely fast & dense to challenge and separate top pilots
-      final p = ((difficultyTimer - 115.0) / 35.0).clamp(0.0, 1.0);
-      spawnInterval = 0.9 - (p * 0.52); // 0.9s -> 0.38s!
-      speedMultiplier = 1.5 + (p * 0.85); // 1.5x -> 2.35x!
+      // Fase 4 (125-150s - Últimos 25s): HIPER TEMPESTADE FINAL (Muito difícil)
+      final p = ((difficultyTimer - 125.0) / 25.0).clamp(0.0, 1.0);
+      spawnInterval = 0.70 - (p * 0.44); // 0.70s -> 0.26s!!
+      speedMultiplier = 1.75 + (p * 0.90); // 1.75x -> 2.65x!!
     }
 
     if (spawnTimer > spawnInterval) {
       spawnTimer = 0.0;
       _spawnAsteroid();
 
-      // In the final 20 seconds, trigger double hazard spawns!
-      if (difficultyTimer >= 130.0 && math.Random().nextDouble() < 0.45) {
+      // Na tempestade final, alta frequência de spawns duplos!
+      if (difficultyTimer >= 125.0 && math.Random().nextDouble() < 0.65) {
         _spawnAsteroid();
       }
     }
@@ -87,7 +91,7 @@ class AsteroidField extends Component with HasGameReference<AsteroidsGame> {
         break;
     }
 
-    // Speed starts at ~35-70 px/s, scaling smoothly with difficulty
+    // Speed starts slow at ~20-40 px/s, scaling up to ~100-200 px/s in storm
     final speed = (35.0 + random.nextDouble() * 45.0) * speedMultiplier;
     
     // Rotate direction randomly by -30 to +30 degrees
@@ -95,8 +99,13 @@ class AsteroidField extends Component with HasGameReference<AsteroidsGame> {
     final velocity = direction.clone()..rotate(deviationAngle);
     velocity.scale(speed);
 
-    // Kind/Size: 1 to 3
-    final kind = random.nextInt(GameConstants.asteroidKinds) + 1;
+    // Kind/Size: In phase 1, spawn large asteroids (kind 2 or 3) for easy target practice
+    final int kind;
+    if (difficultyTimer < 45.0) {
+      kind = random.nextBool() ? 2 : 3;
+    } else {
+      kind = random.nextInt(GameConstants.asteroidKinds) + 1;
+    }
     final radius = GameConstants.asteroidMinRadius * kind;
 
     final asteroid = AsteroidComponent(

@@ -125,12 +125,17 @@ class _HudOverlayState extends State<HudOverlay> with SingleTickerProviderStateM
                         color: Colors.black.withOpacity(0.75),
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(
-                          color: timeRemaining < 35 ? Colors.redAccent : scientist.primaryColor.withOpacity(0.7),
+                          color: timeRemaining <= 25
+                              ? Colors.redAccent
+                              : (timeRemaining <= 45 ? Colors.amberAccent : scientist.primaryColor.withOpacity(0.7)),
                           width: 1.5,
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: (timeRemaining < 35 ? Colors.red : scientist.primaryColor).withOpacity(0.25),
+                            color: (timeRemaining <= 25
+                                    ? Colors.red
+                                    : (timeRemaining <= 45 ? Colors.amber : scientist.primaryColor))
+                                .withOpacity(0.25),
                             blurRadius: 12,
                           ),
                         ],
@@ -140,7 +145,9 @@ class _HudOverlayState extends State<HudOverlay> with SingleTickerProviderStateM
                         children: [
                           Icon(
                             Icons.timer_outlined,
-                            color: timeRemaining < 35 ? Colors.redAccent : scientist.primaryColor,
+                            color: timeRemaining <= 25
+                                ? Colors.redAccent
+                                : (timeRemaining <= 45 ? Colors.amberAccent : scientist.primaryColor),
                             size: 20,
                           ),
                           const SizedBox(width: 8),
@@ -151,18 +158,20 @@ class _HudOverlayState extends State<HudOverlay> with SingleTickerProviderStateM
                               fontSize: 22,
                               fontWeight: FontWeight.bold,
                               letterSpacing: 2,
-                              color: timeRemaining < 35 ? Colors.redAccent : Colors.white,
+                              color: timeRemaining <= 25
+                                  ? Colors.redAccent
+                                  : (timeRemaining <= 45 ? Colors.amberAccent : Colors.white),
                             ),
                           ),
                         ],
                       ),
                     ),
-                    if (timeRemaining < 35) ...[
+                    if (timeRemaining <= 25) ...[
                       const SizedBox(height: 4),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
                         decoration: BoxDecoration(
-                          color: Colors.red.withOpacity(0.3),
+                          color: Colors.red.withOpacity(0.35),
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(color: Colors.redAccent, width: 1),
                         ),
@@ -172,13 +181,40 @@ class _HudOverlayState extends State<HudOverlay> with SingleTickerProviderStateM
                             Icon(Icons.warning_amber_rounded, color: Colors.yellowAccent, size: 14),
                             SizedBox(width: 4),
                             Text(
-                              'TEMPESTADE DE METEOROS!',
+                              'HIPER TEMPESTADE DE METEOROS!',
                               style: TextStyle(
                                 fontFamily: 'Courier',
                                 fontSize: 10,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.yellowAccent,
                                 letterSpacing: 1.2,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ] else if (timeRemaining <= 45) ...[
+                      const SizedBox(height: 4),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: Colors.amber.withOpacity(0.25),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: Colors.amberAccent, width: 1),
+                        ),
+                        child: const Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.warning_amber_rounded, color: Colors.amberAccent, size: 14),
+                            SizedBox(width: 4),
+                            Text(
+                              'ALERTA: METEOROS SE APROXIMANDO!',
+                              style: TextStyle(
+                                fontFamily: 'Courier',
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.amberAccent,
+                                letterSpacing: 1.0,
                               ),
                             ),
                           ],

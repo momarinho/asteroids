@@ -19,6 +19,11 @@ class Scientist {
   final String weaponId;
   final String weaponName;
   final String weaponDescription;
+  final String weaponStyle;
+  final int cadenceRating; // 1 to 5
+  final int areaRating; // 1 to 5
+  final int powerRating; // 1 to 5
+  final String kidTip;
   final String imagePath;
   final Color primaryColor;
   final Color accentColor;
@@ -35,6 +40,11 @@ class Scientist {
     required this.weaponId,
     required this.weaponName,
     required this.weaponDescription,
+    required this.weaponStyle,
+    required this.cadenceRating,
+    required this.areaRating,
+    required this.powerRating,
+    required this.kidTip,
     required this.imagePath,
     required this.primaryColor,
     required this.accentColor,
@@ -53,6 +63,11 @@ class Scientist {
       weaponId: 'spread_shot',
       weaponName: 'Tiro Dispersor',
       weaponDescription: 'Disparo em leque de 3 projéteis para cobrir amplas áreas do espaço.',
+      weaponStyle: 'Disparo Triplo em Leque',
+      cadenceRating: 3,
+      areaRating: 5,
+      powerRating: 3,
+      kidTip: 'Dispara 3 tiros de uma vez só! Ótima para cobrir a tela e acertar sem precisar mirar com precisão.',
       imagePath: 'assets/images/scientists/mae_jemison.png',
       primaryColor: const Color(0xFF00E676), // Emerald Green
       accentColor: const Color(0xFF00E5FF), // Light Cyan
@@ -69,6 +84,11 @@ class Scientist {
       weaponId: 'rapid_fire',
       weaponName: 'Laser Veloz',
       weaponDescription: 'Rajadas rápidas e contínuas de laser, como ciclos de processamento de código.',
+      weaponStyle: 'Metralhadora de Laser',
+      cadenceRating: 5,
+      areaRating: 2,
+      powerRating: 3,
+      kidTip: 'Disparos contínuos e ultrarrápidos! Ideal para quem tem dedo ágil e adora atirar sem parar.',
       imagePath: 'assets/images/scientists/margaret_hamilton.png',
       primaryColor: const Color(0xFF2979FF), // Electric Blue
       accentColor: const Color(0xFFFFFFFF), // Pure White
@@ -85,6 +105,11 @@ class Scientist {
       weaponId: 'blaster',
       weaponName: 'Laser Fotônico',
       weaponDescription: 'Laser concentrado de longo alcance com mira de precisão telescópica.',
+      weaponStyle: 'Laser Concentrado',
+      cadenceRating: 3,
+      areaRating: 2,
+      powerRating: 4,
+      kidTip: 'Tiro rápido e de longo alcance! Destrói meteoros distantes antes que cheguem perto da nave.',
       imagePath: 'assets/images/scientists/nancy_roman.png',
       primaryColor: const Color(0xFFE040FB), // Cosmic Magenta/Purple
       accentColor: const Color(0xFFFFD700), // Gold
@@ -101,6 +126,11 @@ class Scientist {
       weaponId: 'bomb_launcher',
       weaponName: 'Lança-Bombas',
       weaponDescription: 'Lança cargas explosivas de alta energia que pulverizam aglomerados de asteroides.',
+      weaponStyle: 'Bombas de Plasma Explosivo',
+      cadenceRating: 2,
+      areaRating: 5,
+      powerRating: 5,
+      kidTip: 'Lança bombas pesadas que causam uma super explosão, destruindo vários meteoros juntos!',
       imagePath: 'assets/images/scientists/peggy_whitson.png',
       primaryColor: const Color(0xFFFF6D00), // Solar Orange
       accentColor: const Color(0xFFECEFF1), // Silver

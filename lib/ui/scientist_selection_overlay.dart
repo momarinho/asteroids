@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:asteroids/game/asteroids_game.dart';
 import 'package:asteroids/game/scientist.dart';
+import 'package:asteroids/ui/weapon_preview_dialog.dart';
 
 class ScientistSelectionOverlay extends StatelessWidget {
   final AsteroidsGame game;
@@ -202,60 +203,91 @@ class ScientistSelectionOverlay extends StatelessWidget {
 
           const SizedBox(height: 12),
 
-          // Ship & Weapon Info
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 6.0),
-            decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.4),
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.white12),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    const Icon(Icons.flight, color: Colors.white70, size: 14),
-                    const SizedBox(width: 6),
-                    Expanded(
-                      child: Text(
-                        scientist.shipName,
-                        style: TextStyle(
-                          fontFamily: 'Courier',
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold,
-                          color: scientist.accentColor,
+          // Ship & Weapon Info (Interactive with quick preview)
+          InkWell(
+            onTap: () {
+              game.playSfx('menu_select.wav');
+              WeaponPreviewDialog.show(context, scientist, game);
+            },
+            borderRadius: BorderRadius.circular(8),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 6.0),
+              decoration: BoxDecoration(
+                color: Colors.black.withOpacity(0.4),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.white12),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(Icons.flight, color: Colors.white70, size: 14),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: Text(
+                          scientist.shipName,
+                          style: TextStyle(
+                            fontFamily: 'Courier',
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                            color: scientist.accentColor,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 4),
-                Row(
-                  children: [
-                    const Icon(Icons.bolt, color: Colors.amberAccent, size: 14),
-                    const SizedBox(width: 6),
-                    Expanded(
-                      child: Text(
-                        scientist.weaponName,
-                        style: const TextStyle(
-                          fontFamily: 'Courier',
-                          fontSize: 11,
-                          color: Colors.amberAccent,
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      const Icon(Icons.bolt, color: Colors.amberAccent, size: 14),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: Text(
+                          scientist.weaponName,
+                          style: const TextStyle(
+                            fontFamily: 'Courier',
+                            fontSize: 11,
+                            color: Colors.amberAccent,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
                       ),
-                    ),
-                  ],
-                ),
-              ],
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                        decoration: BoxDecoration(
+                          color: Colors.amber.withOpacity(0.18),
+                          borderRadius: BorderRadius.circular(4),
+                          border: Border.all(color: Colors.amberAccent.withOpacity(0.5), width: 0.8),
+                        ),
+                        child: const Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.play_circle_outline, color: Colors.amberAccent, size: 10),
+                            SizedBox(width: 2),
+                            Text(
+                              'VER',
+                              style: TextStyle(
+                                fontFamily: 'Courier',
+                                fontSize: 8.5,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.amberAccent,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
 
-          const SizedBox(height: 10),
+          const SizedBox(height: 8),
 
           // Short Bio (clean 2-line uniform display)
           SizedBox(
@@ -272,7 +304,39 @@ class ScientistSelectionOverlay extends StatelessWidget {
             ),
           ),
 
-          const SizedBox(height: 14),
+          const SizedBox(height: 10),
+
+          // Test Weapon Button
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              onPressed: () {
+                game.playSfx('menu_select.wav');
+                WeaponPreviewDialog.show(context, scientist, game);
+              },
+              icon: const Icon(Icons.play_circle_fill, size: 14, color: Colors.amberAccent),
+              label: const Text(
+                'TESTAR ARMA',
+                style: TextStyle(
+                  fontFamily: 'Courier',
+                  fontSize: 11,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.amberAccent,
+                  letterSpacing: 1.1,
+                ),
+              ),
+              style: OutlinedButton.styleFrom(
+                side: BorderSide(color: Colors.amberAccent.withOpacity(0.4), width: 1.2),
+                backgroundColor: Colors.amberAccent.withOpacity(0.06),
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 8),
 
           // Select & Launch Button
           SizedBox(
@@ -285,9 +349,9 @@ class ScientistSelectionOverlay extends StatelessWidget {
               style: ElevatedButton.styleFrom(
                 backgroundColor: scientist.primaryColor,
                 foregroundColor: Colors.black,
-                padding: const EdgeInsets.symmetric(vertical: 12),
+                padding: const EdgeInsets.symmetric(vertical: 10),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(8),
                 ),
                 elevation: 6,
                 shadowColor: scientist.primaryColor.withOpacity(0.5),
