@@ -1,10 +1,10 @@
 import 'dart:async';
+import 'dart:math' as math;
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:asteroids/game/asteroids_game.dart';
 import 'package:asteroids/game/scientist.dart';
-import 'package:asteroids/ui/weapon_preview_dialog.dart';
 
 class ScientistSelectionOverlay extends StatefulWidget {
   final AsteroidsGame game;
@@ -15,24 +15,37 @@ class ScientistSelectionOverlay extends StatefulWidget {
   State<ScientistSelectionOverlay> createState() => _ScientistSelectionOverlayState();
 }
 
-class _ScientistSelectionOverlayState extends State<ScientistSelectionOverlay> {
+class _ScientistSelectionOverlayState extends State<ScientistSelectionOverlay> with SingleTickerProviderStateMixin {
   final FocusNode _focusNode = FocusNode();
   int _selectedIndex = 0;
   int _countdownSeconds = 25;
-  Timer? _timer;
+  Timer? _countdownTimer;
+
+  // Live Inline Weapon Simulation
+  late final AnimationController _animController;
+  final List<_InlineBullet> _bullets = [];
+  final List<_InlineSpark> _sparks = [];
+  Offset _dummyAsteroidPos = const Offset(120, 22);
+  double _asteroidFlashTimer = 0.0;
+  double _fireTimer = 0.0;
 
   @override
   void initState() {
     super.initState();
     _startCountdown();
-    // Auto-focus keyboard listener for instant arcade input
+
+    _animController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 1),
+    )..addListener(_updateInlineSimulation)..repeat();
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _focusNode.requestFocus();
     });
   }
 
   void _startCountdown() {
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+    _countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (!mounted) return;
       setState(() {
         if (_countdownSeconds > 1) {
@@ -41,29 +54,143 @@ class _ScientistSelectionOverlayState extends State<ScientistSelectionOverlay> {
             widget.game.playSfx('menu_select.wav');
           }
         } else {
-          _timer?.cancel();
+          _countdownTimer?.cancel();
           _launchScientist(Scientist.scientists[_selectedIndex]);
         }
       });
     });
   }
 
+  void _updateInlineSimulation() {
+    const dt = 0.016;
+    _fireTimer += dt;
+    if (_asteroidFlashTimer > 0) {
+      _asteroidFlashTimer = math.max(0.0, _asteroidFlashTimer - dt);
+    }
+
+    final scientist = Scientist.scientists[_selectedIndex];
+    double fireCooldown;
+    switch (scientist.weaponId) {
+      case 'rapid_fire':
+        fireCooldown = 0.13;
+        break;
+      case 'spread_shot':
+        fireCooldown = 0.45;
+        break;
+      case 'bomb_launcher':
+        fireCooldown = 0.85;
+        break;
+      case 'blaster':
+      default:
+        fireCooldown = 0.32;
+        break;
+    }
+
+    if (_fireTimer >= fireCooldown) {
+      _fireTimer = 0.0;
+      _spawnBulletsForSelected(scientist);
+    }
+
+    // Update simulation bullets
+    for (int i = _bullets.length - 1; i >= 0; i--) {
+      final b = _bullets[i];
+      b.pos += b.vel * dt;
+      b.life -= dt;
+
+      // Check hit with dummy asteroid
+      final dist = (b.pos - _dummyAsteroidPos).distance;
+      if (dist <= (12.0 + b.radius)) {
+        _asteroidFlashTimer = 0.12;
+        final sparkCount = b.isBomb ? 14 : 5;
+        for (int s = 0; s < sparkCount; s++) {
+          final ang = math.Random().nextDouble() * 2 * math.pi;
+          final spd = 30.0 + math.Random().nextDouble() * 60.0;
+          _sparks.add(_InlineSpark(
+            pos: b.pos,
+            vel: Offset(math.cos(ang) * spd, math.sin(ang) * spd),
+            color: b.color,
+            life: 0.3,
+          ));
+        }
+        _bullets.removeAt(i);
+        continue;
+      }
+
+      if (b.life <= 0 || b.pos.dy < -5) {
+        _bullets.removeAt(i);
+      }
+    }
+
+    // Update sparks
+    for (int i = _sparks.length - 1; i >= 0; i--) {
+      final s = _sparks[i];
+      s.pos += s.vel * dt;
+      s.life -= dt;
+      if (s.life <= 0) {
+        _sparks.removeAt(i);
+      }
+    }
+
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  void _spawnBulletsForSelected(Scientist scientist) {
+    const muzzle = Offset(120, 68);
+    if (scientist.weaponId == 'spread_shot') {
+      final angles = [-14.0, 0.0, 14.0];
+      for (final a in angles) {
+        final rad = (a - 90.0) * math.pi / 180.0;
+        const spd = 160.0;
+        _bullets.add(_InlineBullet(
+          pos: muzzle,
+          vel: Offset(math.cos(rad) * spd, math.sin(rad) * spd),
+          color: scientist.primaryColor,
+          radius: 2.6,
+          life: 0.6,
+        ));
+      }
+    } else if (scientist.weaponId == 'rapid_fire') {
+      _bullets.add(_InlineBullet(
+        pos: muzzle,
+        vel: const Offset(0, -200),
+        color: scientist.primaryColor,
+        radius: 2.2,
+        life: 0.5,
+      ));
+    } else if (scientist.weaponId == 'bomb_launcher') {
+      _bullets.add(_InlineBullet(
+        pos: muzzle,
+        vel: const Offset(0, -120),
+        color: scientist.primaryColor,
+        radius: 5.0,
+        life: 0.7,
+        isBomb: true,
+      ));
+    } else {
+      _bullets.add(_InlineBullet(
+        pos: muzzle,
+        vel: const Offset(0, -210),
+        color: scientist.primaryColor,
+        radius: 3.0,
+        life: 0.5,
+      ));
+    }
+  }
+
   @override
   void dispose() {
-    _timer?.cancel();
+    _countdownTimer?.cancel();
+    _animController.dispose();
     _focusNode.dispose();
     super.dispose();
   }
 
   void _launchScientist(Scientist scientist) {
-    _timer?.cancel();
+    _countdownTimer?.cancel();
     widget.game.playSfx('powerup.wav');
     widget.game.startFairGame(scientist);
-  }
-
-  void _openPreview(Scientist scientist) {
-    widget.game.playSfx('menu_select.wav');
-    WeaponPreviewDialog.show(context, scientist, widget.game);
   }
 
   KeyEventResult _handleKeyEvent(FocusNode node, KeyEvent event) {
@@ -72,23 +199,24 @@ class _ScientistSelectionOverlayState extends State<ScientistSelectionOverlay> {
       if (event.logicalKey == LogicalKeyboardKey.arrowLeft || event.logicalKey == LogicalKeyboardKey.keyA) {
         setState(() {
           _selectedIndex = (_selectedIndex - 1 + scientists.length) % scientists.length;
+          _bullets.clear();
+          _sparks.clear();
         });
         widget.game.playSfx('menu_select.wav');
         return KeyEventResult.handled;
       } else if (event.logicalKey == LogicalKeyboardKey.arrowRight || event.logicalKey == LogicalKeyboardKey.keyD) {
         setState(() {
           _selectedIndex = (_selectedIndex + 1) % scientists.length;
+          _bullets.clear();
+          _sparks.clear();
         });
         widget.game.playSfx('menu_select.wav');
         return KeyEventResult.handled;
       } else if (event.logicalKey == LogicalKeyboardKey.space || event.logicalKey == LogicalKeyboardKey.enter) {
         _launchScientist(scientists[_selectedIndex]);
         return KeyEventResult.handled;
-      } else if (event.logicalKey == LogicalKeyboardKey.keyT || event.logicalKey == LogicalKeyboardKey.keyV) {
-        _openPreview(scientists[_selectedIndex]);
-        return KeyEventResult.handled;
       } else if (event.logicalKey == LogicalKeyboardKey.escape) {
-        _timer?.cancel();
+        _countdownTimer?.cancel();
         widget.game.changeState(GameState.scienceIntro);
         return KeyEventResult.handled;
       }
@@ -109,13 +237,13 @@ class _ScientistSelectionOverlayState extends State<ScientistSelectionOverlay> {
         backgroundColor: Colors.transparent,
         body: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 16),
+            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
             child: ClipRect(
               child: BackdropFilter(
                 filter: ImageFilter.blur(sigmaX: 8.0, sigmaY: 8.0),
                 child: Container(
                   width: size.width > 1200 ? 1160 : size.width * 0.96,
-                  padding: const EdgeInsets.all(22.0),
+                  padding: const EdgeInsets.all(20.0),
                   decoration: BoxDecoration(
                     color: Colors.black.withOpacity(0.85),
                     borderRadius: BorderRadius.circular(24),
@@ -133,12 +261,12 @@ class _ScientistSelectionOverlayState extends State<ScientistSelectionOverlay> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      // Top Bar with Back Button, Header and Arcade Countdown Timer
+                      // Header & Arcade Timer
                       Row(
                         children: [
                           IconButton(
                             onPressed: () {
-                              _timer?.cancel();
+                              _countdownTimer?.cancel();
                               widget.game.changeState(GameState.scienceIntro);
                             },
                             icon: const Icon(Icons.arrow_back, color: Colors.white70),
@@ -152,18 +280,19 @@ class _ScientistSelectionOverlayState extends State<ScientistSelectionOverlay> {
                                   'ESCOLHA SUA CIENTISTA',
                                   style: TextStyle(
                                     fontFamily: 'Courier',
-                                    fontSize: 26,
+                                    fontSize: 25,
                                     fontWeight: FontWeight.bold,
                                     letterSpacing: 3,
                                     color: Colors.white,
                                   ),
                                 ),
                                 const SizedBox(height: 2),
-                                const Text(
-                                  'Cada cientista comanda uma nave e armamento exclusivo',
+                                Text(
+                                  'Use as setas ◄ / ► para navegar • Pressione ESPAÇO para decolar',
                                   style: TextStyle(
-                                    fontSize: 12,
-                                    color: Colors.white54,
+                                    fontSize: 11.5,
+                                    color: Colors.cyanAccent.withOpacity(0.9),
+                                    fontWeight: FontWeight.w500,
                                   ),
                                 ),
                               ],
@@ -207,9 +336,9 @@ class _ScientistSelectionOverlayState extends State<ScientistSelectionOverlay> {
                         ],
                       ),
 
-                      const SizedBox(height: 18),
+                      const SizedBox(height: 16),
 
-                      // Cards Layout (Grid of 4 or Row of 4)
+                      // 4 Cards Layout
                       LayoutBuilder(
                         builder: (context, constraints) {
                           final isWide = constraints.maxWidth > 900;
@@ -247,7 +376,7 @@ class _ScientistSelectionOverlayState extends State<ScientistSelectionOverlay> {
 
                       const SizedBox(height: 16),
 
-                      // Desktop Arcade Keyboard Guide Bar
+                      // Arcade Control Footer
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                         decoration: BoxDecoration(
@@ -261,7 +390,7 @@ class _ScientistSelectionOverlayState extends State<ScientistSelectionOverlay> {
                             Icon(Icons.keyboard, color: Colors.cyanAccent, size: 16),
                             SizedBox(width: 8),
                             Text(
-                              '◄ / ► (A/D): NAVEGAR  •  [ESPAÇO / ENTER]: DECOLAR  •  [T]: TESTAR ARMA  •  [ESC]: VOLTAR',
+                              '◄ / ► (A/D): NAVEGAR  •  [ESPAÇO / ENTER]: DECOLAR  •  [ESC]: VOLTAR',
                               style: TextStyle(
                                 fontFamily: 'Courier',
                                 fontSize: 10.5,
@@ -289,6 +418,8 @@ class _ScientistSelectionOverlayState extends State<ScientistSelectionOverlay> {
       onTap: () {
         setState(() {
           _selectedIndex = index;
+          _bullets.clear();
+          _sparks.clear();
         });
         widget.game.playSfx('menu_select.wav');
       },
@@ -300,80 +431,121 @@ class _ScientistSelectionOverlayState extends State<ScientistSelectionOverlay> {
               : Colors.white.withOpacity(0.04),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isSelected ? scientist.primaryColor : scientist.primaryColor.withOpacity(0.4),
+            color: isSelected ? scientist.primaryColor : scientist.primaryColor.withOpacity(0.35),
             width: isSelected ? 2.5 : 1.5,
           ),
           boxShadow: [
             BoxShadow(
               color: isSelected
                   ? scientist.primaryColor.withOpacity(0.35)
-                  : scientist.primaryColor.withOpacity(0.08),
-              blurRadius: isSelected ? 18 : 10,
+                  : scientist.primaryColor.withOpacity(0.06),
+              blurRadius: isSelected ? 18 : 8,
               spreadRadius: isSelected ? 2 : 0,
             ),
           ],
         ),
-        padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 14.0),
+        padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 12.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Arcade Selection Indicator Banner
-            if (isSelected)
-              Container(
-                margin: const EdgeInsets.only(bottom: 8),
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+            // Top: Live Hologram Weapon Viewport (Height: 82px)
+            ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: Container(
+                height: 82,
+                width: double.infinity,
                 decoration: BoxDecoration(
-                  color: scientist.primaryColor,
-                  borderRadius: BorderRadius.circular(4),
+                  color: const Color(0xFF090D18),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: isSelected
+                        ? scientist.primaryColor.withOpacity(0.7)
+                        : Colors.white10,
+                    width: isSelected ? 1.5 : 1.0,
+                  ),
                 ),
-                child: const Row(
-                  mainAxisSize: MainAxisSize.min,
+                child: Stack(
                   children: [
-                    Icon(Icons.sports_esports, color: Colors.black, size: 11),
-                    SizedBox(width: 4),
-                    Text(
-                      'PILOTO EM FOCO',
-                      style: TextStyle(
-                        fontFamily: 'Courier',
-                        fontSize: 9,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                        letterSpacing: 1,
+                    CustomPaint(
+                      size: const Size(double.infinity, 82),
+                      painter: _InlineViewportPainter(
+                        scientist: scientist,
+                        isSelected: isSelected,
+                        bullets: isSelected ? _bullets : const [],
+                        sparks: isSelected ? _sparks : const [],
+                        asteroidPos: _dummyAsteroidPos,
+                        asteroidFlash: isSelected && _asteroidFlashTimer > 0,
+                      ),
+                    ),
+                    Positioned(
+                      top: 4,
+                      left: 6,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.65),
+                          borderRadius: BorderRadius.circular(4),
+                          border: Border.all(
+                            color: isSelected ? Colors.redAccent.withOpacity(0.6) : Colors.white12,
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.circle,
+                              color: isSelected ? Colors.redAccent : Colors.white38,
+                              size: 5,
+                            ),
+                            const SizedBox(width: 3),
+                            Text(
+                              isSelected ? 'AO VIVO' : 'STANDBY',
+                              style: TextStyle(
+                                fontFamily: 'Courier',
+                                fontSize: 7.5,
+                                fontWeight: FontWeight.bold,
+                                color: isSelected ? Colors.white : Colors.white54,
+                                letterSpacing: 0.8,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ],
                 ),
-              )
-            else
-              const SizedBox(height: 19),
+              ),
+            ),
 
-            // Header Badge: Pixel-art Portrait + Name & Role
+            const SizedBox(height: 10),
+
+            // Scientist Portrait + Name & Role
             Row(
               children: [
                 ClipRRect(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(8),
                   child: Container(
-                    width: 44,
-                    height: 44,
+                    width: 40,
+                    height: 40,
                     decoration: BoxDecoration(
                       color: scientist.primaryColor.withOpacity(0.15),
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(8),
                       border: Border.all(color: scientist.primaryColor, width: 1.5),
                     ),
                     child: Image.asset(
                       scientist.imagePath,
-                      width: 44,
-                      height: 44,
+                      width: 40,
+                      height: 40,
                       fit: BoxFit.cover,
                       filterQuality: FilterQuality.none,
                       errorBuilder: (context, error, stackTrace) => Center(
-                        child: Icon(Icons.person, color: scientist.primaryColor, size: 24),
+                        child: Icon(Icons.person, color: scientist.primaryColor, size: 22),
                       ),
                     ),
                   ),
                 ),
-                const SizedBox(width: 10),
+                const SizedBox(width: 8),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -382,7 +554,7 @@ class _ScientistSelectionOverlayState extends State<ScientistSelectionOverlay> {
                         scientist.name,
                         style: const TextStyle(
                           fontFamily: 'Courier',
-                          fontSize: 14,
+                          fontSize: 13.5,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
                         ),
@@ -393,7 +565,7 @@ class _ScientistSelectionOverlayState extends State<ScientistSelectionOverlay> {
                       Text(
                         scientist.role,
                         style: TextStyle(
-                          fontSize: 10,
+                          fontSize: 9.5,
                           fontWeight: FontWeight.w600,
                           color: scientist.primaryColor,
                         ),
@@ -406,103 +578,60 @@ class _ScientistSelectionOverlayState extends State<ScientistSelectionOverlay> {
               ],
             ),
 
-            const SizedBox(height: 10),
+            const SizedBox(height: 8),
 
-            // Ship & Weapon Info (Interactive with quick preview)
-            InkWell(
-              onTap: () {
-                setState(() {
-                  _selectedIndex = index;
-                });
-                _openPreview(scientist);
-              },
-              borderRadius: BorderRadius.circular(8),
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 6.0),
-                decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.4),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.white12),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        const Icon(Icons.flight, color: Colors.white70, size: 14),
-                        const SizedBox(width: 6),
-                        Expanded(
-                          child: Text(
-                            scientist.shipName,
-                            style: TextStyle(
-                              fontFamily: 'Courier',
-                              fontSize: 11,
-                              fontWeight: FontWeight.bold,
-                              color: scientist.accentColor,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
+            // Weapon Title & Compact Attribute Bars
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 5.0),
+              decoration: BoxDecoration(
+                color: Colors.black.withOpacity(0.4),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.white12),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(Icons.bolt, color: Colors.amberAccent, size: 12),
+                      const SizedBox(width: 4),
+                      Expanded(
+                        child: Text(
+                          scientist.weaponName,
+                          style: const TextStyle(
+                            fontFamily: 'Courier',
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.amberAccent,
                           ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                    Row(
-                      children: [
-                        const Icon(Icons.bolt, color: Colors.amberAccent, size: 14),
-                        const SizedBox(width: 6),
-                        Expanded(
-                          child: Text(
-                            scientist.weaponName,
-                            style: const TextStyle(
-                              fontFamily: 'Courier',
-                              fontSize: 11,
-                              color: Colors.amberAccent,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
-                          decoration: BoxDecoration(
-                            color: Colors.amber.withOpacity(0.18),
-                            borderRadius: BorderRadius.circular(4),
-                            border: Border.all(color: Colors.amberAccent.withOpacity(0.5), width: 0.8),
-                          ),
-                          child: const Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(Icons.play_circle_outline, color: Colors.amberAccent, size: 10),
-                              SizedBox(width: 2),
-                              Text(
-                                'VER',
-                                style: TextStyle(
-                                  fontFamily: 'Courier',
-                                  fontSize: 8.5,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.amberAccent,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      _buildMiniStat('CAD', scientist.cadenceRating, Colors.cyanAccent),
+                      _buildMiniStat('ÁREA', scientist.areaRating, Colors.greenAccent),
+                      _buildMiniStat('DANO', scientist.powerRating, Colors.orangeAccent),
+                    ],
+                  ),
+                ],
               ),
             ),
 
             const SizedBox(height: 8),
 
-            // Short Bio (clean 2-line uniform display)
+            // Short Bio
             SizedBox(
-              height: 36,
+              height: 34,
               child: Text(
                 scientist.shortBio,
                 style: const TextStyle(
-                  fontSize: 11,
+                  fontSize: 10.5,
                   height: 1.3,
                   color: Colors.white70,
                 ),
@@ -513,67 +642,38 @@ class _ScientistSelectionOverlayState extends State<ScientistSelectionOverlay> {
 
             const SizedBox(height: 10),
 
-            // Test Weapon Button
-            SizedBox(
-              width: double.infinity,
-              child: OutlinedButton.icon(
-                onPressed: () {
-                  setState(() {
-                    _selectedIndex = index;
-                  });
-                  _openPreview(scientist);
-                },
-                icon: const Icon(Icons.play_circle_fill, size: 14, color: Colors.amberAccent),
-                label: const Text(
-                  'TESTAR ARMA (T)',
-                  style: TextStyle(
-                    fontFamily: 'Courier',
-                    fontSize: 10.5,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.amberAccent,
-                    letterSpacing: 1.1,
-                  ),
-                ),
-                style: OutlinedButton.styleFrom(
-                  side: BorderSide(color: Colors.amberAccent.withOpacity(0.4), width: 1.2),
-                  backgroundColor: Colors.amberAccent.withOpacity(0.06),
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 8),
-
-            // Select & Launch Button
+            // Select / Launch Button
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () => _launchScientist(scientist),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: scientist.primaryColor,
-                  foregroundColor: Colors.black,
+                  backgroundColor: isSelected ? scientist.primaryColor : Colors.white.withOpacity(0.08),
+                  foregroundColor: isSelected ? Colors.black : Colors.white70,
                   padding: const EdgeInsets.symmetric(vertical: 10),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  elevation: isSelected ? 8 : 4,
-                  shadowColor: scientist.primaryColor.withOpacity(0.6),
+                  elevation: isSelected ? 8 : 0,
+                  shadowColor: isSelected ? scientist.primaryColor.withOpacity(0.6) : Colors.transparent,
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.play_arrow, size: 18),
+                    Icon(
+                      isSelected ? Icons.play_arrow : Icons.sports_esports,
+                      size: 16,
+                      color: isSelected ? Colors.black : Colors.white60,
+                    ),
                     const SizedBox(width: 4),
                     Text(
-                      isSelected ? 'DECOLAR (ESPAÇO)' : 'DECOLAR',
-                      style: const TextStyle(
+                      isSelected ? 'DECOLAR (ESPAÇO)' : 'SELECIONAR',
+                      style: TextStyle(
                         fontFamily: 'Courier',
-                        fontSize: 12.5,
+                        fontSize: 11.5,
                         fontWeight: FontWeight.bold,
-                        letterSpacing: 1.2,
+                        letterSpacing: 1.1,
+                        color: isSelected ? Colors.black : Colors.white70,
                       ),
                     ),
                   ],
@@ -585,4 +685,204 @@ class _ScientistSelectionOverlayState extends State<ScientistSelectionOverlay> {
       ),
     );
   }
+
+  Widget _buildMiniStat(String label, int value, Color color) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          '$label ',
+          style: const TextStyle(
+            fontFamily: 'Courier',
+            fontSize: 8.5,
+            fontWeight: FontWeight.bold,
+            color: Colors.white54,
+          ),
+        ),
+        Row(
+          children: List.generate(5, (index) {
+            final active = index < value;
+            return Container(
+              width: 4,
+              height: 6,
+              margin: const EdgeInsets.symmetric(horizontal: 1),
+              decoration: BoxDecoration(
+                color: active ? color : Colors.white12,
+                borderRadius: BorderRadius.circular(1),
+              ),
+            );
+          }),
+        ),
+      ],
+    );
+  }
+}
+
+class _InlineBullet {
+  Offset pos;
+  Offset vel;
+  Color color;
+  double radius;
+  double life;
+  bool isBomb;
+
+  _InlineBullet({
+    required this.pos,
+    required this.vel,
+    required this.color,
+    required this.radius,
+    required this.life,
+    this.isBomb = false,
+  });
+}
+
+class _InlineSpark {
+  Offset pos;
+  Offset vel;
+  Color color;
+  double life;
+
+  _InlineSpark({
+    required this.pos,
+    required this.vel,
+    required this.color,
+    required this.life,
+  });
+}
+
+class _InlineViewportPainter extends CustomPainter {
+  final Scientist scientist;
+  final bool isSelected;
+  final List<_InlineBullet> bullets;
+  final List<_InlineSpark> sparks;
+  final Offset asteroidPos;
+  final bool asteroidFlash;
+
+  _InlineViewportPainter({
+    required this.scientist,
+    required this.isSelected,
+    required this.bullets,
+    required this.sparks,
+    required this.asteroidPos,
+    required this.asteroidFlash,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final scaleX = size.width / 240.0;
+    final scaleY = size.height / 82.0;
+
+    // Draw Subtle Space Grid
+    final gridPaint = Paint()
+      ..color = Colors.white.withOpacity(0.04)
+      ..strokeWidth = 1.0;
+    for (double x = 0; x < size.width; x += 24) {
+      canvas.drawLine(Offset(x, 0), Offset(x, size.height), gridPaint);
+    }
+    for (double y = 0; y < size.height; y += 24) {
+      canvas.drawLine(Offset(0, y), Offset(size.width, y), gridPaint);
+    }
+
+    // Draw Target Rock if active
+    if (isSelected) {
+      final mappedAsteroid = Offset(asteroidPos.dx * scaleX, asteroidPos.dy * scaleY);
+      final rockFill = Paint()
+        ..color = asteroidFlash ? Colors.white : Colors.grey[800]!
+        ..style = PaintingStyle.fill;
+      final rockBorder = Paint()
+        ..color = asteroidFlash ? Colors.yellowAccent : Colors.grey[500]!
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1.2;
+
+      canvas.drawCircle(mappedAsteroid, 10.0 * scaleX, rockFill);
+      canvas.drawCircle(mappedAsteroid, 10.0 * scaleX, rockBorder);
+    }
+
+    // Draw Ship Silhouette at center bottom
+    final shipCenter = Offset(size.width / 2, size.height - 14);
+    final shipPaint = Paint()
+      ..color = scientist.primaryColor
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.8;
+
+    final fillPaint = Paint()
+      ..color = scientist.primaryColor.withOpacity(0.18)
+      ..style = PaintingStyle.fill;
+
+    final path = Path();
+    switch (scientist.shipDesign) {
+      case ShipDesign.deltaJet:
+        path.moveTo(shipCenter.dx, shipCenter.dy - 12);
+        path.lineTo(shipCenter.dx - 10, shipCenter.dy + 8);
+        path.lineTo(shipCenter.dx - 4, shipCenter.dy + 4);
+        path.lineTo(shipCenter.dx + 4, shipCenter.dy + 4);
+        path.lineTo(shipCenter.dx + 10, shipCenter.dy + 8);
+        path.close();
+        break;
+      case ShipDesign.codeApollo:
+        path.moveTo(shipCenter.dx, shipCenter.dy - 14);
+        path.lineTo(shipCenter.dx - 8, shipCenter.dy + 8);
+        path.lineTo(shipCenter.dx, shipCenter.dy + 4);
+        path.lineTo(shipCenter.dx + 8, shipCenter.dy + 8);
+        path.close();
+        break;
+      case ShipDesign.hubbleScout:
+        path.addRect(Rect.fromCenter(center: shipCenter, width: 8, height: 18));
+        path.addRect(Rect.fromCenter(center: Offset(shipCenter.dx - 10, shipCenter.dy), width: 8, height: 6));
+        path.addRect(Rect.fromCenter(center: Offset(shipCenter.dx + 10, shipCenter.dy), width: 8, height: 6));
+        break;
+      case ShipDesign.orbitalTitan:
+        path.moveTo(shipCenter.dx - 6, shipCenter.dy - 10);
+        path.lineTo(shipCenter.dx + 6, shipCenter.dy - 10);
+        path.lineTo(shipCenter.dx + 12, shipCenter.dy + 6);
+        path.lineTo(shipCenter.dx - 12, shipCenter.dy + 6);
+        path.close();
+        break;
+    }
+
+    canvas.drawPath(path, fillPaint);
+    canvas.drawPath(path, shipPaint);
+
+    // If selected, draw thruster flame
+    if (isSelected) {
+      final flamePaint = Paint()
+        ..color = Colors.orangeAccent
+        ..style = PaintingStyle.fill;
+      final flamePath = Path()
+        ..moveTo(shipCenter.dx - 3, shipCenter.dy + 6)
+        ..lineTo(shipCenter.dx + 3, shipCenter.dy + 6)
+        ..lineTo(shipCenter.dx, shipCenter.dy + 12)
+        ..close();
+      canvas.drawPath(flamePath, flamePaint);
+    }
+
+    // Draw active simulation bullets
+    for (final b in bullets) {
+      final bPos = Offset(b.pos.dx * scaleX, b.pos.dy * scaleY);
+      final bulletPaint = Paint()
+        ..color = b.color
+        ..style = PaintingStyle.fill;
+      canvas.drawCircle(bPos, b.radius, bulletPaint);
+
+      if (b.isBomb) {
+        final glow = Paint()
+          ..color = b.color.withOpacity(0.4)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 1.5;
+        canvas.drawCircle(bPos, b.radius + 3.0, glow);
+      }
+    }
+
+    // Draw sparks
+    for (final s in sparks) {
+      final sPos = Offset(s.pos.dx * scaleX, s.pos.dy * scaleY);
+      final sparkPaint = Paint()
+        ..color = s.color.withOpacity((s.life / 0.3).clamp(0.0, 1.0))
+        ..style = PaintingStyle.fill;
+      canvas.drawCircle(sPos, 1.5, sparkPaint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _InlineViewportPainter oldDelegate) => true;
 }
