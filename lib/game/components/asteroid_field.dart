@@ -24,15 +24,33 @@ class AsteroidField extends Component with HasGameReference<AsteroidsGame> {
     spawnTimer += dt;
     difficultyTimer += dt;
 
-    // Smooth difficulty curve over the 150s (2:30 min) round:
-    // Starts gentle (2.4s interval, 0.75x speed) so kids adapt, and ramps up to an exciting climax!
-    final progress = (difficultyTimer / 150.0).clamp(0.0, 1.0);
-    final spawnInterval = 2.4 - (progress * 1.65); // 2.4s down to 0.75s
-    speedMultiplier = 0.75 + (progress * 0.9); // 0.75x up to 1.65x
+    double spawnInterval;
+    if (difficultyTimer < 60.0) {
+      // Phase 1 (0-60s): Calm & welcoming for learning controls
+      final p = difficultyTimer / 60.0;
+      spawnInterval = 2.4 - (p * 0.7); // 2.4s -> 1.7s
+      speedMultiplier = 0.75 + (p * 0.3); // 0.75x -> 1.05x
+    } else if (difficultyTimer < 115.0) {
+      // Phase 2 (60-115s): Active progressive arcade
+      final p = (difficultyTimer - 60.0) / 55.0;
+      spawnInterval = 1.7 - (p * 0.7); // 1.7s -> 1.0s
+      speedMultiplier = 1.05 + (p * 0.45); // 1.05x -> 1.5x
+    } else {
+      // Phase 3 (115-150s - FINAL 35s): METEOR STORM!
+      // Extremely fast & dense to challenge and separate top pilots
+      final p = ((difficultyTimer - 115.0) / 35.0).clamp(0.0, 1.0);
+      spawnInterval = 0.9 - (p * 0.52); // 0.9s -> 0.38s!
+      speedMultiplier = 1.5 + (p * 0.85); // 1.5x -> 2.35x!
+    }
 
     if (spawnTimer > spawnInterval) {
       spawnTimer = 0.0;
       _spawnAsteroid();
+
+      // In the final 20 seconds, trigger double hazard spawns!
+      if (difficultyTimer >= 130.0 && math.Random().nextDouble() < 0.45) {
+        _spawnAsteroid();
+      }
     }
   }
 

@@ -109,50 +109,83 @@ class _HudOverlayState extends State<HudOverlay> with SingleTickerProviderStateM
             ),
           ),
 
-          // Top Center: Mission Timer Countdown
+          // Top Center: Mission Timer Countdown & Storm Alert
           Positioned(
             top: 0,
             left: 0,
             right: 0,
             child: IgnorePointer(
               child: Center(
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.75),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: timeRemaining < 30 ? Colors.redAccent : scientist.primaryColor.withOpacity(0.7),
-                      width: 1.5,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withOpacity(0.75),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: timeRemaining < 35 ? Colors.redAccent : scientist.primaryColor.withOpacity(0.7),
+                          width: 1.5,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: (timeRemaining < 35 ? Colors.red : scientist.primaryColor).withOpacity(0.25),
+                            blurRadius: 12,
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.timer_outlined,
+                            color: timeRemaining < 35 ? Colors.redAccent : scientist.primaryColor,
+                            size: 20,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            '${(timeRemaining ~/ 60).toString().padLeft(2, '0')}:${(timeRemaining.toInt() % 60).toString().padLeft(2, '0')}',
+                            style: TextStyle(
+                              fontFamily: 'Courier',
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 2,
+                              color: timeRemaining < 35 ? Colors.redAccent : Colors.white,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: (timeRemaining < 30 ? Colors.red : scientist.primaryColor).withOpacity(0.2),
-                        blurRadius: 12,
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.timer_outlined,
-                        color: timeRemaining < 30 ? Colors.redAccent : scientist.primaryColor,
-                        size: 20,
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        '${(timeRemaining ~/ 60).toString().padLeft(2, '0')}:${(timeRemaining.toInt() % 60).toString().padLeft(2, '0')}',
-                        style: TextStyle(
-                          fontFamily: 'Courier',
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 2,
-                          color: timeRemaining < 30 ? Colors.redAccent : Colors.white,
+                    if (timeRemaining < 35) ...[
+                      const SizedBox(height: 4),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: Colors.red.withOpacity(0.3),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: Colors.redAccent, width: 1),
+                        ),
+                        child: const Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.warning_amber_rounded, color: Colors.yellowAccent, size: 14),
+                            SizedBox(width: 4),
+                            Text(
+                              'TEMPESTADE DE METEOROS!',
+                              style: TextStyle(
+                                fontFamily: 'Courier',
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.yellowAccent,
+                                letterSpacing: 1.2,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
-                  ),
+                  ],
                 ),
               ),
             ),

@@ -253,16 +253,18 @@ class ScientistSelectionOverlay extends StatelessWidget {
 
           const SizedBox(height: 10),
 
-          // Short Bio
-          Text(
-            scientist.shortBio,
-            style: const TextStyle(
-              fontSize: 11,
-              height: 1.4,
-              color: Colors.white70,
+          // Short Bio (clean 2-line uniform display)
+          SizedBox(
+            height: 34,
+            child: Text(
+              scientist.shortBio,
+              style: const TextStyle(
+                fontSize: 11,
+                height: 1.35,
+                color: Colors.white70,
+              ),
+              maxLines: 2,
             ),
-            maxLines: 3,
-            overflow: TextOverflow.ellipsis,
           ),
 
           const SizedBox(height: 14),

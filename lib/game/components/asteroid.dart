@@ -115,18 +115,18 @@ class AsteroidComponent extends PositionComponent with HasGameReference<Asteroid
 
     final random = math.Random();
 
-    // 35% chance to spawn a power-up / science sample drop
-    if (random.nextDouble() < 0.35) {
+    // Rare reward: 12% chance to drop when an asteroid is completely shattered
+    if (radius <= GameConstants.asteroidMinRadius && random.nextDouble() < 0.12) {
       final roll = random.nextDouble();
       DropType dropType;
-      if (roll < 0.45) {
-        dropType = DropType.sample; // 45% Science Sample (+150 pts)
-      } else if (roll < 0.70) {
+      if (roll < 0.50) {
+        dropType = DropType.sample; // 50% Science Sample (+150 pts)
+      } else if (roll < 0.75) {
         dropType = DropType.speedBoost; // 25% Thruster Boost
-      } else if (roll < 0.88) {
-        dropType = DropType.shield; // 18% Photonic Shield
+      } else if (roll < 0.90) {
+        dropType = DropType.shield; // 15% Photonic Shield
       } else {
-        dropType = DropType.health; // 12% Life Recovery Fragment
+        dropType = DropType.health; // 10% Life Recovery Fragment
       }
 
       final driftAngle = random.nextDouble() * 2 * math.pi;
