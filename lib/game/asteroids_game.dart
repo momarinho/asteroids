@@ -105,11 +105,10 @@ class AsteroidsGame extends FlameGame with HasCollisionDetection, KeyboardEvents
 
     // Setup FlameAudio asset folder configuration and silence native warning spam on Linux
     AudioLogger.logLevel = AudioLogLevel.none;
-    FlameAudio.audioCache.prefix = 'assets/sounds/';
+    FlameAudio.updatePrefix('assets/sounds/');
     try {
       FlameAudio.bgm.initialize();
     } catch (_) {}
-    _initAudioPools();
 
     // Add StarfieldComponent first so it is rendered behind the player
     world.add(StarfieldComponent());
@@ -352,54 +351,23 @@ class AsteroidsGame extends FlameGame with HasCollisionDetection, KeyboardEvents
   }
 
   final Map<String, int> _lastPlayedSfxTime = {};
-  final Map<String, AudioPool> _audioPools = {};
-
-  Future<void> _initAudioPools() async {
-    final poolConfigs = {
-      'shoot.wav': 2,
-      'asteroid_split.wav': 2,
-      'player_hit.wav': 2,
-      'powerup.wav': 2,
-      'menu_select.wav': 2,
-    };
-
-    for (final entry in poolConfigs.entries) {
-      try {
-        final pool = await FlameAudio.createPool(
-          entry.key,
-          minPlayers: 1,
-          maxPlayers: entry.value,
-        );
-        _audioPools[entry.key] = pool;
-      } catch (_) {}
-    }
-  }
 
   void playSfx(String name) async {
     final now = DateTime.now().millisecondsSinceEpoch;
-    final minInterval = (name == 'shoot.wav') ? 70 : 85;
+    final minInterval = (name == 'shoot.wav') ? 60 : 75;
     final lastTime = _lastPlayedSfxTime[name] ?? 0;
     if (now - lastTime < minInterval) {
       return;
     }
     _lastPlayedSfxTime[name] = now;
 
-    // Use pre-allocated AudioPool if available to avoid creating dynamic GStreamer pipelines
-    final pool = _audioPools[name];
-    if (pool != null) {
-      try {
-        await pool.start();
-        return;
-      } catch (_) {}
-    }
-
     try {
       final player = await FlameAudio.play(name);
-      player.onPlayerComplete.listen((_) {
+      player.onPlayerComplete.first.then((_) {
         try {
           player.dispose();
         } catch (_) {}
-      });
+      }).catchError((_) {});
     } catch (_) {}
   }
 

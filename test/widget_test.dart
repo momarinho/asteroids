@@ -1,3 +1,4 @@
+import 'package:flame_audio/flame_audio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -171,6 +172,12 @@ void main() {
       expect(leaderboard[1]['username'], 'test3');
       expect(leaderboard[1]['score'], 0);
       expect(leaderboard[1]['scientist'], 'Mae Jemison');
+    });
+
+    test('FlameAudio updatePrefix sets correct asset folder for both SFX and BGM', () {
+      FlameAudio.updatePrefix('assets/sounds/');
+      expect(FlameAudio.audioCache.prefix, 'assets/sounds/');
+      expect(FlameAudio.bgm.audioPlayer.audioCache.prefix, 'assets/sounds/');
     });
   });
 }
