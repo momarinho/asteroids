@@ -19,6 +19,7 @@ class Scientist {
   final String weaponId;
   final String weaponName;
   final String weaponDescription;
+  final String imagePath;
   final Color primaryColor;
   final Color accentColor;
   final Weapon Function() createWeapon;
@@ -34,6 +35,7 @@ class Scientist {
     required this.weaponId,
     required this.weaponName,
     required this.weaponDescription,
+    required this.imagePath,
     required this.primaryColor,
     required this.accentColor,
     required this.createWeapon,
@@ -51,6 +53,7 @@ class Scientist {
       weaponId: 'spread_shot',
       weaponName: 'Spread Shot (Dispersor)',
       weaponDescription: 'Disparo em leque de 3 projéteis para cobrir amplas áreas do espaço.',
+      imagePath: 'assets/images/scientists/mae_jemison.png',
       primaryColor: const Color(0xFF00E676), // Emerald Green
       accentColor: const Color(0xFF00E5FF), // Light Cyan
       createWeapon: () => SpreadShot(),
@@ -66,6 +69,7 @@ class Scientist {
       weaponId: 'rapid_fire',
       weaponName: 'Rapid Fire (Pulso Veloz)',
       weaponDescription: 'Rajadas rápidas e contínuas de laser, como ciclos de processamento de código.',
+      imagePath: 'assets/images/scientists/margaret_hamilton.png',
       primaryColor: const Color(0xFF2979FF), // Electric Blue
       accentColor: const Color(0xFFFFFFFF), // Pure White
       createWeapon: () => RapidFire(),
@@ -81,6 +85,7 @@ class Scientist {
       weaponId: 'blaster',
       weaponName: 'Blaster Fotônico',
       weaponDescription: 'Laser concentrado de longo alcance com mira de precisão telescópica.',
+      imagePath: 'assets/images/scientists/nancy_roman.png',
       primaryColor: const Color(0xFFE040FB), // Cosmic Magenta/Purple
       accentColor: const Color(0xFFFFD700), // Gold
       createWeapon: () => Blaster(),
@@ -96,6 +101,7 @@ class Scientist {
       weaponId: 'bomb_launcher',
       weaponName: 'Bomb Launcher (Pulso de Plasma)',
       weaponDescription: 'Lança cargas explosivas de alta energia que pulverizam aglomerados de asteroides.',
+      imagePath: 'assets/images/scientists/peggy_whitson.png',
       primaryColor: const Color(0xFFFF6D00), // Solar Orange
       accentColor: const Color(0xFFECEFF1), // Silver
       createWeapon: () => BombLauncher(),

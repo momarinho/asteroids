@@ -142,22 +142,31 @@ class ScientistSelectionOverlay extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Header Badge
+          // Header Badge: Pixel-art Portrait + Name & Role
           Row(
             children: [
-              Container(
-                width: 36,
-                height: 36,
-                decoration: BoxDecoration(
-                  color: scientist.primaryColor.withOpacity(0.2),
-                  shape: BoxShape.circle,
-                  border: Border.all(color: scientist.primaryColor, width: 1.5),
-                ),
-                child: Center(
-                  child: Icon(Icons.rocket, color: scientist.primaryColor, size: 18),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: Container(
+                  width: 52,
+                  height: 52,
+                  decoration: BoxDecoration(
+                    color: scientist.primaryColor.withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: scientist.primaryColor, width: 1.5),
+                  ),
+                  child: Image.asset(
+                    scientist.imagePath,
+                    width: 52,
+                    height: 52,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) => Center(
+                      child: Icon(Icons.person, color: scientist.primaryColor, size: 26),
+                    ),
+                  ),
                 ),
               ),
-              const SizedBox(width: 10),
+              const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,

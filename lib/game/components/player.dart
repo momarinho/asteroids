@@ -55,6 +55,7 @@ class PlayerComponent extends PositionComponent with HasGameReference<AsteroidsG
   @override
   void onCollisionStart(Set<Vector2> intersectionPoints, PositionComponent other) {
     super.onCollisionStart(intersectionPoints, other);
+    if (game.state != GameState.playing) return;
     if (other is AsteroidComponent) {
       if (!isInvulnerable()) {
         game.playSfx('player_hit.wav');
@@ -128,6 +129,7 @@ class PlayerComponent extends PositionComponent with HasGameReference<AsteroidsG
   @override
   void update(double dt) {
     super.update(dt);
+    if (game.state != GameState.playing) return;
 
     shootTimer = math.max(0.0, shootTimer - dt);
     invulnerableTimer = math.max(0.0, invulnerableTimer - dt);

@@ -24,16 +24,12 @@ class AsteroidField extends Component with HasGameReference<AsteroidsGame> {
     spawnTimer += dt;
     difficultyTimer += dt;
 
-    spawnRateMultiplier = math.min(
-      GameConstants.asteroidMaxSpawnRateMultiplier,
-      1.0 + difficultyTimer * GameConstants.asteroidSpawnRateGrowth,
-    );
-    speedMultiplier = math.min(
-      GameConstants.asteroidMaxSpeedMultiplier,
-      1.0 + difficultyTimer * GameConstants.asteroidSpeedGrowth,
-    );
+    // Smooth difficulty curve over the 150s (2:30 min) round:
+    // Starts gentle (2.4s interval, 0.75x speed) so kids adapt, and ramps up to an exciting climax!
+    final progress = (difficultyTimer / 150.0).clamp(0.0, 1.0);
+    final spawnInterval = 2.4 - (progress * 1.65); // 2.4s down to 0.75s
+    speedMultiplier = 0.75 + (progress * 0.9); // 0.75x up to 1.65x
 
-    final spawnInterval = GameConstants.asteroidSpawnRateSeconds / spawnRateMultiplier;
     if (spawnTimer > spawnInterval) {
       spawnTimer = 0.0;
       _spawnAsteroid();
@@ -73,8 +69,8 @@ class AsteroidField extends Component with HasGameReference<AsteroidsGame> {
         break;
     }
 
-    // Speed: 40 to 100, scaled by speedMultiplier
-    final speed = (40.0 + random.nextDouble() * 60.0) * speedMultiplier;
+    // Speed starts at ~35-70 px/s, scaling smoothly with difficulty
+    final speed = (35.0 + random.nextDouble() * 45.0) * speedMultiplier;
     
     // Rotate direction randomly by -30 to +30 degrees
     final deviationAngle = (-30.0 + random.nextDouble() * 60.0) * math.pi / 180.0;

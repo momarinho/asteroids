@@ -169,7 +169,7 @@ class _GameOverOverlayState extends State<GameOverOverlay> {
 
                     const SizedBox(height: 18),
 
-                    // Educational Fun Fact Card
+                    // Educational Fun Fact Card with Portrait
                     Container(
                       padding: const EdgeInsets.all(14.0),
                       decoration: BoxDecoration(
@@ -182,32 +182,63 @@ class _GameOverOverlayState extends State<GameOverOverlay> {
                         borderRadius: BorderRadius.circular(14),
                         border: Border.all(color: scientist.primaryColor.withOpacity(0.4)),
                       ),
-                      child: Column(
+                      child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Row(
-                            children: [
-                              Icon(Icons.lightbulb, color: scientist.accentColor, size: 18),
-                              const SizedBox(width: 6),
-                              Text(
-                                'VOCÊ SABIA? • ${scientist.name.toUpperCase()}',
-                                style: TextStyle(
-                                  fontFamily: 'Courier',
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.bold,
-                                  color: scientist.accentColor,
-                                  letterSpacing: 1,
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(10),
+                            child: Image.asset(
+                              scientist.imagePath,
+                              width: 58,
+                              height: 58,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) => Container(
+                                width: 58,
+                                height: 58,
+                                decoration: BoxDecoration(
+                                  color: scientist.primaryColor.withOpacity(0.2),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Center(
+                                  child: Icon(Icons.school, color: scientist.primaryColor, size: 28),
                                 ),
                               ),
-                            ],
+                            ),
                           ),
-                          const SizedBox(height: 6),
-                          Text(
-                            scientist.funFact,
-                            style: const TextStyle(
-                              fontSize: 12,
-                              height: 1.45,
-                              color: Colors.white,
+                          const SizedBox(width: 14),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Icon(Icons.lightbulb, color: scientist.accentColor, size: 16),
+                                    const SizedBox(width: 6),
+                                    Expanded(
+                                      child: Text(
+                                        'VOCÊ SABIA? • ${scientist.name.toUpperCase()}',
+                                        style: TextStyle(
+                                          fontFamily: 'Courier',
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.bold,
+                                          color: scientist.accentColor,
+                                          letterSpacing: 1,
+                                        ),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 6),
+                                Text(
+                                  scientist.funFact,
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    height: 1.4,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ],

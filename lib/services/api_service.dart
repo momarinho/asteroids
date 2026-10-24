@@ -150,9 +150,9 @@ class ApiService {
     }
   }
 
-  static Future<List<Map<String, dynamic>>> getFairLeaderboard({int limit = 10}) async {
+  static Future<List<Map<String, dynamic>>> getFairLeaderboard({String period = 'all', int limit = 10}) async {
     // 1. Try to fetch from live Go backend first
-    final backendScores = await getLeaderboard('arcade', limit: limit);
+    final backendScores = await getLeaderboard('arcade', period: period, limit: limit);
     if (backendScores.isNotEmpty) {
       return backendScores;
     }
@@ -162,7 +162,15 @@ class ApiService {
       final prefs = await SharedPreferences.getInstance();
       final existingJson = prefs.getString(_keyFairLeaderboard);
       if (existingJson != null) {
-        final List<dynamic> list = jsonDecode(existingJson);
+        List<dynamic> list = jsonDecode(existingJson);
+        if (period == 'today') {
+          final now = DateTime.now();
+          final todayPrefix = "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
+          list = list.where((e) {
+            final createdAt = (e['created_at'] ?? '').toString();
+            return createdAt.startsWith(todayPrefix);
+          }).toList();
+        }
         list.sort((a, b) => (b['score'] as int).compareTo(a['score'] as int));
         return list.take(limit).map((e) => Map<String, dynamic>.from(e as Map)).toList();
       }
@@ -174,10 +182,10 @@ class ApiService {
   }
 
   // 6. Get leaderboards list
-  static Future<List<Map<String, dynamic>>> getLeaderboard(String mode, {int limit = 10}) async {
+  static Future<List<Map<String, dynamic>>> getLeaderboard(String mode, {String period = 'all', int limit = 10}) async {
     try {
       final response = await http.get(
-        Uri.parse('$baseUrl/scores?mode=$mode&limit=$limit'),
+        Uri.parse('$baseUrl/scores?mode=$mode&period=$period&limit=$limit'),
       );
 
       if (response.statusCode == 200) {

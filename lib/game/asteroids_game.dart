@@ -15,6 +15,7 @@ import 'components/bullet.dart';
 import 'components/bomb.dart';
 import 'components/starfield.dart';
 import 'components/joystick.dart';
+import 'components/drop.dart';
 import 'weapons.dart';
 import 'level_manager.dart';
 import 'scientist.dart';
@@ -53,7 +54,7 @@ class AsteroidsGame extends FlameGame with HasCollisionDetection, KeyboardEvents
   
   // Science Fair mode properties
   Scientist selectedScientist = Scientist.defaultScientist;
-  static const double fairRoundDuration = 120.0; // 2 minutes
+  static const double fairRoundDuration = 150.0; // 2 minutes and 30 seconds
   double timeRemaining = fairRoundDuration;
   bool missionSurvived = false;
   String? participantName;
@@ -271,7 +272,8 @@ class AsteroidsGame extends FlameGame with HasCollisionDetection, KeyboardEvents
         child is BulletComponent ||
         child is BombComponent ||
         child is BombExplosionComponent ||
-        child is ParticleComponent);
+        child is ParticleComponent ||
+        child is DropComponent);
     for (final child in List.from(childrenToRemove)) {
       child.removeFromParent();
     }
@@ -459,6 +461,8 @@ class AsteroidsGame extends FlameGame with HasCollisionDetection, KeyboardEvents
   }
 
   void completeMission({required bool survived}) {
+    if (state != GameState.playing) return;
+
     missionSurvived = survived;
     if (survived) {
       score += 500; // Survival bonus
@@ -466,6 +470,16 @@ class AsteroidsGame extends FlameGame with HasCollisionDetection, KeyboardEvents
     } else {
       playSfx('player_hit.wav');
     }
+
+    if (asteroidField != null) {
+      asteroidField!.removeFromParent();
+      asteroidField = null;
+    }
+    _removeAllAsteroidsAndProjectiles();
+
+    player.invulnerableTimer = 999999.0;
+    player.velocity.setZero();
+
     changeState(GameState.gameOver);
   }
 }

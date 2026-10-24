@@ -4,6 +4,7 @@ import 'package:flame/collisions.dart';
 import 'package:flutter/material.dart';
 import 'package:asteroids/constants.dart';
 import 'package:asteroids/game/asteroids_game.dart';
+import 'drop.dart';
 
 class AsteroidComponent extends PositionComponent with HasGameReference<AsteroidsGame>, CollisionCallbacks {
   final double radius;
@@ -112,12 +113,39 @@ class AsteroidComponent extends PositionComponent with HasGameReference<Asteroid
     final shakeIntensity = radius * 0.15;
     game.triggerScreenShake(duration: 0.15, intensity: shakeIntensity);
 
+    final random = math.Random();
+
+    // 35% chance to spawn a power-up / science sample drop
+    if (random.nextDouble() < 0.35) {
+      final roll = random.nextDouble();
+      DropType dropType;
+      if (roll < 0.45) {
+        dropType = DropType.sample; // 45% Science Sample (+150 pts)
+      } else if (roll < 0.70) {
+        dropType = DropType.speedBoost; // 25% Thruster Boost
+      } else if (roll < 0.88) {
+        dropType = DropType.shield; // 18% Photonic Shield
+      } else {
+        dropType = DropType.health; // 12% Life Recovery Fragment
+      }
+
+      final driftAngle = random.nextDouble() * 2 * math.pi;
+      final dropVel = Vector2(math.cos(driftAngle), math.sin(driftAngle)) * 25.0;
+
+      game.world.add(
+        DropComponent(
+          position: position.clone(),
+          type: dropType,
+          initialVelocity: dropVel,
+        ),
+      );
+    }
+
     if (radius <= GameConstants.asteroidMinRadius) {
       return;
     }
 
     // Split into two smaller asteroids
-    final random = math.Random();
     final splitAngle = 20.0 + random.nextDouble() * 30.0; // 20 to 50 degrees
     final radAngle = splitAngle * math.pi / 180.0;
 

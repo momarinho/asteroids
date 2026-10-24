@@ -13,6 +13,8 @@ class LeaderboardOverlay extends StatefulWidget {
 }
 
 class _LeaderboardOverlayState extends State<LeaderboardOverlay> {
+  String _selectedPeriod = 'today'; // 'today' or 'all'
+
   @override
   Widget build(BuildContext context) {
     final game = widget.game;
@@ -25,7 +27,7 @@ class _LeaderboardOverlayState extends State<LeaderboardOverlay> {
             filter: ImageFilter.blur(sigmaX: 8.0, sigmaY: 8.0),
             child: Container(
               width: MediaQuery.of(context).size.width > 680 ? 650 : MediaQuery.of(context).size.width * 0.94,
-              height: MediaQuery.of(context).size.height > 520 ? 500 : MediaQuery.of(context).size.height * 0.92,
+              height: MediaQuery.of(context).size.height > 520 ? 530 : MediaQuery.of(context).size.height * 0.92,
               padding: const EdgeInsets.all(22.0),
               decoration: BoxDecoration(
                 color: Colors.black.withOpacity(0.85),
@@ -87,7 +89,18 @@ class _LeaderboardOverlayState extends State<LeaderboardOverlay> {
                     ],
                   ),
 
-                  const Divider(color: Colors.white24, height: 24),
+                  const SizedBox(height: 12),
+
+                  // Filter Tabs: Hoje vs Todos os Dias
+                  Row(
+                    children: [
+                      _buildTabButton('HOJE', 'today'),
+                      const SizedBox(width: 10),
+                      _buildTabButton('TODOS OS DIAS (GERAL)', 'all'),
+                    ],
+                  ),
+
+                  const Divider(color: Colors.white24, height: 20),
 
                   // Table Header
                   const Padding(
@@ -148,7 +161,7 @@ class _LeaderboardOverlayState extends State<LeaderboardOverlay> {
                   // High scores table
                   Expanded(
                     child: FutureBuilder<List<Map<String, dynamic>>>(
-                      future: ApiService.getFairLeaderboard(limit: 10),
+                      future: ApiService.getFairLeaderboard(period: _selectedPeriod, limit: 10),
                       builder: (context, snapshot) {
                         if (snapshot.connectionState == ConnectionState.waiting) {
                           return const Center(child: CircularProgressIndicator(color: Colors.cyanAccent));
@@ -332,6 +345,39 @@ class _LeaderboardOverlayState extends State<LeaderboardOverlay> {
                 ],
               ),
             ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTabButton(String label, String period) {
+    final isSelected = _selectedPeriod == period;
+    return InkWell(
+      onTap: () {
+        setState(() {
+          _selectedPeriod = period;
+        });
+      },
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: isSelected ? Colors.cyanAccent.withOpacity(0.2) : Colors.white.withOpacity(0.04),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: isSelected ? Colors.cyanAccent : Colors.white24,
+            width: isSelected ? 1.5 : 1.0,
+          ),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontFamily: 'Courier',
+            fontSize: 11,
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+            color: isSelected ? Colors.cyanAccent : Colors.white70,
+            letterSpacing: 1.2,
           ),
         ),
       ),

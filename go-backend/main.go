@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/glebarez/sqlite"
@@ -171,7 +172,8 @@ func handleSubmitScore(c *gin.Context) {
 }
 
 func handleGetScores(c *gin.Context) {
-	mode := c.DefaultQuery("mode", "classic")
+	mode := c.DefaultQuery("mode", "arcade")
+	period := c.DefaultQuery("period", "all") // "today" or "all"
 	limitStr := c.DefaultQuery("limit", "10")
 	limit, err := strconv.Atoi(limitStr)
 	if err != nil || limit <= 0 || limit > 100 {
@@ -179,12 +181,14 @@ func handleGetScores(c *gin.Context) {
 	}
 
 	var scores []Score
-	// Query top scores preloading the player username
-	err = db.Preload("Player").
-		Where("mode = ?", mode).
-		Order("score desc").
-		Limit(limit).
-		Find(&scores).Error
+	query := db.Preload("Player").Where("mode = ?", mode)
+	if period == "today" {
+		now := time.Now()
+		startOfDay := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())
+		query = query.Where("created_at >= ?", startOfDay)
+	}
+
+	err = query.Order("score desc").Limit(limit).Find(&scores).Error
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve highscores"})
