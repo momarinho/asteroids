@@ -107,8 +107,10 @@ class AsteroidsGame extends FlameGame with HasCollisionDetection, KeyboardEvents
     AudioLogger.logLevel = AudioLogLevel.none;
     FlameAudio.updatePrefix('assets/sounds/');
     try {
-      FlameAudio.bgm.initialize();
+      await FlameAudio.bgm.initialize();
     } catch (_) {}
+
+    initSfxPlayers();
 
     // Add StarfieldComponent first so it is rendered behind the player
     world.add(StarfieldComponent());
@@ -153,14 +155,18 @@ class AsteroidsGame extends FlameGame with HasCollisionDetection, KeyboardEvents
       case GameState.scienceIntro:
         _safeAddOverlay('scienceIntro');
         try {
-          FlameAudio.bgm.stop();
+          if (!FlameAudio.bgm.isPlaying) {
+            FlameAudio.bgm.play('music.wav', volume: 0.65);
+          }
         } catch (_) {}
         _removeAllAsteroidsAndProjectiles();
         break;
       case GameState.scientistSelection:
         _safeAddOverlay('scientistSelection');
         try {
-          FlameAudio.bgm.stop();
+          if (!FlameAudio.bgm.isPlaying) {
+            FlameAudio.bgm.play('music.wav', volume: 0.65);
+          }
         } catch (_) {}
         _removeAllAsteroidsAndProjectiles();
         break;
@@ -179,7 +185,7 @@ class AsteroidsGame extends FlameGame with HasCollisionDetection, KeyboardEvents
         _safeAddOverlay('hud');
         // Play loop background music
         try {
-          FlameAudio.bgm.play('music.wav');
+          FlameAudio.bgm.play('music.wav', volume: 0.85);
         } catch (_) {}
         gameFocusNode?.requestFocus();
         break;
@@ -197,6 +203,11 @@ class AsteroidsGame extends FlameGame with HasCollisionDetection, KeyboardEvents
         break;
       case GameState.leaderboard:
         _safeAddOverlay('leaderboard');
+        try {
+          if (!FlameAudio.bgm.isPlaying) {
+            FlameAudio.bgm.play('music.wav', volume: 0.6);
+          }
+        } catch (_) {}
         break;
     }
   }
@@ -351,24 +362,49 @@ class AsteroidsGame extends FlameGame with HasCollisionDetection, KeyboardEvents
   }
 
   final Map<String, int> _lastPlayedSfxTime = {};
+  final List<AudioPlayer> _sfxPlayers = [];
+  List<AudioPlayer> get sfxPlayers => _sfxPlayers;
+  int _currentSfxIndex = 0;
+
+  void initSfxPlayers() {
+    for (int i = 0; i < 3; i++) {
+      final p = AudioPlayer();
+      p.audioCache.prefix = 'assets/sounds/';
+      _sfxPlayers.add(p);
+    }
+  }
 
   void playSfx(String name) async {
     final now = DateTime.now().millisecondsSinceEpoch;
-    final minInterval = (name == 'shoot.wav') ? 60 : 75;
+    final minInterval = (name == 'shoot.wav') ? 50 : 65;
     final lastTime = _lastPlayedSfxTime[name] ?? 0;
     if (now - lastTime < minInterval) {
       return;
     }
     _lastPlayedSfxTime[name] = now;
 
+    if (_sfxPlayers.isEmpty) return;
+
+    _currentSfxIndex = (_currentSfxIndex + 1) % _sfxPlayers.length;
+    final player = _sfxPlayers[_currentSfxIndex];
+
     try {
-      final player = await FlameAudio.play(name);
-      player.onPlayerComplete.first.then((_) {
-        try {
-          player.dispose();
-        } catch (_) {}
-      }).catchError((_) {});
+      await player.play(AssetSource(name), volume: 1.0);
     } catch (_) {}
+  }
+
+  @override
+  void onRemove() {
+    for (final p in _sfxPlayers) {
+      try {
+        p.dispose();
+      } catch (_) {}
+    }
+    _sfxPlayers.clear();
+    try {
+      FlameAudio.bgm.dispose();
+    } catch (_) {}
+    super.onRemove();
   }
 
   void triggerScreenShake({required double duration, required double intensity}) {

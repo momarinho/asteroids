@@ -179,5 +179,16 @@ void main() {
       expect(FlameAudio.audioCache.prefix, 'assets/sounds/');
       expect(FlameAudio.bgm.audioPlayer.audioCache.prefix, 'assets/sounds/');
     });
+
+    test('AsteroidsGame initializes fixed pool of recycled SFX players', () async {
+      final game = AsteroidsGame();
+      game.initSfxPlayers();
+      expect(game.sfxPlayers.length, 3);
+      for (final p in game.sfxPlayers) {
+        expect(p.audioCache.prefix, 'assets/sounds/');
+      }
+      game.onRemove();
+      expect(game.sfxPlayers.isEmpty, isTrue);
+    });
   });
 }
