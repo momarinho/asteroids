@@ -402,6 +402,40 @@ class _HudOverlayState extends State<HudOverlay> with SingleTickerProviderStateM
                 ],
               ),
             ),
+
+          // Desktop/PC Keyboard Controls Guide
+          if (!game.isMobile)
+            Positioned(
+              bottom: 15,
+              right: 15,
+              child: IgnorePointer(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.65),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.white12),
+                  ),
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.keyboard, color: Colors.white54, size: 16),
+                      SizedBox(width: 8),
+                      Text(
+                        'W/▲: ACELERAR  •  A/D: GIRAR  •  ESPAÇO: ATIRAR  •  SHIFT: DASH',
+                        style: TextStyle(
+                          fontFamily: 'Courier',
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white70,
+                          letterSpacing: 1.1,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
         ],
       ),
     );

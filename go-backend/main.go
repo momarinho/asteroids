@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -47,6 +48,21 @@ func main() {
 	r.GET("/scores", handleGetScores)
 	r.GET("/live", handleLiveLeaderboard)
 	r.GET("/ranking", handleLiveLeaderboard)
+
+	// Serve Flutter Web if build/web exists
+	if _, err := os.Stat("../build/web/index.html"); err == nil {
+		r.Static("/assets", "../build/web/assets")
+		r.Static("/canvaskit", "../build/web/canvaskit")
+		r.Static("/icons", "../build/web/icons")
+		r.StaticFile("/favicon.png", "../build/web/favicon.png")
+		r.StaticFile("/flutter.js", "../build/web/flutter.js")
+		r.StaticFile("/flutter_bootstrap.js", "../build/web/flutter_bootstrap.js")
+		r.StaticFile("/flutter_service_worker.js", "../build/web/flutter_service_worker.js")
+		r.StaticFile("/main.dart.js", "../build/web/main.dart.js")
+		r.StaticFile("/manifest.json", "../build/web/manifest.json")
+		r.StaticFile("/version.json", "../build/web/version.json")
+		r.StaticFile("/", "../build/web/index.html")
+	}
 
 	fmt.Println("Asteroids backend listening on port 8080...")
 	if err := r.Run(":8080"); err != nil {
