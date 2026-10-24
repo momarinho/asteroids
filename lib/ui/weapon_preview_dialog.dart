@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:asteroids/game/asteroids_game.dart';
 import 'package:asteroids/game/scientist.dart';
 
@@ -196,15 +197,31 @@ class _WeaponPreviewDialogState extends State<WeaponPreviewDialog> with SingleTi
   Widget build(BuildContext context) {
     final scientist = widget.scientist;
 
-    return Center(
-      child: Material(
-        color: Colors.transparent,
-        child: ClipRect(
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-            child: Container(
-              width: 480,
-              padding: const EdgeInsets.all(22.0),
+    return Focus(
+      autofocus: true,
+      onKeyEvent: (node, event) {
+        if (event is KeyDownEvent) {
+          if (event.logicalKey == LogicalKeyboardKey.space || event.logicalKey == LogicalKeyboardKey.enter) {
+            Navigator.of(context).pop();
+            widget.game.playSfx('powerup.wav');
+            widget.game.startFairGame(scientist);
+            return KeyEventResult.handled;
+          } else if (event.logicalKey == LogicalKeyboardKey.escape || event.logicalKey == LogicalKeyboardKey.backspace) {
+            Navigator.of(context).pop();
+            return KeyEventResult.handled;
+          }
+        }
+        return KeyEventResult.ignored;
+      },
+      child: Center(
+        child: Material(
+          color: Colors.transparent,
+          child: ClipRect(
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+              child: Container(
+                width: 480,
+                padding: const EdgeInsets.all(22.0),
               decoration: BoxDecoration(
                 color: Colors.black.withOpacity(0.90),
                 borderRadius: BorderRadius.circular(20),
@@ -443,6 +460,7 @@ class _WeaponPreviewDialogState extends State<WeaponPreviewDialog> with SingleTi
         ),
       ),
     );
+  }
   }
 
   Widget _buildStatBar(String label, int value, Color color) {

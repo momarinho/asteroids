@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:asteroids/game/asteroids_game.dart';
 import 'package:asteroids/services/api_service.dart';
 
@@ -19,7 +20,28 @@ class _LeaderboardOverlayState extends State<LeaderboardOverlay> {
   Widget build(BuildContext context) {
     final game = widget.game;
 
-    return Scaffold(
+    return Focus(
+      autofocus: true,
+      onKeyEvent: (node, event) {
+        if (event is KeyDownEvent) {
+          if (event.logicalKey == LogicalKeyboardKey.space || event.logicalKey == LogicalKeyboardKey.enter) {
+            game.changeState(GameState.scienceIntro);
+            return KeyEventResult.handled;
+          } else if (event.logicalKey == LogicalKeyboardKey.escape) {
+            game.changeState(GameState.scienceIntro);
+            return KeyEventResult.handled;
+          } else if (event.logicalKey == LogicalKeyboardKey.tab ||
+              event.logicalKey == LogicalKeyboardKey.arrowLeft ||
+              event.logicalKey == LogicalKeyboardKey.arrowRight) {
+            setState(() {
+              _selectedPeriod = _selectedPeriod == 'today' ? 'all' : 'today';
+            });
+            return KeyEventResult.handled;
+          }
+        }
+        return KeyEventResult.ignored;
+      },
+      child: Scaffold(
       backgroundColor: Colors.transparent,
       body: Center(
         child: ClipRect(
@@ -349,6 +371,7 @@ class _LeaderboardOverlayState extends State<LeaderboardOverlay> {
         ),
       ),
     );
+  }
   }
 
   Widget _buildTabButton(String label, String period) {

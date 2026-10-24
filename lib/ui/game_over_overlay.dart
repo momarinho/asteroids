@@ -264,6 +264,7 @@ class _GameOverOverlayState extends State<GameOverOverlay> {
                     const SizedBox(height: 6),
                     TextField(
                       controller: _nameController,
+                      autofocus: true,
                       textCapitalization: TextCapitalization.characters,
                       style: const TextStyle(
                         fontFamily: 'Courier',
