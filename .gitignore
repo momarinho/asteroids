@@ -22,7 +22,7 @@ game_events.jsonl
 # Android/iOS/Desktop local build files
 build/
 linux/flutter/ephemeral/
-windows/flutter/ephemeral/
+windows/flutter/
 macos/Flutter/ephemeral/
 
 # Go backend binary & logs
