@@ -370,9 +370,9 @@ class _LeaderboardOverlayState extends State<LeaderboardOverlay> {
           ),
         ),
       ),
-    );
-  }
-  }
+    ),
+  );
+}
 
   Widget _buildTabButton(String label, String period) {
     final isSelected = _selectedPeriod == period;

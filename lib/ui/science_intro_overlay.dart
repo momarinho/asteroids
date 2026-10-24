@@ -252,8 +252,9 @@ class ScienceIntroOverlay extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildBadge(IconData icon, String label, String value, Color color) {
     return Column(

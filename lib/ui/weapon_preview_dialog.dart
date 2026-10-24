@@ -459,9 +459,9 @@ class _WeaponPreviewDialogState extends State<WeaponPreviewDialog> with SingleTi
           ),
         ),
       ),
-    );
-  }
-  }
+    ),
+  );
+}
 
   Widget _buildStatBar(String label, int value, Color color) {
     return Row(
