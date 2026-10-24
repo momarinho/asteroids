@@ -95,7 +95,7 @@ class _GameOverOverlayState extends State<GameOverOverlay> {
                     const SizedBox(height: 4),
                     Text(
                       survived
-                          ? 'Parabéns! Você sobreviveu aos 2 minutos no espaço!'
+                          ? 'Parabéns! Você sobreviveu aos 2:30 min no espaço!'
                           : 'Sua nave foi abatida pelos asteroides.',
                       style: const TextStyle(
                         fontSize: 13,

@@ -37,7 +37,7 @@ abstract class Weapon {
 class Blaster extends Weapon {
   Blaster()
       : super(
-          name: "Blaster",
+          name: "Laser Fotônico",
           cooldown: GameConstants.playerShootCooldownSeconds,
           recoil: 25.0,
           muzzleFlashSize: 8.0,
@@ -71,7 +71,7 @@ class Blaster extends Weapon {
 class SpreadShot extends Weapon {
   SpreadShot()
       : super(
-          name: "Spread Shot",
+          name: "Tiro Dispersor",
           cooldown: 0.5,
           recoil: 55.0,
           muzzleFlashSize: 12.0,
@@ -118,7 +118,7 @@ class SpreadShot extends Weapon {
 class RapidFire extends Weapon {
   RapidFire()
       : super(
-          name: "Rapid Fire",
+          name: "Laser Veloz",
           cooldown: 0.15,
           recoil: 12.0,
           muzzleFlashSize: 6.0,
@@ -152,7 +152,7 @@ class RapidFire extends Weapon {
 class BombLauncher extends Weapon {
   BombLauncher()
       : super(
-          name: "Bomb Launcher",
+          name: "Lança-Bombas",
           cooldown: 1.5,
           recoil: 150.0,
           muzzleFlashSize: 18.0,

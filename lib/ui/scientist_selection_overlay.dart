@@ -22,8 +22,8 @@ class ScientistSelectionOverlay extends StatelessWidget {
             child: BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 8.0, sigmaY: 8.0),
               child: Container(
-                width: size.width > 1100 ? 1060 : size.width * 0.96,
-                padding: const EdgeInsets.all(24.0),
+                width: size.width > 1200 ? 1160 : size.width * 0.96,
+                padding: const EdgeInsets.all(22.0),
                 decoration: BoxDecoration(
                   color: Colors.black.withOpacity(0.85),
                   borderRadius: BorderRadius.circular(24),
@@ -137,7 +137,7 @@ class ScientistSelectionOverlay extends StatelessWidget {
           ),
         ],
       ),
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 14.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
@@ -148,8 +148,8 @@ class ScientistSelectionOverlay extends StatelessWidget {
               ClipRRect(
                 borderRadius: BorderRadius.circular(10),
                 child: Container(
-                  width: 52,
-                  height: 52,
+                  width: 44,
+                  height: 44,
                   decoration: BoxDecoration(
                     color: scientist.primaryColor.withOpacity(0.15),
                     borderRadius: BorderRadius.circular(10),
@@ -157,16 +157,17 @@ class ScientistSelectionOverlay extends StatelessWidget {
                   ),
                   child: Image.asset(
                     scientist.imagePath,
-                    width: 52,
-                    height: 52,
+                    width: 44,
+                    height: 44,
                     fit: BoxFit.cover,
+                    filterQuality: FilterQuality.none,
                     errorBuilder: (context, error, stackTrace) => Center(
-                      child: Icon(Icons.person, color: scientist.primaryColor, size: 26),
+                      child: Icon(Icons.person, color: scientist.primaryColor, size: 24),
                     ),
                   ),
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 10),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -175,13 +176,14 @@ class ScientistSelectionOverlay extends StatelessWidget {
                       scientist.name,
                       style: const TextStyle(
                         fontFamily: 'Courier',
-                        fontSize: 15,
+                        fontSize: 14,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
+                    const SizedBox(height: 1),
                     Text(
                       scientist.role,
                       style: TextStyle(
@@ -202,7 +204,7 @@ class ScientistSelectionOverlay extends StatelessWidget {
 
           // Ship & Weapon Info
           Container(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 6.0),
             decoration: BoxDecoration(
               color: Colors.black.withOpacity(0.4),
               borderRadius: BorderRadius.circular(8),
@@ -224,6 +226,7 @@ class ScientistSelectionOverlay extends StatelessWidget {
                           fontWeight: FontWeight.bold,
                           color: scientist.accentColor,
                         ),
+                        maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
@@ -242,6 +245,7 @@ class ScientistSelectionOverlay extends StatelessWidget {
                           fontSize: 11,
                           color: Colors.amberAccent,
                         ),
+                        maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
@@ -255,15 +259,16 @@ class ScientistSelectionOverlay extends StatelessWidget {
 
           // Short Bio (clean 2-line uniform display)
           SizedBox(
-            height: 34,
+            height: 36,
             child: Text(
               scientist.shortBio,
               style: const TextStyle(
                 fontSize: 11,
-                height: 1.35,
+                height: 1.3,
                 color: Colors.white70,
               ),
               maxLines: 2,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
 

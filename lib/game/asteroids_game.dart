@@ -85,10 +85,10 @@ class AsteroidsGame extends FlameGame with HasCollisionDetection, KeyboardEvents
   ];
 
   final List<String> weaponOptions = [
-    "Blaster",
-    "Spread Shot",
-    "Rapid Fire",
-    "Bomb Launcher",
+    "Laser Fotônico",
+    "Tiro Dispersor",
+    "Laser Veloz",
+    "Lança-Bombas",
   ];
 
   @override
