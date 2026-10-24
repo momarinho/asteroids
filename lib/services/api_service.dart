@@ -45,7 +45,7 @@ class ApiService {
         Uri.parse('$baseUrl/players'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'username': username}),
-      );
+      ).timeout(const Duration(milliseconds: 1500));
 
       if (response.statusCode == 201) {
         final data = jsonDecode(response.body) as Map<String, dynamic>;
@@ -93,7 +93,7 @@ class ApiService {
         Uri.parse('$baseUrl/scores'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode(body),
-      );
+      ).timeout(const Duration(milliseconds: 1500));
 
       if (response.statusCode == 201) {
         debugPrint('Score submitted successfully to cloud leaderboard!');
@@ -134,11 +134,12 @@ class ApiService {
       // Save immediately to local persistent storage for instant arcade response
       await prefs.setString(_keyFairLeaderboard, jsonEncode(list));
 
-      // Asynchronously sync with Go backend if online without blocking UI
+      // Synchronize with Go backend if online
       final safeUsername = playerName.length >= 2 ? playerName : '$playerName ';
-      registerPlayer(safeUsername).then((registered) {
+      try {
+        final registered = await registerPlayer(safeUsername);
         if (registered != null) {
-          submitScore(
+          await submitScore(
             playerId: registered['id']!,
             score: score,
             level: 1,
@@ -146,41 +147,63 @@ class ApiService {
             scientist: scientistName,
           );
         }
-      }).catchError((_) {});
+      } catch (_) {}
     } catch (e) {
       debugPrint('Error saving fair score: $e');
     }
   }
 
   static Future<List<Map<String, dynamic>>> getFairLeaderboard({String period = 'all', int limit = 10}) async {
-    // 1. Try to fetch from live Go backend first
-    final backendScores = await getLeaderboard('arcade', period: period, limit: limit);
-    if (backendScores.isNotEmpty) {
-      return backendScores;
-    }
-
-    // 2. Offline fallback to local SharedPreferences
+    // 1. Fetch local scores from SharedPreferences
+    List<Map<String, dynamic>> localScores = [];
     try {
       final prefs = await SharedPreferences.getInstance();
       final existingJson = prefs.getString(_keyFairLeaderboard);
       if (existingJson != null) {
-        List<dynamic> list = jsonDecode(existingJson);
-        if (period == 'today') {
-          final now = DateTime.now();
-          final todayPrefix = "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
-          list = list.where((e) {
-            final createdAt = (e['created_at'] ?? '').toString();
-            return createdAt.startsWith(todayPrefix);
-          }).toList();
-        }
-        list.sort((a, b) => (b['score'] as int).compareTo(a['score'] as int));
-        return list.take(limit).map((e) => Map<String, dynamic>.from(e as Map)).toList();
+        final List<dynamic> list = jsonDecode(existingJson);
+        localScores = list.map((e) => Map<String, dynamic>.from(e as Map)).toList();
       }
     } catch (e) {
       debugPrint('Error reading local fair leaderboard: $e');
     }
 
-    return [];
+    // 2. Fetch remote scores from Go backend
+    List<Map<String, dynamic>> backendScores = [];
+    try {
+      backendScores = await getLeaderboard('arcade', period: period, limit: limit);
+    } catch (e) {
+      debugPrint('Error reading backend leaderboard: $e');
+    }
+
+    // 3. Merge both sources (combine and deduplicate by username + score + scientist)
+    final Map<String, Map<String, dynamic>> combined = {};
+    for (final s in backendScores) {
+      final key = '${s['username']}_${s['score']}_${s['scientist']}';
+      combined[key] = s;
+    }
+    for (final s in localScores) {
+      final key = '${s['username']}_${s['score']}_${s['scientist']}';
+      if (!combined.containsKey(key)) {
+        combined[key] = s;
+      }
+    }
+
+    List<Map<String, dynamic>> allScores = combined.values.toList();
+
+    // 4. Apply period filter if 'today'
+    if (period == 'today') {
+      final now = DateTime.now();
+      final todayPrefix = "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
+      allScores = allScores.where((e) {
+        final createdAt = (e['created_at'] ?? '').toString();
+        return createdAt.startsWith(todayPrefix);
+      }).toList();
+    }
+
+    // 5. Sort descending by score
+    allScores.sort((a, b) => ((b['score'] ?? 0) as int).compareTo((a['score'] ?? 0) as int));
+
+    return allScores.take(limit).toList();
   }
 
   // 6. Get leaderboards list
@@ -188,7 +211,7 @@ class ApiService {
     try {
       final response = await http.get(
         Uri.parse('$baseUrl/scores?mode=$mode&period=$period&limit=$limit'),
-      );
+      ).timeout(const Duration(milliseconds: 1500));
 
       if (response.statusCode == 200) {
         final List<dynamic> data = jsonDecode(response.body);

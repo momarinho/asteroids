@@ -126,8 +126,8 @@ func handleRegisterPlayer(c *gin.Context) {
 type SubmitScoreRequest struct {
 	PlayerID  string `json:"player_id" binding:"required"`
 	Scientist string `json:"scientist"`
-	Score     int    `json:"score" binding:"required,min=0"`
-	Level     int    `json:"level" binding:"required,min=1"`
+	Score     int    `json:"score"`
+	Level     int    `json:"level"`
 	Mode      string `json:"mode" binding:"required"`
 	Signature string `json:"signature" binding:"required"`
 }

@@ -1,4 +1,3 @@
-import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -8,6 +7,7 @@ import 'package:asteroids/ui/science_intro_overlay.dart';
 import 'package:asteroids/ui/game_over_overlay.dart';
 import 'package:asteroids/ui/leaderboard_overlay.dart';
 
+import 'package:asteroids/services/api_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
@@ -145,6 +145,32 @@ void main() {
       await tester.pump();
 
       expect(game.state, GameState.scienceIntro);
+    });
+  });
+
+  group('Fair Score Persistence and Leaderboard Tests', () {
+    test('saveFairScore and getFairLeaderboard saves and retrieves scores including score 0', () async {
+      SharedPreferences.setMockInitialValues({});
+
+      await ApiService.saveFairScore(
+        playerName: 'test3',
+        scientistName: 'Mae Jemison',
+        score: 0,
+      );
+
+      await ApiService.saveFairScore(
+        playerName: 'PILOT_ACE',
+        scientistName: 'Nancy Grace Roman',
+        score: 5500,
+      );
+
+      final leaderboard = await ApiService.getFairLeaderboard(period: 'all');
+      expect(leaderboard.length, 2);
+      expect(leaderboard[0]['username'], 'PILOT_ACE');
+      expect(leaderboard[0]['score'], 5500);
+      expect(leaderboard[1]['username'], 'test3');
+      expect(leaderboard[1]['score'], 0);
+      expect(leaderboard[1]['scientist'], 'Mae Jemison');
     });
   });
 }

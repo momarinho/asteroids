@@ -49,6 +49,7 @@ class _GameOverOverlayState extends State<GameOverOverlay> {
   }
 
   Future<void> _submitAndShowLeaderboard() async {
+    if (_isSaving) return;
     final name = _nameController.text.trim().isEmpty ? 'Astronauta' : _nameController.text.trim();
     setState(() {
       _isSaving = true;
