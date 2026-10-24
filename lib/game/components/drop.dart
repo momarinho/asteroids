@@ -137,24 +137,19 @@ class DropComponent extends PositionComponent with HasGameReference<AsteroidsGam
 
     final pulseScale = 1.0 + math.sin(pulseTimer) * 0.15;
     Color mainColor;
-    IconData icon;
 
     switch (type) {
       case DropType.sample:
         mainColor = Colors.amberAccent;
-        icon = Icons.science;
         break;
       case DropType.health:
         mainColor = const Color(0xFF00E676);
-        icon = Icons.favorite;
         break;
       case DropType.speedBoost:
         mainColor = Colors.orangeAccent;
-        icon = Icons.bolt;
         break;
       case DropType.shield:
         mainColor = Colors.cyanAccent;
-        icon = Icons.shield;
         break;
     }
 

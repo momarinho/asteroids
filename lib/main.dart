@@ -70,6 +70,7 @@ class _GameScreenState extends State<GameScreen> {
       body: GameWidget<AsteroidsGame>(
         game: _game,
         focusNode: _focusNode,
+        autofocus: false,
         overlayBuilderMap: {
           'scienceIntro': (context, game) => ScienceIntroOverlay(game: game),
           'scientistSelection': (context, game) => ScientistSelectionOverlay(game: game),

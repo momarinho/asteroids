@@ -133,27 +133,36 @@ class AsteroidsGame extends FlameGame with HasCollisionDetection, KeyboardEvents
 
   void changeState(GameState newState) {
     state = newState;
+    keysPressed.clear();
+
+    if (newState == GameState.playing) {
+      gameFocusNode?.requestFocus();
+    } else {
+      gameFocusNode?.unfocus();
+    }
 
     // Clear active overlays first
-    overlays.clear();
+    try {
+      overlays.clear();
+    } catch (_) {}
 
     switch (newState) {
       case GameState.scienceIntro:
-        overlays.add('scienceIntro');
+        _safeAddOverlay('scienceIntro');
         try {
           FlameAudio.bgm.stop();
         } catch (_) {}
         _removeAllAsteroidsAndProjectiles();
         break;
       case GameState.scientistSelection:
-        overlays.add('scientistSelection');
+        _safeAddOverlay('scientistSelection');
         try {
           FlameAudio.bgm.stop();
         } catch (_) {}
         _removeAllAsteroidsAndProjectiles();
         break;
       case GameState.menu:
-        overlays.add('menu');
+        _safeAddOverlay('menu');
         try {
           FlameAudio.bgm.stop();
         } catch (_) {}
@@ -161,10 +170,10 @@ class AsteroidsGame extends FlameGame with HasCollisionDetection, KeyboardEvents
         _removeAllAsteroidsAndProjectiles();
         break;
       case GameState.settings:
-        overlays.add('settings');
+        _safeAddOverlay('settings');
         break;
       case GameState.playing:
-        overlays.add('hud');
+        _safeAddOverlay('hud');
         // Play loop background music
         try {
           FlameAudio.bgm.play('music.wav').catchError((_) {});
@@ -172,25 +181,35 @@ class AsteroidsGame extends FlameGame with HasCollisionDetection, KeyboardEvents
         gameFocusNode?.requestFocus();
         break;
       case GameState.shop:
-        overlays.add('shop');
+        _safeAddOverlay('shop');
         break;
       case GameState.stageClear:
-        overlays.add('stageClear');
+        _safeAddOverlay('stageClear');
         break;
       case GameState.gameOver:
-        overlays.add('gameOver');
+        _safeAddOverlay('gameOver');
         try {
           FlameAudio.bgm.stop().catchError((_) {});
         } catch (_) {}
         break;
       case GameState.leaderboard:
-        overlays.add('leaderboard');
+        _safeAddOverlay('leaderboard');
         break;
     }
   }
 
+  void _safeAddOverlay(String name) {
+    try {
+      overlays.add(name);
+    } catch (_) {}
+  }
+
   @override
   KeyEventResult onKeyEvent(KeyEvent event, Set<LogicalKeyboardKey> keysPressed) {
+    if (state != GameState.playing) {
+      this.keysPressed.clear();
+      return KeyEventResult.ignored;
+    }
     this.keysPressed.clear();
     this.keysPressed.addAll(keysPressed);
     return KeyEventResult.handled;
@@ -341,9 +360,7 @@ class AsteroidsGame extends FlameGame with HasCollisionDetection, KeyboardEvents
     _lastPlayedSfxTime[name] = now;
 
     try {
-      FlameAudio.play(name).catchError((e) {
-        // Silently catch GStreamer platform errors so audio glitches never crash the game
-      });
+      FlameAudio.play(name).then<void>((_) {}).catchError((_) {});
     } catch (_) {}
   }
 

@@ -15,11 +15,24 @@ class LeaderboardOverlay extends StatefulWidget {
 }
 
 class _LeaderboardOverlayState extends State<LeaderboardOverlay> {
+  final FocusNode _focusNode = FocusNode();
   String _selectedPeriod = 'today'; // 'today' or 'all'
   final ScrollController _scrollController = ScrollController();
+  int _selectedButtonIndex = 0; // 0 = PRÓXIMO PARTICIPANTE, 1 = CIENTISTAS
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _focusNode.requestFocus();
+      }
+    });
+  }
 
   @override
   void dispose() {
+    _focusNode.dispose();
     _scrollController.dispose();
     super.dispose();
   }
@@ -29,12 +42,47 @@ class _LeaderboardOverlayState extends State<LeaderboardOverlay> {
     final game = widget.game;
 
     return Focus(
+      focusNode: _focusNode,
       autofocus: true,
       onKeyEvent: (node, event) {
         if (event is KeyDownEvent) {
-          if (event.logicalKey == LogicalKeyboardKey.space || event.logicalKey == LogicalKeyboardKey.enter) {
-            game.participantName = null;
-            game.changeState(GameState.scienceIntro);
+          if (event.logicalKey == LogicalKeyboardKey.arrowLeft ||
+              event.logicalKey == LogicalKeyboardKey.arrowRight ||
+              event.logicalKey == LogicalKeyboardKey.keyA ||
+              event.logicalKey == LogicalKeyboardKey.keyD) {
+            setState(() {
+              _selectedButtonIndex = 1 - _selectedButtonIndex;
+            });
+            game.playSfx('menu_select.wav');
+            return KeyEventResult.handled;
+          } else if (event.logicalKey == LogicalKeyboardKey.tab ||
+              event.logicalKey == LogicalKeyboardKey.keyT) {
+            setState(() {
+              _selectedPeriod = _selectedPeriod == 'today' ? 'all' : 'today';
+            });
+            game.playSfx('menu_select.wav');
+            return KeyEventResult.handled;
+          } else if (event.logicalKey == LogicalKeyboardKey.digit1) {
+            setState(() {
+              _selectedPeriod = 'today';
+            });
+            game.playSfx('menu_select.wav');
+            return KeyEventResult.handled;
+          } else if (event.logicalKey == LogicalKeyboardKey.digit2) {
+            setState(() {
+              _selectedPeriod = 'all';
+            });
+            game.playSfx('menu_select.wav');
+            return KeyEventResult.handled;
+          } else if (event.logicalKey == LogicalKeyboardKey.space ||
+              event.logicalKey == LogicalKeyboardKey.enter ||
+              event.logicalKey == LogicalKeyboardKey.numpadEnter) {
+            if (_selectedButtonIndex == 0) {
+              game.participantName = null;
+              game.changeState(GameState.scienceIntro);
+            } else {
+              game.changeState(GameState.scientistSelection);
+            }
             return KeyEventResult.handled;
           } else if (event.logicalKey == LogicalKeyboardKey.escape) {
             game.changeState(GameState.scienceIntro);
@@ -42,17 +90,9 @@ class _LeaderboardOverlayState extends State<LeaderboardOverlay> {
           } else if (event.logicalKey == LogicalKeyboardKey.keyC) {
             game.changeState(GameState.scientistSelection);
             return KeyEventResult.handled;
-          } else if (event.logicalKey == LogicalKeyboardKey.tab ||
-              event.logicalKey == LogicalKeyboardKey.arrowLeft ||
-              event.logicalKey == LogicalKeyboardKey.arrowRight ||
-              event.logicalKey == LogicalKeyboardKey.keyA ||
-              event.logicalKey == LogicalKeyboardKey.keyD) {
-            setState(() {
-              _selectedPeriod = _selectedPeriod == 'today' ? 'all' : 'today';
-            });
-            game.playSfx('menu_select.wav');
-            return KeyEventResult.handled;
-          } else if (event.logicalKey == LogicalKeyboardKey.arrowDown || event.logicalKey == LogicalKeyboardKey.keyS) {
+          } else if (event.logicalKey == LogicalKeyboardKey.arrowDown ||
+              event.logicalKey == LogicalKeyboardKey.keyS ||
+              event.logicalKey == LogicalKeyboardKey.pageDown) {
             if (_scrollController.hasClients) {
               _scrollController.animateTo(
                 _scrollController.offset + 90,
@@ -61,7 +101,9 @@ class _LeaderboardOverlayState extends State<LeaderboardOverlay> {
               );
             }
             return KeyEventResult.handled;
-          } else if (event.logicalKey == LogicalKeyboardKey.arrowUp || event.logicalKey == LogicalKeyboardKey.keyW) {
+          } else if (event.logicalKey == LogicalKeyboardKey.arrowUp ||
+              event.logicalKey == LogicalKeyboardKey.keyW ||
+              event.logicalKey == LogicalKeyboardKey.pageUp) {
             if (_scrollController.hasClients) {
               _scrollController.animateTo(
                 math.max(0.0, _scrollController.offset - 90),
@@ -135,6 +177,7 @@ class _LeaderboardOverlayState extends State<LeaderboardOverlay> {
                         ],
                       ),
                       IconButton(
+                        focusNode: FocusNode(canRequestFocus: false),
                         onPressed: () {
                           game.changeState(GameState.scienceIntro);
                         },
@@ -342,29 +385,37 @@ class _LeaderboardOverlayState extends State<LeaderboardOverlay> {
                       Expanded(
                         flex: 2,
                         child: ElevatedButton.icon(
+                          focusNode: FocusNode(canRequestFocus: false),
                           onPressed: () {
                             game.participantName = null;
                             game.changeState(GameState.scienceIntro);
                           },
                           icon: const Icon(Icons.person_add, size: 20),
-                          label: const Text(
-                            'PRÓXIMO PARTICIPANTE 🚀',
+                          label: Text(
+                            _selectedButtonIndex == 0 ? '► PRÓXIMO PILOTO 🚀' : 'PRÓXIMO PILOTO 🚀',
                             style: TextStyle(
                               fontFamily: 'Courier',
                               fontSize: 13,
                               fontWeight: FontWeight.bold,
                               letterSpacing: 1.2,
+                              color: _selectedButtonIndex == 0 ? Colors.black : Colors.cyanAccent,
                             ),
                           ),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.cyanAccent,
-                            foregroundColor: Colors.black,
+                            backgroundColor: _selectedButtonIndex == 0
+                                ? Colors.cyanAccent
+                                : Colors.cyan.withOpacity(0.12),
+                            foregroundColor: _selectedButtonIndex == 0 ? Colors.black : Colors.cyanAccent,
                             padding: const EdgeInsets.symmetric(vertical: 14),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
+                              side: BorderSide(
+                                color: _selectedButtonIndex == 0 ? Colors.white : Colors.cyanAccent.withOpacity(0.4),
+                                width: _selectedButtonIndex == 0 ? 2.0 : 1.0,
+                              ),
                             ),
-                            elevation: 6,
-                            shadowColor: Colors.cyanAccent.withOpacity(0.5),
+                            elevation: _selectedButtonIndex == 0 ? 8 : 0,
+                            shadowColor: Colors.cyanAccent.withOpacity(0.6),
                           ),
                         ),
                       ),
@@ -375,22 +426,30 @@ class _LeaderboardOverlayState extends State<LeaderboardOverlay> {
                       Expanded(
                         flex: 1,
                         child: OutlinedButton(
+                          focusNode: FocusNode(canRequestFocus: false),
                           onPressed: () {
                             game.changeState(GameState.scientistSelection);
                           },
                           style: OutlinedButton.styleFrom(
-                            foregroundColor: Colors.white70,
-                            side: const BorderSide(color: Colors.white24),
+                            backgroundColor: _selectedButtonIndex == 1
+                                ? Colors.cyanAccent.withOpacity(0.2)
+                                : Colors.transparent,
+                            foregroundColor: _selectedButtonIndex == 1 ? Colors.white : Colors.white70,
+                            side: BorderSide(
+                              color: _selectedButtonIndex == 1 ? Colors.cyanAccent : Colors.white24,
+                              width: _selectedButtonIndex == 1 ? 2.0 : 1.0,
+                            ),
                             padding: const EdgeInsets.symmetric(vertical: 14),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
                             ),
                           ),
-                          child: const Text(
-                            'CIENTISTAS',
+                          child: Text(
+                            _selectedButtonIndex == 1 ? '► CIENTISTAS' : 'CIENTISTAS',
                             style: TextStyle(
                               fontFamily: 'Courier',
                               fontSize: 12,
+                              fontWeight: _selectedButtonIndex == 1 ? FontWeight.bold : FontWeight.normal,
                               letterSpacing: 1,
                             ),
                           ),
@@ -409,22 +468,25 @@ class _LeaderboardOverlayState extends State<LeaderboardOverlay> {
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(color: Colors.white12),
                     ),
-                    child: const Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.keyboard, color: Colors.cyanAccent, size: 14),
-                        SizedBox(width: 8),
-                        Text(
-                          '◄ / ►: MUDAR ABA  •  ▲ / ▼: ROLAR  •  [ESPAÇO / ENTER]: PRÓXIMO PILOTO  •  [ESC]: VOLTAR',
-                          style: TextStyle(
-                            fontFamily: 'Courier',
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white70,
-                            letterSpacing: 1.1,
+                    child: const FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.keyboard, color: Colors.cyanAccent, size: 14),
+                          SizedBox(width: 8),
+                          Text(
+                            '◄ / ►: ESCOLHER BOTÃO  •  [ENTER / ESPAÇO]: CONFIRMAR  •  [TAB]: HOJE / GERAL  •  ▲ / ▼: ROLAR  •  [ESC]: VOLTAR',
+                            style: TextStyle(
+                              fontFamily: 'Courier',
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white70,
+                              letterSpacing: 1.1,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ],

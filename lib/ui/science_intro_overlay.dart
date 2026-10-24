@@ -55,12 +55,24 @@ class _ScienceIntroOverlayState extends State<ScienceIntroOverlay> {
         widget.game.playSfx('menu_select.wav');
         return KeyEventResult.handled;
       } else if (event.logicalKey == LogicalKeyboardKey.space ||
-          event.logicalKey == LogicalKeyboardKey.enter) {
+          event.logicalKey == LogicalKeyboardKey.enter ||
+          event.logicalKey == LogicalKeyboardKey.numpadEnter) {
         _activateOption();
         return KeyEventResult.handled;
-      } else if (event.logicalKey == LogicalKeyboardKey.keyR) {
+      } else if (event.logicalKey == LogicalKeyboardKey.keyR ||
+          event.logicalKey == LogicalKeyboardKey.digit2) {
+        setState(() {
+          _selectedMenuIndex = 1;
+        });
         widget.game.playSfx('menu_select.wav');
         widget.game.changeState(GameState.leaderboard);
+        return KeyEventResult.handled;
+      } else if (event.logicalKey == LogicalKeyboardKey.digit1) {
+        setState(() {
+          _selectedMenuIndex = 0;
+        });
+        widget.game.playSfx('powerup.wav');
+        widget.game.changeState(GameState.scientistSelection);
         return KeyEventResult.handled;
       }
     }
@@ -71,7 +83,6 @@ class _ScienceIntroOverlayState extends State<ScienceIntroOverlay> {
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     final cardWidth = size.width > 700 ? 680.0 : size.width * 0.94;
-    final game = widget.game;
 
     return Focus(
       focusNode: _focusNode,
@@ -210,6 +221,7 @@ class _ScienceIntroOverlayState extends State<ScienceIntroOverlay> {
                           // Start Button (Index 0)
                           Expanded(
                             child: ElevatedButton.icon(
+                              focusNode: FocusNode(canRequestFocus: false),
                               onPressed: () {
                                 setState(() {
                                   _selectedMenuIndex = 0;
@@ -254,6 +266,7 @@ class _ScienceIntroOverlayState extends State<ScienceIntroOverlay> {
                           // Leaderboard Button (Index 1)
                           Expanded(
                             child: ElevatedButton.icon(
+                              focusNode: FocusNode(canRequestFocus: false),
                               onPressed: () {
                                 setState(() {
                                   _selectedMenuIndex = 1;
@@ -305,22 +318,25 @@ class _ScienceIntroOverlayState extends State<ScienceIntroOverlay> {
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(color: Colors.white12),
                         ),
-                        child: const Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(Icons.keyboard, color: Colors.cyanAccent, size: 16),
-                            SizedBox(width: 8),
-                            Text(
-                              '◄ / ►: SELECIONAR OPÇÃO   •   [ESPAÇO / ENTER]: CONFIRMAR',
-                              style: TextStyle(
-                                fontFamily: 'Courier',
-                                fontSize: 10.5,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white70,
-                                letterSpacing: 1.1,
+                        child: const FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.keyboard, color: Colors.cyanAccent, size: 16),
+                              SizedBox(width: 8),
+                              Text(
+                                '◄ / ►: ESCOLHER   •   [ESPAÇO / ENTER]: CONFIRMAR   •   [R]: RANKING',
+                                style: TextStyle(
+                                  fontFamily: 'Courier',
+                                  fontSize: 10.5,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white70,
+                                  letterSpacing: 1.1,
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ],

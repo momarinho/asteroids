@@ -131,20 +131,22 @@ class ApiService {
       });
       // Sort descending by score
       list.sort((a, b) => (b['score'] as int).compareTo(a['score'] as int));
+      // Save immediately to local persistent storage for instant arcade response
       await prefs.setString(_keyFairLeaderboard, jsonEncode(list));
 
-      // Also try registering player and submitting score to Go backend asynchronously if online
+      // Asynchronously sync with Go backend if online without blocking UI
       final safeUsername = playerName.length >= 2 ? playerName : '$playerName ';
-      final registered = await registerPlayer(safeUsername);
-      if (registered != null) {
-        await submitScore(
-          playerId: registered['id']!,
-          score: score,
-          level: 1,
-          mode: 'arcade',
-          scientist: scientistName,
-        );
-      }
+      registerPlayer(safeUsername).then((registered) {
+        if (registered != null) {
+          submitScore(
+            playerId: registered['id']!,
+            score: score,
+            level: 1,
+            mode: 'arcade',
+            scientist: scientistName,
+          );
+        }
+      }).catchError((_) {});
     } catch (e) {
       debugPrint('Error saving fair score: $e');
     }

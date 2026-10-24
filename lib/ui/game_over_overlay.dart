@@ -15,11 +15,36 @@ class GameOverOverlay extends StatefulWidget {
 
 class _GameOverOverlayState extends State<GameOverOverlay> {
   final TextEditingController _nameController = TextEditingController();
+  final FocusNode _nameFocusNode = FocusNode();
   bool _isSaving = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _nameFocusNode.onKeyEvent = (node, event) {
+      if (event is KeyDownEvent) {
+        if (event.logicalKey == LogicalKeyboardKey.escape) {
+          widget.game.changeState(GameState.scienceIntro);
+          return KeyEventResult.handled;
+        } else if (event.logicalKey == LogicalKeyboardKey.enter ||
+            event.logicalKey == LogicalKeyboardKey.numpadEnter) {
+          _submitAndShowLeaderboard();
+          return KeyEventResult.handled;
+        }
+      }
+      return KeyEventResult.ignored;
+    };
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _nameFocusNode.requestFocus();
+      }
+    });
+  }
 
   @override
   void dispose() {
     _nameController.dispose();
+    _nameFocusNode.dispose();
     super.dispose();
   }
 
@@ -48,14 +73,8 @@ class _GameOverOverlayState extends State<GameOverOverlay> {
     final score = game.score;
     final survived = game.missionSurvived;
 
-    return Focus(
-      onKeyEvent: (node, event) {
-        if (event is KeyDownEvent && event.logicalKey == LogicalKeyboardKey.escape) {
-          game.changeState(GameState.scienceIntro);
-          return KeyEventResult.handled;
-        }
-        return KeyEventResult.ignored;
-      },
+    return GestureDetector(
+      onTap: () => _nameFocusNode.requestFocus(),
       child: Scaffold(
       backgroundColor: Colors.transparent,
       body: Center(
@@ -273,11 +292,14 @@ class _GameOverOverlayState extends State<GameOverOverlay> {
                     const SizedBox(height: 6),
                     TextField(
                       controller: _nameController,
+                      focusNode: _nameFocusNode,
                       autofocus: true,
                       textCapitalization: TextCapitalization.characters,
+                      maxLength: 14,
+                      buildCounter: (context, {required currentLength, required isFocused, maxLength}) => null,
                       style: const TextStyle(
                         fontFamily: 'Courier',
-                        fontSize: 18,
+                        fontSize: 20,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
                         letterSpacing: 2,
@@ -298,7 +320,7 @@ class _GameOverOverlayState extends State<GameOverOverlay> {
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),
-                          borderSide: const BorderSide(color: Colors.cyanAccent, width: 1.8),
+                          borderSide: const BorderSide(color: Colors.cyanAccent, width: 2.0),
                         ),
                       ),
                       onSubmitted: (_) => _submitAndShowLeaderboard(),
@@ -313,10 +335,11 @@ class _GameOverOverlayState extends State<GameOverOverlay> {
                         Expanded(
                           flex: 2,
                           child: ElevatedButton.icon(
+                            focusNode: FocusNode(canRequestFocus: false),
                             onPressed: _isSaving ? null : _submitAndShowLeaderboard,
                             icon: const Icon(Icons.emoji_events, size: 18),
                             label: Text(
-                              _isSaving ? 'SALVANDO...' : 'SALVAR NO RANKING',
+                              _isSaving ? 'SALVANDO...' : 'SALVAR NO RANKING [ENTER]',
                               style: const TextStyle(
                                 fontFamily: 'Courier',
                                 fontSize: 13,
@@ -343,6 +366,7 @@ class _GameOverOverlayState extends State<GameOverOverlay> {
                         Expanded(
                           flex: 1,
                           child: OutlinedButton(
+                            focusNode: FocusNode(canRequestFocus: false),
                             onPressed: () {
                               game.changeState(GameState.scienceIntro);
                             },
@@ -355,7 +379,7 @@ class _GameOverOverlayState extends State<GameOverOverlay> {
                               ),
                             ),
                             child: const Text(
-                              'PULAR',
+                              'PULAR [ESC]',
                               style: TextStyle(
                                 fontFamily: 'Courier',
                                 fontSize: 12,
@@ -377,22 +401,25 @@ class _GameOverOverlayState extends State<GameOverOverlay> {
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(color: Colors.white12),
                       ),
-                      child: const Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.keyboard, color: Colors.cyanAccent, size: 14),
-                          SizedBox(width: 8),
-                          Text(
-                            '[ENTER]: SALVAR NO RANKING   •   [ESC]: PULAR SEM SALVAR',
-                            style: TextStyle(
-                              fontFamily: 'Courier',
-                              fontSize: 10,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white70,
-                              letterSpacing: 1.1,
+                      child: const FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.keyboard, color: Colors.cyanAccent, size: 14),
+                            SizedBox(width: 8),
+                            Text(
+                              '[DIGITE SEU NOME]   •   [ENTER]: SALVAR NO RANKING   •   [ESC]: PULAR',
+                              style: TextStyle(
+                                fontFamily: 'Courier',
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white70,
+                                letterSpacing: 1.1,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ],
