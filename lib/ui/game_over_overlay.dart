@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:asteroids/game/asteroids_game.dart';
 import 'package:asteroids/services/api_service.dart';
 
@@ -47,7 +48,15 @@ class _GameOverOverlayState extends State<GameOverOverlay> {
     final score = game.score;
     final survived = game.missionSurvived;
 
-    return Scaffold(
+    return Focus(
+      onKeyEvent: (node, event) {
+        if (event is KeyDownEvent && event.logicalKey == LogicalKeyboardKey.escape) {
+          game.changeState(GameState.scienceIntro);
+          return KeyEventResult.handled;
+        }
+        return KeyEventResult.ignored;
+      },
+      child: Scaffold(
       backgroundColor: Colors.transparent,
       body: Center(
         child: SingleChildScrollView(
@@ -357,6 +366,35 @@ class _GameOverOverlayState extends State<GameOverOverlay> {
                         ),
                       ],
                     ),
+
+                    const SizedBox(height: 14),
+
+                    // Keyboard prompt
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.04),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.white12),
+                      ),
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.keyboard, color: Colors.cyanAccent, size: 14),
+                          SizedBox(width: 8),
+                          Text(
+                            '[ENTER]: SALVAR NO RANKING   •   [ESC]: PULAR SEM SALVAR',
+                            style: TextStyle(
+                              fontFamily: 'Courier',
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white70,
+                              letterSpacing: 1.1,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -364,6 +402,7 @@ class _GameOverOverlayState extends State<GameOverOverlay> {
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 }

@@ -167,7 +167,7 @@ class AsteroidsGame extends FlameGame with HasCollisionDetection, KeyboardEvents
         overlays.add('hud');
         // Play loop background music
         try {
-          FlameAudio.bgm.play('music.wav');
+          FlameAudio.bgm.play('music.wav').catchError((_) {});
         } catch (_) {}
         gameFocusNode?.requestFocus();
         break;
@@ -180,7 +180,7 @@ class AsteroidsGame extends FlameGame with HasCollisionDetection, KeyboardEvents
       case GameState.gameOver:
         overlays.add('gameOver');
         try {
-          FlameAudio.bgm.stop();
+          FlameAudio.bgm.stop().catchError((_) {});
         } catch (_) {}
         break;
       case GameState.leaderboard:
@@ -328,12 +328,23 @@ class AsteroidsGame extends FlameGame with HasCollisionDetection, KeyboardEvents
     }
   }
 
+  final Map<String, int> _lastPlayedSfxTime = {};
+
   void playSfx(String name) {
-    try {
-      FlameAudio.play(name);
-    } catch (e) {
-      debugPrint('Error playing sound $name: $e');
+    // Throttle rapid duplicate audio triggers (e.g. multiple asteroid split sounds in the same frame)
+    // to prevent Linux GStreamer audio pipeline saturation and pad crashes
+    final now = DateTime.now().millisecondsSinceEpoch;
+    final lastTime = _lastPlayedSfxTime[name] ?? 0;
+    if (now - lastTime < 65) {
+      return; // Skip if played within the last 65ms
     }
+    _lastPlayedSfxTime[name] = now;
+
+    try {
+      FlameAudio.play(name).catchError((e) {
+        // Silently catch GStreamer platform errors so audio glitches never crash the game
+      });
+    } catch (_) {}
   }
 
   void triggerScreenShake({required double duration, required double intensity}) {

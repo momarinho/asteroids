@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -15,6 +16,13 @@ class LeaderboardOverlay extends StatefulWidget {
 
 class _LeaderboardOverlayState extends State<LeaderboardOverlay> {
   String _selectedPeriod = 'today'; // 'today' or 'all'
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,17 +33,42 @@ class _LeaderboardOverlayState extends State<LeaderboardOverlay> {
       onKeyEvent: (node, event) {
         if (event is KeyDownEvent) {
           if (event.logicalKey == LogicalKeyboardKey.space || event.logicalKey == LogicalKeyboardKey.enter) {
+            game.participantName = null;
             game.changeState(GameState.scienceIntro);
             return KeyEventResult.handled;
           } else if (event.logicalKey == LogicalKeyboardKey.escape) {
             game.changeState(GameState.scienceIntro);
             return KeyEventResult.handled;
+          } else if (event.logicalKey == LogicalKeyboardKey.keyC) {
+            game.changeState(GameState.scientistSelection);
+            return KeyEventResult.handled;
           } else if (event.logicalKey == LogicalKeyboardKey.tab ||
               event.logicalKey == LogicalKeyboardKey.arrowLeft ||
-              event.logicalKey == LogicalKeyboardKey.arrowRight) {
+              event.logicalKey == LogicalKeyboardKey.arrowRight ||
+              event.logicalKey == LogicalKeyboardKey.keyA ||
+              event.logicalKey == LogicalKeyboardKey.keyD) {
             setState(() {
               _selectedPeriod = _selectedPeriod == 'today' ? 'all' : 'today';
             });
+            game.playSfx('menu_select.wav');
+            return KeyEventResult.handled;
+          } else if (event.logicalKey == LogicalKeyboardKey.arrowDown || event.logicalKey == LogicalKeyboardKey.keyS) {
+            if (_scrollController.hasClients) {
+              _scrollController.animateTo(
+                _scrollController.offset + 90,
+                duration: const Duration(milliseconds: 100),
+                curve: Curves.easeOut,
+              );
+            }
+            return KeyEventResult.handled;
+          } else if (event.logicalKey == LogicalKeyboardKey.arrowUp || event.logicalKey == LogicalKeyboardKey.keyW) {
+            if (_scrollController.hasClients) {
+              _scrollController.animateTo(
+                math.max(0.0, _scrollController.offset - 90),
+                duration: const Duration(milliseconds: 100),
+                curve: Curves.easeOut,
+              );
+            }
             return KeyEventResult.handled;
           }
         }
@@ -205,6 +238,7 @@ class _LeaderboardOverlayState extends State<LeaderboardOverlay> {
                         }
 
                         return ListView.builder(
+                          controller: _scrollController,
                           itemCount: entries.length,
                           itemBuilder: (context, index) {
                             final entry = entries[index];
@@ -363,6 +397,35 @@ class _LeaderboardOverlayState extends State<LeaderboardOverlay> {
                         ),
                       ),
                     ],
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  // Keyboard arcade guide
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.04),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.white12),
+                    ),
+                    child: const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.keyboard, color: Colors.cyanAccent, size: 14),
+                        SizedBox(width: 8),
+                        Text(
+                          '◄ / ►: MUDAR ABA  •  ▲ / ▼: ROLAR  •  [ESPAÇO / ENTER]: PRÓXIMO PILOTO  •  [ESC]: VOLTAR',
+                          style: TextStyle(
+                            fontFamily: 'Courier',
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white70,
+                            letterSpacing: 1.1,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
