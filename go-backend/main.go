@@ -45,6 +45,8 @@ func main() {
 	r.POST("/players", handleRegisterPlayer)
 	r.POST("/scores", handleSubmitScore)
 	r.GET("/scores", handleGetScores)
+	r.GET("/live", handleLiveLeaderboard)
+	r.GET("/ranking", handleLiveLeaderboard)
 
 	fmt.Println("Asteroids backend listening on port 8080...")
 	if err := r.Run(":8080"); err != nil {
@@ -99,6 +101,7 @@ func handleRegisterPlayer(c *gin.Context) {
 
 type SubmitScoreRequest struct {
 	PlayerID  string `json:"player_id" binding:"required"`
+	Scientist string `json:"scientist"`
 	Score     int    `json:"score" binding:"required,min=0"`
 	Level     int    `json:"level" binding:"required,min=1"`
 	Mode      string `json:"mode" binding:"required"`
@@ -133,10 +136,11 @@ func handleSubmitScore(c *gin.Context) {
 
 	// 3. Save score to database
 	scoreRecord := Score{
-		PlayerID: req.PlayerID,
-		Score:    req.Score,
-		Level:    req.Level,
-		Mode:     req.Mode,
+		PlayerID:  req.PlayerID,
+		Scientist: req.Scientist,
+		Score:     req.Score,
+		Level:     req.Level,
+		Mode:      req.Mode,
 	}
 
 	if err := db.Create(&scoreRecord).Error; err != nil {
@@ -174,6 +178,7 @@ func handleGetScores(c *gin.Context) {
 	// Format results for client consumption
 	type LeaderboardEntry struct {
 		Username  string `json:"username"`
+		Scientist string `json:"scientist"`
 		Score     int    `json:"score"`
 		Level     int    `json:"level"`
 		CreatedAt string `json:"created_at"`
@@ -181,8 +186,13 @@ func handleGetScores(c *gin.Context) {
 
 	results := make([]LeaderboardEntry, len(scores))
 	for i, s := range scores {
+		scientist := s.Scientist
+		if scientist == "" {
+			scientist = "Pioneira"
+		}
 		results[i] = LeaderboardEntry{
 			Username:  s.Player.Username,
+			Scientist: scientist,
 			Score:     s.Score,
 			Level:     s.Level,
 			CreatedAt: s.CreatedAt.Format("2006-01-02 15:04:05"),
@@ -190,4 +200,67 @@ func handleGetScores(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, results)
+}
+
+func handleLiveLeaderboard(c *gin.Context) {
+	var scores []Score
+	db.Preload("Player").
+		Where("mode = ?", "arcade").
+		Order("score desc").
+		Limit(15).
+		Find(&scores)
+
+	html := `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="refresh" content="3">
+<title>Ranking ao Vivo • Mulheres na Ciência</title>
+<style>
+  body { background: #0a0e17; color: #fff; font-family: 'Courier New', monospace; margin: 0; padding: 24px; display: flex; flex-direction: column; align-items: center; }
+  h1 { color: #00e5ff; letter-spacing: 3px; margin-bottom: 4px; text-shadow: 0 0 12px #00e5ff88; }
+  p.subtitle { color: #8892b0; margin-top: 0; font-size: 14px; letter-spacing: 1.5px; }
+  table { width: 90%; max-width: 800px; border-collapse: collapse; margin-top: 20px; background: rgba(255,255,255,0.03); border: 1px solid rgba(0,229,255,0.3); border-radius: 12px; overflow: hidden; }
+  th { background: rgba(0,229,255,0.15); color: #00e5ff; padding: 14px; text-align: left; font-size: 14px; letter-spacing: 1.5px; }
+  td { padding: 12px 14px; border-bottom: 1px solid rgba(255,255,255,0.06); font-size: 15px; }
+  tr:nth-child(1) td { color: #ffd700; font-weight: bold; font-size: 17px; }
+  tr:nth-child(2) td { color: #cfd8dc; font-weight: bold; }
+  tr:nth-child(3) td { color: #bcaaa4; font-weight: bold; }
+  .badge { background: rgba(0,230,118,0.2); color: #00e676; padding: 4px 8px; border-radius: 6px; font-size: 12px; border: 1px solid rgba(0,230,118,0.4); }
+  .refresh-hint { margin-top: 16px; color: #556; font-size: 12px; }
+</style>
+</head>
+<body>
+  <h1>RANKING DA FEIRA DE CIÊNCIAS</h1>
+  <p class="subtitle">MULHERES NA CIÊNCIA • TOP PILOTOS ESPACIAIS</p>
+  <table>
+    <thead>
+      <tr><th>POS</th><th>PILOTO</th><th>CIENTISTA</th><th style="text-align:right">PONTOS</th></tr>
+    </thead>
+    <tbody>`
+
+	if len(scores) == 0 {
+		html += `<tr><td colspan="4" style="text-align:center; padding: 24px; color: #667;">Nenhum recorde registrado ainda. Seja a primeira a jogar!</td></tr>`
+	} else {
+		for i, s := range scores {
+			pos := fmt.Sprintf("#%d", i+1)
+			scientist := s.Scientist
+			if scientist == "" {
+				scientist = "Pioneira"
+			}
+			html += fmt.Sprintf(`<tr>
+				<td>%s</td>
+				<td><strong>%s</strong></td>
+				<td><span class="badge">%s</span></td>
+				<td style="text-align:right; font-weight:bold;">%d</td>
+			</tr>`, pos, s.Player.Username, scientist, s.Score)
+		}
+	}
+
+	html += `</tbody></table>
+  <p class="refresh-hint">Atualização automática em tempo real a cada 3 segundos • Asteroids</p>
+</body>
+</html>`
+
+	c.Data(http.StatusOK, "text/html; charset=utf-8", []byte(html))
 }

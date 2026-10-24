@@ -67,6 +67,7 @@ class ApiService {
     required int score,
     required int level,
     required String mode,
+    String? scientist,
   }) async {
     try {
       // Generate HMAC-SHA256 signature
@@ -77,16 +78,21 @@ class ApiService {
       final digest = hmacSha256.convert(payloadBytes);
       final signature = digest.toString();
 
+      final body = <String, dynamic>{
+        'player_id': playerId,
+        'score': score,
+        'level': level,
+        'mode': mode,
+        'signature': signature,
+      };
+      if (scientist != null) {
+        body['scientist'] = scientist;
+      }
+
       final response = await http.post(
         Uri.parse('$baseUrl/scores'),
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'player_id': playerId,
-          'score': score,
-          'level': level,
-          'mode': mode,
-          'signature': signature,
-        }),
+        body: jsonEncode(body),
       );
 
       if (response.statusCode == 201) {
@@ -136,6 +142,7 @@ class ApiService {
           score: score,
           level: 1,
           mode: 'arcade',
+          scientist: scientistName,
         );
       }
     } catch (e) {
@@ -144,6 +151,13 @@ class ApiService {
   }
 
   static Future<List<Map<String, dynamic>>> getFairLeaderboard({int limit = 10}) async {
+    // 1. Try to fetch from live Go backend first
+    final backendScores = await getLeaderboard('arcade', limit: limit);
+    if (backendScores.isNotEmpty) {
+      return backendScores;
+    }
+
+    // 2. Offline fallback to local SharedPreferences
     try {
       final prefs = await SharedPreferences.getInstance();
       final existingJson = prefs.getString(_keyFairLeaderboard);
@@ -156,8 +170,7 @@ class ApiService {
       debugPrint('Error reading local fair leaderboard: $e');
     }
 
-    // Fallback to backend
-    return getLeaderboard('arcade', limit: limit);
+    return [];
   }
 
   // 6. Get leaderboards list

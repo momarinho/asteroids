@@ -14,6 +14,7 @@ type Score struct {
 	ID        uint      `gorm:"primaryKey;autoIncrement" json:"id"`
 	PlayerID  string    `gorm:"not null;index" json:"player_id"`
 	Player    Player    `gorm:"foreignKey:PlayerID" json:"player,omitempty"`
+	Scientist string    `gorm:"default:''" json:"scientist"`
 	Score     int       `gorm:"not null" json:"score"`
 	Level     int       `gorm:"not null" json:"level"`
 	Mode      string    `gorm:"not null" json:"mode"`
