@@ -49,20 +49,8 @@ class _HudOverlayState extends State<HudOverlay> with SingleTickerProviderStateM
     final dashCooldown = player.dashCooldownTimer;
     final currentWeapon = player.weapon;
 
-    return Focus(
-      autofocus: true,
-      onKeyEvent: (node, event) {
-        if (event is KeyDownEvent) {
-          if (event.logicalKey == LogicalKeyboardKey.escape ||
-              event.logicalKey == LogicalKeyboardKey.keyP) {
-            game.togglePause();
-            return KeyEventResult.handled;
-          }
-        }
-        return KeyEventResult.ignored;
-      },
-      child: Container(
-        padding: const EdgeInsets.all(20.0),
+    return Container(
+      padding: const EdgeInsets.all(20.0),
       child: Stack(
         children: [
           // Item 5: Last Life Dramatic Red Pulsing Vignette
@@ -825,7 +813,6 @@ class _HudOverlayState extends State<HudOverlay> with SingleTickerProviderStateM
             ),
         ],
       ),
-    ),
-  );
+    );
   }
 }

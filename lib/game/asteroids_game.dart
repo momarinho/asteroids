@@ -151,24 +151,17 @@ class AsteroidsGame extends FlameGame with HasCollisionDetection, KeyboardEvents
     changeState(GameState.scienceIntro);
   }
 
+  DateTime? _lastPauseToggleTime;
+
   bool _handleGlobalKeyEvent(KeyEvent event) {
     if (event is! KeyDownEvent) return false;
 
     final key = event.logicalKey;
     final isPauseKey = key == LogicalKeyboardKey.escape || key == LogicalKeyboardKey.keyP;
 
-    if (state == GameState.playing) {
-      if (isGamePaused) {
-        if (isPauseKey || key == LogicalKeyboardKey.space || key == LogicalKeyboardKey.enter) {
-          resumeGame();
-          return true;
-        }
-      } else {
-        if (isPauseKey) {
-          pauseGame();
-          return true;
-        }
-      }
+    if (state == GameState.playing && isPauseKey) {
+      togglePause();
+      return true;
     }
     return false;
   }
@@ -259,6 +252,12 @@ class AsteroidsGame extends FlameGame with HasCollisionDetection, KeyboardEvents
 
   void togglePause() {
     if (state != GameState.playing) return;
+    final now = DateTime.now();
+    if (_lastPauseToggleTime != null && now.difference(_lastPauseToggleTime!).inMilliseconds < 300) {
+      return;
+    }
+    _lastPauseToggleTime = now;
+
     if (isGamePaused) {
       resumeGame();
     } else {
@@ -268,6 +267,7 @@ class AsteroidsGame extends FlameGame with HasCollisionDetection, KeyboardEvents
 
   void pauseGame() {
     if (state != GameState.playing || isGamePaused) return;
+    _lastPauseToggleTime = DateTime.now();
     isGamePaused = true;
     keysPressed.clear();
     pauseEngine();
@@ -276,6 +276,7 @@ class AsteroidsGame extends FlameGame with HasCollisionDetection, KeyboardEvents
 
   void resumeGame() {
     if (!isGamePaused) return;
+    _lastPauseToggleTime = DateTime.now();
     isGamePaused = false;
     keysPressed.clear();
     overlays.remove('pause');
@@ -288,14 +289,6 @@ class AsteroidsGame extends FlameGame with HasCollisionDetection, KeyboardEvents
     if (state != GameState.playing) {
       this.keysPressed.clear();
       return KeyEventResult.ignored;
-    }
-
-    if (event is KeyDownEvent) {
-      if (event.logicalKey == LogicalKeyboardKey.escape ||
-          event.logicalKey == LogicalKeyboardKey.keyP) {
-        togglePause();
-        return KeyEventResult.handled;
-      }
     }
 
     this.keysPressed.clear();
