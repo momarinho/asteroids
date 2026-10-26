@@ -16,8 +16,8 @@ enum DropType {
 class DropComponent extends PositionComponent with HasGameReference<AsteroidsGame>, CollisionCallbacks {
   final DropType type;
   Vector2 velocity;
-  double lifespan = 12.0;
-  final double maxLifespan = 12.0;
+  double lifespan = 8.0;
+  final double maxLifespan = 8.0;
   double pulseTimer = 0.0;
   final double radius = 12.0;
 
@@ -177,8 +177,8 @@ class DropComponent extends PositionComponent with HasGameReference<AsteroidsGam
 
   @override
   void render(Canvas canvas) {
-    // Blinking effect in the last 3 seconds of lifespan
-    if (lifespan < 3.0 && (DateTime.now().millisecondsSinceEpoch % 200 < 100)) {
+    // Blinking effect in the last 2.5 seconds of lifespan
+    if (lifespan < 2.5 && (DateTime.now().millisecondsSinceEpoch % 200 < 100)) {
       return;
     }
 

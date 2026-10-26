@@ -69,7 +69,7 @@ class Scientist {
       weaponDescription: 'Disparo em leque de 3 projéteis para cobrir amplas áreas do espaço.',
       weaponStyle: 'Disparo Triplo em Leque',
       specialAbilityName: 'Repulsão Zero-G',
-      specialAbilityDesc: 'Onda de choque que empurra meteoros para longe e ativa escudo de 3.5s!',
+      specialAbilityDesc: 'Onda gravitacional que desacelera os meteoros, limpa a área ao redor e ativa escudo de 4s!',
       cadenceRating: 3,
       areaRating: 5,
       powerRating: 3,

@@ -631,21 +631,38 @@ class AsteroidsGame extends FlameGame with HasCollisionDetection, KeyboardEvents
 
     switch (selectedScientist.id) {
       case 'mae_jemison':
-        // Gravidade Zero: Empurra todos os meteoros para longe e concede 3.5s de invulnerabilidade
-        player.invulnerableTimer = 3.5;
+        // Gravidade Zero: Desacelera todos os meteoros no espaço + repele e causa dano nos próximos + 4.0s de escudo
+        player.invulnerableTimer = 4.0;
         final asteroids = List<AsteroidComponent>.from(world.children.whereType<AsteroidComponent>());
         for (final ast in asteroids) {
           final diff = ast.position - player.position;
           final dist = diff.length;
           final pushDir = dist > 0 ? diff.normalized() : Vector2(1, 0);
-          ast.velocity.setFrom(pushDir * 350.0);
-          if (dist < 140.0) {
-            final destroyed = ast.takeDamage(50.0, ast.position);
+
+          // Efeito Gravidade Zero: Desacelera a velocidade dos meteoros para 35% (câmera lenta suave)
+          // NUNCA aumenta a velocidade para 350 (evita o bug de hipervelocidade)
+          ast.velocity.scale(0.35);
+
+          // Meteoros próximos sofrem repulsão suave e dano para limpar a área ao redor
+          if (dist < 180.0) {
+            ast.position += pushDir * math.min(90.0, 180.0 - dist);
+            final destroyed = ast.takeDamage(60.0, ast.position);
             if (destroyed) {
               onAsteroidDestroyed(ast.position, (ast.radius * 5).toInt());
             }
           }
         }
+
+        // Onda visual cósmica em roxo/ciano expandindo da nave
+        spawnExplosionParticles(
+          position: player.position,
+          colorChoices: [Colors.purpleAccent, Colors.cyanAccent, Colors.white],
+          count: 36,
+          minSize: 3.0,
+          maxSize: 6.0,
+          minSpeed: 70.0,
+          maxSpeed: 220.0,
+        );
         break;
 
       case 'margaret_hamilton':

@@ -183,31 +183,34 @@ class AsteroidComponent extends PositionComponent with HasGameReference<Asteroid
 
     final random = math.Random();
 
-    // Science Fair: Chance to drop exploration samples or utility powerups based on asteroid size
-    double dropChance = 0.25;
+    // Cap active drops on screen to maximum 2 so space remains clean and exciting
+    final activeDrops = game.world.children.whereType<DropComponent>().length;
+
+    // Science Fair: Calibrated rare drop chances based on asteroid size
+    double dropChance = 0.05; // 5% chance on small asteroids
     if (radius >= 50.0) {
-      dropChance = 0.60;
+      dropChance = 0.25; // 25% chance on large asteroids
     } else if (radius >= 30.0) {
-      dropChance = 0.40;
+      dropChance = 0.12; // 12% chance on medium asteroids
     }
 
-    if (random.nextDouble() < dropChance) {
+    if (activeDrops < 2 && random.nextDouble() < dropChance) {
       final roll = random.nextDouble();
       DropType dropType;
-      if (roll < 0.45) {
-        dropType = DropType.lunarSample; // 45% Lunar Sample (+100 pts)
-      } else if (roll < 0.70) {
+      if (roll < 0.50) {
+        dropType = DropType.lunarSample; // 50% Lunar Sample (+100 pts)
+      } else if (roll < 0.75) {
         dropType = DropType.rareHelium;  // 25% Rare Helium-3 (+250 pts)
-      } else if (roll < 0.80) {
-        dropType = DropType.darkMatter;  // 10% Dark Matter (+500 pts)
-      } else if (roll < 0.90) {
+      } else if (roll < 0.85) {
         dropType = DropType.shield;      // 10% Photonic Shield (4s)
+      } else if (roll < 0.93) {
+        dropType = DropType.darkMatter;  // 8% Dark Matter (+500 pts, Legendary)
       } else {
-        dropType = DropType.health;      // 10% Life Repair Fragment
+        dropType = DropType.health;      // 7% Life Repair Fragment (+1 Life)
       }
 
       final driftAngle = random.nextDouble() * 2 * math.pi;
-      final dropVel = Vector2(math.cos(driftAngle), math.sin(driftAngle)) * 30.0;
+      final dropVel = Vector2(math.cos(driftAngle), math.sin(driftAngle)) * 25.0;
 
       game.world.add(
         DropComponent(
