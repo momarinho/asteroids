@@ -70,7 +70,7 @@ class _MenuOverlayState extends State<MenuOverlay> {
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 6.0, sigmaY: 6.0),
             child: Container(
-              width: MediaQuery.of(context).size.width > 500 ? 500 : MediaQuery.of(context).size.width * 0.92,
+              width: MediaQuery.of(context).size.width > 540 ? 540 : MediaQuery.of(context).size.width * 0.94,
               padding: const EdgeInsets.symmetric(vertical: 24.0, horizontal: 20.0),
               decoration: BoxDecoration(
                 color: Colors.black.withOpacity(0.75),
@@ -113,7 +113,7 @@ class _MenuOverlayState extends State<MenuOverlay> {
                     'MULTIPLATFORM EDITION',
                     style: TextStyle(
                       fontFamily: 'Courier',
-                      fontSize: 12,
+                      fontSize: 13,
                       letterSpacing: 4,
                       color: Colors.cyanAccent.withOpacity(0.8),
                     ),
@@ -125,7 +125,7 @@ class _MenuOverlayState extends State<MenuOverlay> {
                     const Text(
                       'NEW PILOT REGISTRATION',
                       style: TextStyle(
-                        fontSize: 14,
+                        fontSize: 16,
                         fontWeight: FontWeight.bold,
                         letterSpacing: 2,
                         color: Colors.cyanAccent,
@@ -136,17 +136,17 @@ class _MenuOverlayState extends State<MenuOverlay> {
                       'Register your callsign to unlock online global leaderboards and campaign achievements.',
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        fontSize: 11,
-                        color: Colors.white54,
+                        fontSize: 13,
+                        color: Colors.white70,
                       ),
                     ),
                     const SizedBox(height: 25),
                     TextField(
                       controller: _usernameController,
-                      style: const TextStyle(color: Colors.white, fontFamily: 'Courier'),
+                      style: const TextStyle(color: Colors.white, fontFamily: 'Courier', fontSize: 14),
                       decoration: InputDecoration(
                         hintText: 'ENTER PILOT CALLSIGN',
-                        hintStyle: const TextStyle(color: Colors.white24, fontSize: 13),
+                        hintStyle: const TextStyle(color: Colors.white24, fontSize: 14),
                         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),
@@ -163,7 +163,7 @@ class _MenuOverlayState extends State<MenuOverlay> {
                       const SizedBox(height: 10),
                       Text(
                         _errorMessage!,
-                        style: const TextStyle(color: Colors.redAccent, fontSize: 11),
+                        style: const TextStyle(color: Colors.redAccent, fontSize: 13),
                       ),
                     ],
                     const SizedBox(height: 25),
@@ -183,7 +183,7 @@ class _MenuOverlayState extends State<MenuOverlay> {
                         child: const Text(
                           'REGISTER PILOT',
                           style: TextStyle(
-                            fontSize: 13,
+                            fontSize: 15,
                             fontWeight: FontWeight.bold,
                             letterSpacing: 1.5,
                           ),
@@ -195,7 +195,7 @@ class _MenuOverlayState extends State<MenuOverlay> {
                       'WELCOME BACK, PILOT ${game.playerUsername?.toUpperCase()}!',
                       style: const TextStyle(
                         fontFamily: 'Courier',
-                        fontSize: 12,
+                        fontSize: 14,
                         fontWeight: FontWeight.bold,
                         letterSpacing: 1.5,
                         color: Colors.cyanAccent,
@@ -247,12 +247,12 @@ class _MenuOverlayState extends State<MenuOverlay> {
                       child: const Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.play_arrow, size: 24),
+                          Icon(Icons.play_arrow, size: 26),
                           SizedBox(width: 8),
                           Text(
                             'START GAME',
                             style: TextStyle(
-                              fontSize: 16,
+                              fontSize: 18,
                               fontWeight: FontWeight.bold,
                               letterSpacing: 2,
                             ),
@@ -264,8 +264,10 @@ class _MenuOverlayState extends State<MenuOverlay> {
                     const SizedBox(height: 15),
 
                     // Settings & Leaderboard Buttons Row
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                    Wrap(
+                      alignment: WrapAlignment.center,
+                      spacing: 12,
+                      runSpacing: 10,
                       children: [
                         TextButton(
                           onPressed: () {
@@ -273,7 +275,7 @@ class _MenuOverlayState extends State<MenuOverlay> {
                           },
                           style: TextButton.styleFrom(
                             foregroundColor: Colors.white70,
-                            padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 14.0),
+                            padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8),
                               side: const BorderSide(color: Colors.white24, width: 1),
@@ -281,17 +283,16 @@ class _MenuOverlayState extends State<MenuOverlay> {
                           ),
                           child: const Text(
                             'SETTINGS',
-                            style: TextStyle(fontSize: 10, letterSpacing: 1.0),
+                            style: TextStyle(fontSize: 12.5, letterSpacing: 1.0, fontWeight: FontWeight.bold),
                           ),
                         ),
-                        const SizedBox(width: 10),
                         TextButton(
                           onPressed: () {
                             game.changeState(GameState.leaderboard);
                           },
                           style: TextButton.styleFrom(
                             foregroundColor: Colors.cyanAccent.withOpacity(0.8),
-                            padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 14.0),
+                            padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8),
                               side: BorderSide(color: Colors.cyan.withOpacity(0.3), width: 1),
@@ -299,10 +300,9 @@ class _MenuOverlayState extends State<MenuOverlay> {
                           ),
                           child: const Text(
                             'RANKING',
-                            style: TextStyle(fontSize: 10, letterSpacing: 1.0),
+                            style: TextStyle(fontSize: 12.5, letterSpacing: 1.0, fontWeight: FontWeight.bold),
                           ),
                         ),
-                        const SizedBox(width: 10),
                         // Profile reset button (log out)
                         TextButton(
                           onPressed: () async {
@@ -314,7 +314,7 @@ class _MenuOverlayState extends State<MenuOverlay> {
                           },
                           style: TextButton.styleFrom(
                             foregroundColor: Colors.redAccent.withOpacity(0.8),
-                            padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 14.0),
+                            padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8),
                               side: BorderSide(color: Colors.redAccent.withOpacity(0.3), width: 1),
@@ -322,7 +322,7 @@ class _MenuOverlayState extends State<MenuOverlay> {
                           ),
                           child: const Text(
                             'RESET PILOT',
-                            style: TextStyle(fontSize: 10, letterSpacing: 1.0),
+                            style: TextStyle(fontSize: 12.5, letterSpacing: 1.0, fontWeight: FontWeight.bold),
                           ),
                         ),
                       ],
@@ -365,13 +365,13 @@ class _MenuOverlayState extends State<MenuOverlay> {
                 Icon(
                   isActive ? Icons.radio_button_checked : Icons.radio_button_off,
                   color: isActive ? Colors.cyan : Colors.white38,
-                  size: 18,
+                  size: 20,
                 ),
                 const SizedBox(width: 8),
                 Text(
                   title,
                   style: TextStyle(
-                    fontSize: 14,
+                    fontSize: 16,
                     fontWeight: FontWeight.bold,
                     letterSpacing: 1.5,
                     color: isActive ? Colors.cyanAccent : Colors.white,
@@ -379,14 +379,14 @@ class _MenuOverlayState extends State<MenuOverlay> {
                 ),
               ],
             ),
-            const SizedBox(height: 5),
+            const SizedBox(height: 6),
             Padding(
-              padding: const EdgeInsets.only(left: 26.0),
+              padding: const EdgeInsets.only(left: 28.0),
               child: Text(
                 description,
                 style: const TextStyle(
-                  fontSize: 11,
-                  color: Colors.white54,
+                  fontSize: 13,
+                  color: Colors.white70,
                 ),
               ),
             ),

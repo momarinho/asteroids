@@ -127,7 +127,7 @@ class _GameOverOverlayState extends State<GameOverOverlay> {
                           ? 'Parabéns! Você sobreviveu aos 2:30 min no espaço!'
                           : 'Sua nave foi abatida pelos asteroides.',
                       style: const TextStyle(
-                        fontSize: 13,
+                        fontSize: 15,
                         color: Colors.white70,
                       ),
                     ),
@@ -151,7 +151,7 @@ class _GameOverOverlayState extends State<GameOverOverlay> {
                                 'PONTUAÇÃO',
                                 style: TextStyle(
                                   fontFamily: 'Courier',
-                                  fontSize: 11,
+                                  fontSize: 13,
                                   color: Colors.white54,
                                   letterSpacing: 1.2,
                                 ),
@@ -161,7 +161,7 @@ class _GameOverOverlayState extends State<GameOverOverlay> {
                                 '$score',
                                 style: const TextStyle(
                                   fontFamily: 'Courier',
-                                  fontSize: 30,
+                                  fontSize: 32,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.white,
                                 ),
@@ -175,7 +175,7 @@ class _GameOverOverlayState extends State<GameOverOverlay> {
                                 'CIENTISTA',
                                 style: TextStyle(
                                   fontFamily: 'Courier',
-                                  fontSize: 11,
+                                  fontSize: 13,
                                   color: Colors.white54,
                                   letterSpacing: 1.2,
                                 ),
@@ -185,7 +185,7 @@ class _GameOverOverlayState extends State<GameOverOverlay> {
                                 scientist.name,
                                 style: TextStyle(
                                   fontFamily: 'Courier',
-                                  fontSize: 14,
+                                  fontSize: 16,
                                   fontWeight: FontWeight.bold,
                                   color: scientist.primaryColor,
                                 ),
@@ -241,14 +241,14 @@ class _GameOverOverlayState extends State<GameOverOverlay> {
                               children: [
                                 Row(
                                   children: [
-                                    Icon(Icons.lightbulb, color: scientist.accentColor, size: 16),
+                                    Icon(Icons.lightbulb, color: scientist.accentColor, size: 18),
                                     const SizedBox(width: 6),
                                     Expanded(
                                       child: Text(
                                         'VOCÊ SABIA? • ${scientist.name.toUpperCase()}',
                                         style: TextStyle(
                                           fontFamily: 'Courier',
-                                          fontSize: 11,
+                                          fontSize: 13,
                                           fontWeight: FontWeight.bold,
                                           color: scientist.accentColor,
                                           letterSpacing: 1,
@@ -262,7 +262,7 @@ class _GameOverOverlayState extends State<GameOverOverlay> {
                                 Text(
                                   scientist.funFact,
                                   style: const TextStyle(
-                                    fontSize: 12,
+                                    fontSize: 14,
                                     height: 1.4,
                                     color: Colors.white,
                                   ),
@@ -283,7 +283,7 @@ class _GameOverOverlayState extends State<GameOverOverlay> {
                         'DIGITE SEU NOME PARA O RANKING DA FEIRA:',
                         style: TextStyle(
                           fontFamily: 'Courier',
-                          fontSize: 11,
+                          fontSize: 13,
                           fontWeight: FontWeight.bold,
                           color: Colors.white70,
                           letterSpacing: 1,
@@ -309,7 +309,7 @@ class _GameOverOverlayState extends State<GameOverOverlay> {
                         hintText: 'SEU NOME / APELIDO',
                         hintStyle: const TextStyle(
                           fontFamily: 'Courier',
-                          fontSize: 14,
+                          fontSize: 15,
                           color: Colors.white24,
                         ),
                         filled: true,
@@ -338,12 +338,12 @@ class _GameOverOverlayState extends State<GameOverOverlay> {
                           child: ElevatedButton.icon(
                             focusNode: FocusNode(canRequestFocus: false),
                             onPressed: _isSaving ? null : _submitAndShowLeaderboard,
-                            icon: const Icon(Icons.emoji_events, size: 18),
+                            icon: const Icon(Icons.emoji_events, size: 20),
                             label: Text(
                               _isSaving ? 'SALVANDO...' : 'SALVAR NO RANKING [ENTER]',
                               style: const TextStyle(
                                 fontFamily: 'Courier',
-                                fontSize: 13,
+                                fontSize: 15,
                                 fontWeight: FontWeight.bold,
                                 letterSpacing: 1,
                               ),
@@ -351,7 +351,7 @@ class _GameOverOverlayState extends State<GameOverOverlay> {
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.cyanAccent,
                               foregroundColor: Colors.black,
-                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              padding: const EdgeInsets.symmetric(vertical: 16),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10),
                               ),
@@ -374,7 +374,7 @@ class _GameOverOverlayState extends State<GameOverOverlay> {
                             style: OutlinedButton.styleFrom(
                               foregroundColor: Colors.white70,
                               side: const BorderSide(color: Colors.white24),
-                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              padding: const EdgeInsets.symmetric(vertical: 16),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10),
                               ),
@@ -383,7 +383,7 @@ class _GameOverOverlayState extends State<GameOverOverlay> {
                               'PULAR [ESC]',
                               style: TextStyle(
                                 fontFamily: 'Courier',
-                                fontSize: 12,
+                                fontSize: 14,
                                 letterSpacing: 1,
                               ),
                             ),
@@ -407,13 +407,13 @@ class _GameOverOverlayState extends State<GameOverOverlay> {
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(Icons.keyboard, color: Colors.cyanAccent, size: 14),
+                            Icon(Icons.keyboard, color: Colors.cyanAccent, size: 16),
                             SizedBox(width: 8),
                             Text(
                               '[DIGITE SEU NOME]   •   [ENTER]: SALVAR NO RANKING   •   [ESC]: PULAR',
                               style: TextStyle(
                                 fontFamily: 'Courier',
-                                fontSize: 10,
+                                fontSize: 12,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white70,
                                 letterSpacing: 1.1,

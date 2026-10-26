@@ -1,15 +1,17 @@
 import 'dart:math' as math;
 import 'package:flame/components.dart';
+import 'package:flame/collisions.dart';
 import 'package:flutter/material.dart';
 import 'package:asteroids/constants.dart';
 import 'package:asteroids/game/asteroids_game.dart';
 import 'asteroid.dart';
 
-class BombComponent extends PositionComponent with HasGameReference<AsteroidsGame> {
+class BombComponent extends PositionComponent with HasGameReference<AsteroidsGame>, CollisionCallbacks {
   final Vector2 velocity;
-  double fuseTimer = 1.0;
-  final double explosionRadius = 120.0;
-  final double radius = 12.0;
+  double fuseTimer = 1.1; // Max flight time if no asteroid is hit
+  final double explosionRadius = 90.0; // Balanced: wide impact without trivializing the whole screen
+  final double radius = 10.0;
+  bool _hasExploded = false;
 
   BombComponent({
     required Vector2 position,
@@ -21,15 +23,22 @@ class BombComponent extends PositionComponent with HasGameReference<AsteroidsGam
   }
 
   @override
+  Future<void> onLoad() async {
+    await super.onLoad();
+    add(CircleHitbox());
+  }
+
+  @override
   void update(double dt) {
     super.update(dt);
+    if (_hasExploded) return;
+
     position += velocity * dt;
     wrapAround();
 
     fuseTimer -= dt;
     if (fuseTimer <= 0) {
       explode();
-      removeFromParent();
     }
   }
 
@@ -51,12 +60,26 @@ class BombComponent extends PositionComponent with HasGameReference<AsteroidsGam
   }
 
   void explode() {
+    if (_hasExploded) return;
+    _hasExploded = true;
+
     game.world.add(
       BombExplosionComponent(
         position: position.clone(),
         maxRadius: explosionRadius,
       ),
     );
+    removeFromParent();
+  }
+
+  @override
+  void onCollisionStart(Set<Vector2> intersectionPoints, PositionComponent other) {
+    super.onCollisionStart(intersectionPoints, other);
+    if (_hasExploded) return;
+
+    if (other is AsteroidComponent) {
+      explode();
+    }
   }
 
   @override
@@ -65,13 +88,13 @@ class BombComponent extends PositionComponent with HasGameReference<AsteroidsGam
 
     // Filled red body
     final fillPaint = Paint()
-      ..color = Colors.red
+      ..color = Colors.redAccent
       ..style = PaintingStyle.fill;
     canvas.drawCircle(Offset.zero, radius, fillPaint);
 
     // Orange outline
     final strokePaint = Paint()
-      ..color = Colors.orange
+      ..color = Colors.amberAccent
       ..style = PaintingStyle.stroke
       ..strokeWidth = GameConstants.lineWidth;
     canvas.drawCircle(Offset.zero, radius, strokePaint);

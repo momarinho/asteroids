@@ -208,13 +208,13 @@ class ShopOverlay extends StatelessWidget {
                             Text(
                               'LAUNCH NEXT STAGE',
                               style: TextStyle(
-                                fontSize: 14,
+                                fontSize: 16,
                                 fontWeight: FontWeight.bold,
                                 letterSpacing: 1.5,
                               ),
                             ),
                             SizedBox(width: 8),
-                            Icon(Icons.arrow_forward, size: 18),
+                            Icon(Icons.arrow_forward, size: 20),
                           ],
                         ),
                       ),
@@ -274,7 +274,7 @@ class ShopOverlay extends StatelessWidget {
                 Text(
                   title.toUpperCase(),
                   style: TextStyle(
-                    fontSize: 13,
+                    fontSize: 14.5,
                     fontWeight: FontWeight.bold,
                     color: isUnlocked ? Colors.white : Colors.white60,
                   ),
@@ -282,7 +282,7 @@ class ShopOverlay extends StatelessWidget {
                 Text(
                   isUnlocked ? 'Level $weaponLevel' : 'LOCKED',
                   style: TextStyle(
-                    fontSize: 10,
+                    fontSize: 12,
                     color: isUnlocked ? Colors.cyanAccent : Colors.redAccent,
                   ),
                 ),
@@ -290,7 +290,7 @@ class ShopOverlay extends StatelessWidget {
                 Expanded(
                   child: Text(
                     description,
-                    style: const TextStyle(fontSize: 9, color: Colors.white38),
+                    style: const TextStyle(fontSize: 11, color: Colors.white60),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -312,7 +312,7 @@ class ShopOverlay extends StatelessWidget {
               disabledBackgroundColor: Colors.white10,
               disabledForegroundColor: Colors.white24,
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-              textStyle: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
+              textStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(6),
               ),
@@ -354,7 +354,7 @@ class ShopOverlay extends StatelessWidget {
                 Text(
                   title.toUpperCase(),
                   style: TextStyle(
-                    fontSize: 13,
+                    fontSize: 14.5,
                     fontWeight: FontWeight.bold,
                     color: isPurchased ? Colors.white : Colors.white60,
                   ),
@@ -362,7 +362,7 @@ class ShopOverlay extends StatelessWidget {
                 Text(
                   isPurchased ? 'INSTALLED [MAX]' : 'NOT PURCHASED',
                   style: TextStyle(
-                    fontSize: 10,
+                    fontSize: 12,
                     color: isPurchased ? Colors.greenAccent : Colors.orangeAccent,
                   ),
                 ),
@@ -370,7 +370,7 @@ class ShopOverlay extends StatelessWidget {
                 Expanded(
                   child: Text(
                     description,
-                    style: const TextStyle(fontSize: 9, color: Colors.white38),
+                    style: const TextStyle(fontSize: 11, color: Colors.white60),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -392,7 +392,7 @@ class ShopOverlay extends StatelessWidget {
               disabledBackgroundColor: Colors.white10,
               disabledForegroundColor: Colors.white24,
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-              textStyle: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
+              textStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(6),
               ),
@@ -435,7 +435,7 @@ class ShopOverlay extends StatelessWidget {
                 Text(
                   title.toUpperCase(),
                   style: const TextStyle(
-                    fontSize: 13,
+                    fontSize: 14.5,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                   ),
@@ -443,7 +443,7 @@ class ShopOverlay extends StatelessWidget {
                 Text(
                   'CURRENT LIVES: $currentLives / 5',
                   style: const TextStyle(
-                    fontSize: 10,
+                    fontSize: 12,
                     color: Colors.redAccent,
                   ),
                 ),
@@ -451,7 +451,7 @@ class ShopOverlay extends StatelessWidget {
                 Expanded(
                   child: Text(
                     description,
-                    style: const TextStyle(fontSize: 9, color: Colors.white38),
+                    style: const TextStyle(fontSize: 11, color: Colors.white60),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -473,7 +473,7 @@ class ShopOverlay extends StatelessWidget {
               disabledBackgroundColor: Colors.white10,
               disabledForegroundColor: Colors.white24,
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-              textStyle: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
+              textStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(6),
               ),

@@ -34,8 +34,16 @@ fi
 # Step 1: Start Go Backend
 echo "-> Starting Go backend server..."
 cd go-backend
-# Run in background and redirect output to log file to keep console clean
-go run . > "../$LOG_FILE" 2>&1 &
+# Run with 'go run .' if go is installed, otherwise fallback to precompiled binary './server'
+if command -v go >/dev/null 2>&1; then
+    go run . > "../$LOG_FILE" 2>&1 &
+elif [ -f "./server" ]; then
+    echo "-> 'go' not found, using precompiled ./server binary..."
+    chmod +x ./server
+    ./server > "../$LOG_FILE" 2>&1 &
+else
+    echo "Error: Neither 'go' command nor precompiled './server' found." > "../$LOG_FILE"
+fi
 BACKEND_PID=$!
 cd ..
 

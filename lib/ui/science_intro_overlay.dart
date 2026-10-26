@@ -129,13 +129,13 @@ class _ScienceIntroOverlayState extends State<ScienceIntroOverlay> {
                         child: const Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(Icons.auto_awesome, color: Colors.cyanAccent, size: 16),
+                            Icon(Icons.auto_awesome, color: Colors.cyanAccent, size: 18),
                             SizedBox(width: 8),
                             Text(
                               'FEIRA DE CIÊNCIAS • MULHERES NA CIÊNCIA',
                               style: TextStyle(
                                 fontFamily: 'Courier',
-                                fontSize: 12,
+                                fontSize: 13.5,
                                 fontWeight: FontWeight.bold,
                                 letterSpacing: 2,
                                 color: Colors.cyanAccent,
@@ -170,7 +170,7 @@ class _ScienceIntroOverlayState extends State<ScienceIntroOverlay> {
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontFamily: 'Courier',
-                          fontSize: 14,
+                          fontSize: 15,
                           letterSpacing: 2.5,
                           fontWeight: FontWeight.bold,
                           color: Colors.white70,
@@ -193,7 +193,7 @@ class _ScienceIntroOverlayState extends State<ScienceIntroOverlay> {
                           'seu lugar no topo do ranking dos melhores pilotos da feira!',
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            fontSize: 13,
+                            fontSize: 15,
                             height: 1.5,
                             color: Colors.white70,
                           ),
@@ -230,14 +230,14 @@ class _ScienceIntroOverlayState extends State<ScienceIntroOverlay> {
                               },
                               icon: Icon(
                                 Icons.rocket_launch,
-                                size: 18,
+                                size: 20,
                                 color: _selectedMenuIndex == 0 ? Colors.black : Colors.cyanAccent,
                               ),
                               label: Text(
                                 _selectedMenuIndex == 0 ? '► INICIAR MISSÃO' : 'INICIAR MISSÃO',
                                 style: TextStyle(
                                   fontFamily: 'Courier',
-                                  fontSize: 13,
+                                  fontSize: 15,
                                   fontWeight: FontWeight.bold,
                                   letterSpacing: 1.2,
                                   color: _selectedMenuIndex == 0 ? Colors.black : Colors.cyanAccent,
@@ -247,7 +247,7 @@ class _ScienceIntroOverlayState extends State<ScienceIntroOverlay> {
                                 backgroundColor: _selectedMenuIndex == 0
                                     ? Colors.cyanAccent
                                     : Colors.cyan.withOpacity(0.12),
-                                padding: const EdgeInsets.symmetric(vertical: 16),
+                                padding: const EdgeInsets.symmetric(vertical: 18),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
                                   side: BorderSide(
@@ -275,14 +275,14 @@ class _ScienceIntroOverlayState extends State<ScienceIntroOverlay> {
                               },
                               icon: Icon(
                                 Icons.leaderboard,
-                                size: 18,
+                                size: 20,
                                 color: _selectedMenuIndex == 1 ? Colors.black : Colors.amberAccent,
                               ),
                               label: Text(
                                 _selectedMenuIndex == 1 ? '► RANKING DA FEIRA' : 'RANKING DA FEIRA',
                                 style: TextStyle(
                                   fontFamily: 'Courier',
-                                  fontSize: 13,
+                                  fontSize: 15,
                                   fontWeight: FontWeight.bold,
                                   letterSpacing: 1.2,
                                   color: _selectedMenuIndex == 1 ? Colors.black : Colors.amberAccent,
@@ -292,7 +292,7 @@ class _ScienceIntroOverlayState extends State<ScienceIntroOverlay> {
                                 backgroundColor: _selectedMenuIndex == 1
                                     ? Colors.amberAccent
                                     : Colors.amber.withOpacity(0.12),
-                                padding: const EdgeInsets.symmetric(vertical: 16),
+                                padding: const EdgeInsets.symmetric(vertical: 18),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
                                   side: BorderSide(
@@ -323,13 +323,13 @@ class _ScienceIntroOverlayState extends State<ScienceIntroOverlay> {
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(Icons.keyboard, color: Colors.cyanAccent, size: 16),
+                              Icon(Icons.keyboard, color: Colors.cyanAccent, size: 18),
                               SizedBox(width: 8),
                               Text(
                                 '◄ / ►: ESCOLHER   •   [ESPAÇO / ENTER]: CONFIRMAR   •   [R]: RANKING',
                                 style: TextStyle(
                                   fontFamily: 'Courier',
-                                  fontSize: 10.5,
+                                  fontSize: 12,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.white70,
                                   letterSpacing: 1.1,
@@ -353,13 +353,13 @@ class _ScienceIntroOverlayState extends State<ScienceIntroOverlay> {
   Widget _buildBadge(IconData icon, String label, String value, Color color) {
     return Column(
       children: [
-        Icon(icon, color: color, size: 24),
+        Icon(icon, color: color, size: 26),
         const SizedBox(height: 4),
         Text(
           label,
           style: const TextStyle(
             fontFamily: 'Courier',
-            fontSize: 10,
+            fontSize: 11.5,
             color: Colors.white54,
             letterSpacing: 1.2,
           ),
@@ -368,7 +368,7 @@ class _ScienceIntroOverlayState extends State<ScienceIntroOverlay> {
           value,
           style: TextStyle(
             fontFamily: 'Courier',
-            fontSize: 12,
+            fontSize: 14,
             fontWeight: FontWeight.bold,
             color: color,
           ),

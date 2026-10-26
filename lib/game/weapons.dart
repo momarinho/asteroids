@@ -153,14 +153,14 @@ class BombLauncher extends Weapon {
   BombLauncher()
       : super(
           name: "Lança-Bombas",
-          cooldown: 1.5,
-          recoil: 150.0,
+          cooldown: 1.45,
+          recoil: 135.0,
           muzzleFlashSize: 18.0,
         );
 
   @override
   bool fire(PlayerComponent player) {
-    final velocity = player.forward * 200.0;
+    final velocity = player.forward * 220.0;
     final bomb = BombComponent(
       position: player.position + player.forward * player.radius,
       velocity: velocity,
@@ -172,11 +172,11 @@ class BombLauncher extends Weapon {
   @override
   void applyUpgradeStats() {
     if (level == 2) {
-      cooldown = 1.1;
-      recoil = 90.0;
+      cooldown = 1.05;
+      recoil = 80.0;
     } else if (level == 3) {
-      cooldown = 0.8;
-      recoil = 50.0;
+      cooldown = 0.75;
+      recoil = 45.0;
     }
   }
 }

@@ -115,7 +115,7 @@ class _WeaponSelectionOverlayState extends State<WeaponSelectionOverlay> {
                       style: const TextStyle(
                         color: Colors.grey,
                         letterSpacing: 2,
-                        fontSize: 12,
+                        fontSize: 14,
                       ),
                     ),
                   ),
@@ -180,7 +180,7 @@ class _WeaponSelectionOverlayState extends State<WeaponSelectionOverlay> {
                                     weapon['name'],
                                     style: TextStyle(
                                       fontFamily: 'Courier',
-                                      fontSize: 16,
+                                      fontSize: 17,
                                       fontWeight: FontWeight.bold,
                                       color: isSelected ? Colors.white : Colors.white70,
                                     ),
@@ -192,7 +192,7 @@ class _WeaponSelectionOverlayState extends State<WeaponSelectionOverlay> {
                                 child: Text(
                                   weapon['description'],
                                   style: TextStyle(
-                                    fontSize: 11,
+                                    fontSize: 12.5,
                                     color: Colors.grey[400],
                                     height: 1.3,
                                   ),
@@ -279,12 +279,12 @@ class _WeaponSelectionOverlayState extends State<WeaponSelectionOverlay> {
                           child: const Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(Icons.rocket, size: 20),
+                              Icon(Icons.rocket, size: 22),
                               SizedBox(width: 8),
                               Text(
                                 'LAUNCH SYSTEM',
                                 style: TextStyle(
-                                  fontSize: 15,
+                                  fontSize: 17,
                                   fontWeight: FontWeight.bold,
                                   letterSpacing: 2,
                                 ),
@@ -317,7 +317,7 @@ class _WeaponSelectionOverlayState extends State<WeaponSelectionOverlay> {
         Text(
           label.toUpperCase(),
           style: const TextStyle(
-            fontSize: 8,
+            fontSize: 10,
             color: Colors.grey,
             fontWeight: FontWeight.bold,
           ),
@@ -325,7 +325,7 @@ class _WeaponSelectionOverlayState extends State<WeaponSelectionOverlay> {
         Text(
           value,
           style: TextStyle(
-            fontSize: 10,
+            fontSize: 12,
             color: isSelected ? color : Colors.white70,
             fontWeight: FontWeight.bold,
           ),

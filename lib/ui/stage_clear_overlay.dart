@@ -98,12 +98,12 @@ class StageClearOverlay extends StatelessWidget {
                     child: const Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.shopping_cart, size: 20),
+                        Icon(Icons.shopping_cart, size: 22),
                         SizedBox(width: 8),
                         Text(
                           'ENTER UPGRADE SHOP',
                           style: TextStyle(
-                            fontSize: 14,
+                            fontSize: 16,
                             fontWeight: FontWeight.bold,
                             letterSpacing: 1.5,
                           ),
@@ -130,7 +130,7 @@ class StageClearOverlay extends StatelessWidget {
                     child: const Text(
                       'BACK TO MENU',
                       style: TextStyle(
-                        fontSize: 13,
+                        fontSize: 14.5,
                         letterSpacing: 1.5,
                       ),
                     ),
@@ -151,16 +151,16 @@ class StageClearOverlay extends StatelessWidget {
         Text(
           label,
           style: const TextStyle(
-            fontSize: 11,
+            fontSize: 13,
             letterSpacing: 1.2,
-            color: Colors.white54,
+            color: Colors.white70,
           ),
         ),
         Text(
           value,
           style: TextStyle(
             fontFamily: 'Courier',
-            fontSize: 14,
+            fontSize: 16,
             fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
             color: color,
           ),

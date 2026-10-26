@@ -157,7 +157,7 @@ class _LeaderboardOverlayState extends State<LeaderboardOverlay> {
                                 'RANKING DA FEIRA',
                                 style: TextStyle(
                                   fontFamily: 'Courier',
-                                  fontSize: 22,
+                                  fontSize: 24,
                                   fontWeight: FontWeight.bold,
                                   letterSpacing: 2.5,
                                   color: Colors.white,
@@ -167,7 +167,7 @@ class _LeaderboardOverlayState extends State<LeaderboardOverlay> {
                                 'MULHERES NA CIÊNCIA • TOP PILOTOS',
                                 style: TextStyle(
                                   fontFamily: 'Courier',
-                                  fontSize: 10,
+                                  fontSize: 12,
                                   letterSpacing: 1.5,
                                   color: Colors.cyanAccent,
                                 ),
@@ -206,12 +206,12 @@ class _LeaderboardOverlayState extends State<LeaderboardOverlay> {
                     child: Row(
                       children: [
                         SizedBox(
-                          width: 38,
+                          width: 44,
                           child: Text(
                             'POS',
                             style: TextStyle(
                               fontFamily: 'Courier',
-                              fontSize: 11,
+                              fontSize: 13,
                               color: Colors.white54,
                               fontWeight: FontWeight.bold,
                             ),
@@ -223,7 +223,7 @@ class _LeaderboardOverlayState extends State<LeaderboardOverlay> {
                             'PILOTO',
                             style: TextStyle(
                               fontFamily: 'Courier',
-                              fontSize: 11,
+                              fontSize: 13,
                               color: Colors.white54,
                               fontWeight: FontWeight.bold,
                             ),
@@ -235,7 +235,7 @@ class _LeaderboardOverlayState extends State<LeaderboardOverlay> {
                             'CIENTISTA',
                             style: TextStyle(
                               fontFamily: 'Courier',
-                              fontSize: 11,
+                              fontSize: 13,
                               color: Colors.white54,
                               fontWeight: FontWeight.bold,
                             ),
@@ -245,7 +245,7 @@ class _LeaderboardOverlayState extends State<LeaderboardOverlay> {
                           'PONTOS',
                           style: TextStyle(
                             fontFamily: 'Courier',
-                            fontSize: 11,
+                            fontSize: 13,
                             color: Colors.white54,
                             fontWeight: FontWeight.bold,
                           ),
@@ -308,12 +308,12 @@ class _LeaderboardOverlayState extends State<LeaderboardOverlay> {
                                 children: [
                                   // Rank number
                                   SizedBox(
-                                    width: 38,
+                                    width: 44,
                                     child: Text(
                                       '#${index + 1}',
                                       style: TextStyle(
                                         fontFamily: 'Courier',
-                                        fontSize: 13,
+                                        fontSize: 15,
                                         fontWeight: FontWeight.bold,
                                         color: index == 0
                                             ? Colors.amberAccent
@@ -333,7 +333,7 @@ class _LeaderboardOverlayState extends State<LeaderboardOverlay> {
                                       username.toUpperCase(),
                                       style: TextStyle(
                                         fontFamily: 'Courier',
-                                        fontSize: 13,
+                                        fontSize: 15,
                                         fontWeight: isCurrent ? FontWeight.bold : FontWeight.w600,
                                         color: isCurrent ? Colors.cyanAccent : Colors.white,
                                       ),
@@ -349,7 +349,7 @@ class _LeaderboardOverlayState extends State<LeaderboardOverlay> {
                                       scientist,
                                       style: const TextStyle(
                                         fontFamily: 'Courier',
-                                        fontSize: 11,
+                                        fontSize: 13,
                                         color: Colors.white70,
                                       ),
                                       maxLines: 1,
@@ -362,7 +362,7 @@ class _LeaderboardOverlayState extends State<LeaderboardOverlay> {
                                     '$score',
                                     style: const TextStyle(
                                       fontFamily: 'Courier',
-                                      fontSize: 14,
+                                      fontSize: 16,
                                       fontWeight: FontWeight.bold,
                                       color: Colors.white,
                                     ),
@@ -395,7 +395,7 @@ class _LeaderboardOverlayState extends State<LeaderboardOverlay> {
                             _selectedButtonIndex == 0 ? '► PRÓXIMO PILOTO 🚀' : 'PRÓXIMO PILOTO 🚀',
                             style: TextStyle(
                               fontFamily: 'Courier',
-                              fontSize: 13,
+                              fontSize: 15,
                               fontWeight: FontWeight.bold,
                               letterSpacing: 1.2,
                               color: _selectedButtonIndex == 0 ? Colors.black : Colors.cyanAccent,
@@ -406,7 +406,7 @@ class _LeaderboardOverlayState extends State<LeaderboardOverlay> {
                                 ? Colors.cyanAccent
                                 : Colors.cyan.withOpacity(0.12),
                             foregroundColor: _selectedButtonIndex == 0 ? Colors.black : Colors.cyanAccent,
-                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            padding: const EdgeInsets.symmetric(vertical: 16),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
                               side: BorderSide(
@@ -439,7 +439,7 @@ class _LeaderboardOverlayState extends State<LeaderboardOverlay> {
                               color: _selectedButtonIndex == 1 ? Colors.cyanAccent : Colors.white24,
                               width: _selectedButtonIndex == 1 ? 2.0 : 1.0,
                             ),
-                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            padding: const EdgeInsets.symmetric(vertical: 16),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
                             ),
@@ -448,7 +448,7 @@ class _LeaderboardOverlayState extends State<LeaderboardOverlay> {
                             _selectedButtonIndex == 1 ? '► CIENTISTAS' : 'CIENTISTAS',
                             style: TextStyle(
                               fontFamily: 'Courier',
-                              fontSize: 12,
+                              fontSize: 14,
                               fontWeight: _selectedButtonIndex == 1 ? FontWeight.bold : FontWeight.normal,
                               letterSpacing: 1,
                             ),
@@ -462,7 +462,7 @@ class _LeaderboardOverlayState extends State<LeaderboardOverlay> {
 
                   // Keyboard arcade guide
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     decoration: BoxDecoration(
                       color: Colors.white.withOpacity(0.04),
                       borderRadius: BorderRadius.circular(8),
@@ -473,13 +473,13 @@ class _LeaderboardOverlayState extends State<LeaderboardOverlay> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.keyboard, color: Colors.cyanAccent, size: 14),
+                          Icon(Icons.keyboard, color: Colors.cyanAccent, size: 16),
                           SizedBox(width: 8),
                           Text(
                             '◄ / ►: ESCOLHER BOTÃO  •  [ENTER / ESPAÇO]: CONFIRMAR  •  [TAB]: HOJE / GERAL  •  ▲ / ▼: ROLAR  •  [ESC]: VOLTAR',
                             style: TextStyle(
                               fontFamily: 'Courier',
-                              fontSize: 10,
+                              fontSize: 12,
                               fontWeight: FontWeight.bold,
                               color: Colors.white70,
                               letterSpacing: 1.1,
@@ -522,7 +522,7 @@ class _LeaderboardOverlayState extends State<LeaderboardOverlay> {
           label,
           style: TextStyle(
             fontFamily: 'Courier',
-            fontSize: 11,
+            fontSize: 13,
             fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
             color: isSelected ? Colors.cyanAccent : Colors.white70,
             letterSpacing: 1.2,

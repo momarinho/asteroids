@@ -242,19 +242,21 @@ class _ScientistSelectionOverlayState extends State<ScientistSelectionOverlay> w
               child: BackdropFilter(
                 filter: ImageFilter.blur(sigmaX: 8.0, sigmaY: 8.0),
                 child: Container(
-                  width: size.width > 1200 ? 1160 : size.width * 0.96,
-                  padding: const EdgeInsets.all(20.0),
+                  width: size.width > 1500
+                      ? 1440
+                      : (size.width > 1100 ? size.width * 0.96 : size.width * 0.98),
+                  padding: const EdgeInsets.symmetric(vertical: 22.0, horizontal: 20.0),
                   decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.85),
+                    color: Colors.black.withOpacity(0.88),
                     borderRadius: BorderRadius.circular(24),
                     border: Border.all(
-                      color: Colors.cyanAccent.withOpacity(0.3),
+                      color: Colors.cyanAccent.withOpacity(0.35),
                       width: 1.5,
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.cyanAccent.withOpacity(0.12),
-                        blurRadius: 24,
+                        color: Colors.cyanAccent.withOpacity(0.15),
+                        blurRadius: 28,
                       ),
                     ],
                   ),
@@ -269,7 +271,7 @@ class _ScientistSelectionOverlayState extends State<ScientistSelectionOverlay> w
                               _countdownTimer?.cancel();
                               widget.game.changeState(GameState.scienceIntro);
                             },
-                            icon: const Icon(Icons.arrow_back, color: Colors.white70),
+                            icon: const Icon(Icons.arrow_back, color: Colors.white70, size: 26),
                             tooltip: 'Voltar (ESC)',
                           ),
                           Expanded(
@@ -280,18 +282,18 @@ class _ScientistSelectionOverlayState extends State<ScientistSelectionOverlay> w
                                   'ESCOLHA SUA CIENTISTA',
                                   style: TextStyle(
                                     fontFamily: 'Courier',
-                                    fontSize: 25,
+                                    fontSize: 30,
                                     fontWeight: FontWeight.bold,
-                                    letterSpacing: 3,
+                                    letterSpacing: 4,
                                     color: Colors.white,
                                   ),
                                 ),
-                                const SizedBox(height: 2),
+                                const SizedBox(height: 3),
                                 Text(
                                   'Use as setas ◄ / ► para navegar • Pressione ESPAÇO para decolar',
                                   style: TextStyle(
-                                    fontSize: 11.5,
-                                    color: Colors.cyanAccent.withOpacity(0.9),
+                                    fontSize: 14.5,
+                                    color: Colors.cyanAccent.withOpacity(0.95),
                                     fontWeight: FontWeight.w500,
                                   ),
                                 ),
@@ -300,7 +302,7 @@ class _ScientistSelectionOverlayState extends State<ScientistSelectionOverlay> w
                           ),
                           // Arcade Countdown Badge
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                             decoration: BoxDecoration(
                               color: _countdownSeconds <= 5
                                   ? Colors.red.withOpacity(0.3)
@@ -317,14 +319,14 @@ class _ScientistSelectionOverlayState extends State<ScientistSelectionOverlay> w
                                 Icon(
                                   Icons.timer,
                                   color: _countdownSeconds <= 5 ? Colors.redAccent : Colors.cyanAccent,
-                                  size: 16,
+                                  size: 18,
                                 ),
                                 const SizedBox(width: 6),
                                 Text(
                                   '${_countdownSeconds}s',
                                   style: TextStyle(
                                     fontFamily: 'Courier',
-                                    fontSize: 14,
+                                    fontSize: 16,
                                     fontWeight: FontWeight.bold,
                                     letterSpacing: 1.2,
                                     color: _countdownSeconds <= 5 ? Colors.redAccent : Colors.white,
@@ -336,12 +338,12 @@ class _ScientistSelectionOverlayState extends State<ScientistSelectionOverlay> w
                         ],
                       ),
 
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 18),
 
                       // 4 Cards Layout
                       LayoutBuilder(
                         builder: (context, constraints) {
-                          final isWide = constraints.maxWidth > 900;
+                          final isWide = constraints.maxWidth >= 1050;
                           if (isWide) {
                             return Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -357,13 +359,13 @@ class _ScientistSelectionOverlayState extends State<ScientistSelectionOverlay> w
                             );
                           } else {
                             return Wrap(
-                              spacing: 12,
-                              runSpacing: 12,
+                              spacing: 14,
+                              runSpacing: 14,
                               alignment: WrapAlignment.center,
                               children: List.generate(scientists.length, (index) {
                                 final isSelected = index == _selectedIndex;
                                 return SizedBox(
-                                  width: (constraints.maxWidth - 20) / 2 > 300
+                                  width: (constraints.maxWidth - 20) / 2 > 320
                                       ? (constraints.maxWidth - 20) / 2
                                       : constraints.maxWidth,
                                   child: _buildScientistCard(context, scientists[index], index, isSelected),
@@ -374,32 +376,35 @@ class _ScientistSelectionOverlayState extends State<ScientistSelectionOverlay> w
                         },
                       ),
 
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 18),
 
-                      // Arcade Control Footer
+                      // Bottom Arcade Navigation Guide
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
                         decoration: BoxDecoration(
                           color: Colors.white.withOpacity(0.04),
                           borderRadius: BorderRadius.circular(10),
                           border: Border.all(color: Colors.white12),
                         ),
-                        child: const Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.keyboard, color: Colors.cyanAccent, size: 16),
-                            SizedBox(width: 8),
-                            Text(
-                              '◄ / ► (A/D): NAVEGAR  •  [ESPAÇO / ENTER]: DECOLAR  •  [ESC]: VOLTAR',
-                              style: TextStyle(
-                                fontFamily: 'Courier',
-                                fontSize: 10.5,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white70,
-                                letterSpacing: 1.1,
+                        child: const FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.keyboard, color: Colors.cyanAccent, size: 18),
+                              SizedBox(width: 8),
+                              Text(
+                                '◄ / ► (A/D): NAVEGAR  •  [ESPAÇO / ENTER]: DECOLAR  •  [ESC]: VOLTAR',
+                                style: TextStyle(
+                                  fontFamily: 'Courier',
+                                  fontSize: 12.5,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white70,
+                                  letterSpacing: 1.1,
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ],
@@ -444,16 +449,16 @@ class _ScientistSelectionOverlayState extends State<ScientistSelectionOverlay> w
             ),
           ],
         ),
-        padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 12.0),
+        padding: const EdgeInsets.all(14.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Top: Live Hologram Weapon Viewport (Height: 82px)
+            // Top: Live Hologram Weapon Viewport (Height: 96px)
             ClipRRect(
               borderRadius: BorderRadius.circular(10),
               child: Container(
-                height: 82,
+                height: 96,
                 width: double.infinity,
                 decoration: BoxDecoration(
                   color: const Color(0xFF090D18),
@@ -468,7 +473,7 @@ class _ScientistSelectionOverlayState extends State<ScientistSelectionOverlay> w
                 child: Stack(
                   children: [
                     CustomPaint(
-                      size: const Size(double.infinity, 82),
+                      size: const Size(double.infinity, 96),
                       painter: _InlineViewportPainter(
                         scientist: scientist,
                         isSelected: isSelected,
@@ -479,12 +484,12 @@ class _ScientistSelectionOverlayState extends State<ScientistSelectionOverlay> w
                       ),
                     ),
                     Positioned(
-                      top: 4,
-                      left: 6,
+                      top: 6,
+                      left: 8,
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                         decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.65),
+                          color: Colors.black.withOpacity(0.7),
                           borderRadius: BorderRadius.circular(4),
                           border: Border.all(
                             color: isSelected ? Colors.redAccent.withOpacity(0.6) : Colors.white12,
@@ -496,14 +501,14 @@ class _ScientistSelectionOverlayState extends State<ScientistSelectionOverlay> w
                             Icon(
                               Icons.circle,
                               color: isSelected ? Colors.redAccent : Colors.white38,
-                              size: 5,
+                              size: 6,
                             ),
-                            const SizedBox(width: 3),
+                            const SizedBox(width: 4),
                             Text(
                               isSelected ? 'AO VIVO' : 'STANDBY',
                               style: TextStyle(
                                 fontFamily: 'Courier',
-                                fontSize: 7.5,
+                                fontSize: 9.5,
                                 fontWeight: FontWeight.bold,
                                 color: isSelected ? Colors.white : Colors.white54,
                                 letterSpacing: 0.8,
@@ -518,34 +523,34 @@ class _ScientistSelectionOverlayState extends State<ScientistSelectionOverlay> w
               ),
             ),
 
-            const SizedBox(height: 10),
+            const SizedBox(height: 12),
 
             // Scientist Portrait + Name & Role
             Row(
               children: [
                 ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(10),
                   child: Container(
-                    width: 40,
-                    height: 40,
+                    width: 52,
+                    height: 52,
                     decoration: BoxDecoration(
                       color: scientist.primaryColor.withOpacity(0.15),
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: scientist.primaryColor, width: 1.5),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: scientist.primaryColor, width: 2.0),
                     ),
                     child: Image.asset(
                       scientist.imagePath,
-                      width: 40,
-                      height: 40,
+                      width: 52,
+                      height: 52,
                       fit: BoxFit.cover,
                       filterQuality: FilterQuality.none,
                       errorBuilder: (context, error, stackTrace) => Center(
-                        child: Icon(Icons.person, color: scientist.primaryColor, size: 22),
+                        child: Icon(Icons.person, color: scientist.primaryColor, size: 28),
                       ),
                     ),
                   ),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: 10),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -554,18 +559,18 @@ class _ScientistSelectionOverlayState extends State<ScientistSelectionOverlay> w
                         scientist.name,
                         style: const TextStyle(
                           fontFamily: 'Courier',
-                          fontSize: 13.5,
+                          fontSize: 17,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      const SizedBox(height: 1),
+                      const SizedBox(height: 2),
                       Text(
                         scientist.role,
                         style: TextStyle(
-                          fontSize: 9.5,
+                          fontSize: 12.5,
                           fontWeight: FontWeight.w600,
                           color: scientist.primaryColor,
                         ),
@@ -578,11 +583,11 @@ class _ScientistSelectionOverlayState extends State<ScientistSelectionOverlay> w
               ],
             ),
 
-            const SizedBox(height: 8),
+            const SizedBox(height: 10),
 
             // Weapon Title & Compact Attribute Bars
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 5.0),
+              padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 7.0),
               decoration: BoxDecoration(
                 color: Colors.black.withOpacity(0.4),
                 borderRadius: BorderRadius.circular(8),
@@ -593,14 +598,14 @@ class _ScientistSelectionOverlayState extends State<ScientistSelectionOverlay> w
                 children: [
                   Row(
                     children: [
-                      const Icon(Icons.bolt, color: Colors.amberAccent, size: 12),
+                      const Icon(Icons.bolt, color: Colors.amberAccent, size: 16),
                       const SizedBox(width: 4),
                       Expanded(
                         child: Text(
                           scientist.weaponName,
                           style: const TextStyle(
                             fontFamily: 'Courier',
-                            fontSize: 11,
+                            fontSize: 13.5,
                             fontWeight: FontWeight.bold,
                             color: Colors.amberAccent,
                           ),
@@ -610,7 +615,7 @@ class _ScientistSelectionOverlayState extends State<ScientistSelectionOverlay> w
                       ),
                     ],
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 5),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -623,16 +628,16 @@ class _ScientistSelectionOverlayState extends State<ScientistSelectionOverlay> w
               ),
             ),
 
-            const SizedBox(height: 8),
+            const SizedBox(height: 10),
 
             // Short Bio
             SizedBox(
-              height: 34,
+              height: 44,
               child: Text(
                 scientist.shortBio,
                 style: const TextStyle(
-                  fontSize: 10.5,
-                  height: 1.3,
+                  fontSize: 13.5,
+                  height: 1.35,
                   color: Colors.white70,
                 ),
                 maxLines: 2,
@@ -640,7 +645,7 @@ class _ScientistSelectionOverlayState extends State<ScientistSelectionOverlay> w
               ),
             ),
 
-            const SizedBox(height: 10),
+            const SizedBox(height: 12),
 
             // Select / Launch Button
             SizedBox(
@@ -650,7 +655,7 @@ class _ScientistSelectionOverlayState extends State<ScientistSelectionOverlay> w
                 style: ElevatedButton.styleFrom(
                   backgroundColor: isSelected ? scientist.primaryColor : Colors.white.withOpacity(0.08),
                   foregroundColor: isSelected ? Colors.black : Colors.white70,
-                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  padding: const EdgeInsets.symmetric(vertical: 13),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
@@ -662,15 +667,15 @@ class _ScientistSelectionOverlayState extends State<ScientistSelectionOverlay> w
                   children: [
                     Icon(
                       isSelected ? Icons.play_arrow : Icons.sports_esports,
-                      size: 16,
+                      size: 18,
                       color: isSelected ? Colors.black : Colors.white60,
                     ),
-                    const SizedBox(width: 4),
+                    const SizedBox(width: 6),
                     Text(
                       isSelected ? 'DECOLAR (ESPAÇO)' : 'SELECIONAR',
                       style: TextStyle(
                         fontFamily: 'Courier',
-                        fontSize: 11.5,
+                        fontSize: 14,
                         fontWeight: FontWeight.bold,
                         letterSpacing: 1.1,
                         color: isSelected ? Colors.black : Colors.white70,
@@ -694,7 +699,7 @@ class _ScientistSelectionOverlayState extends State<ScientistSelectionOverlay> w
           '$label ',
           style: const TextStyle(
             fontFamily: 'Courier',
-            fontSize: 8.5,
+            fontSize: 11,
             fontWeight: FontWeight.bold,
             color: Colors.white54,
           ),
@@ -703,12 +708,12 @@ class _ScientistSelectionOverlayState extends State<ScientistSelectionOverlay> w
           children: List.generate(5, (index) {
             final active = index < value;
             return Container(
-              width: 4,
-              height: 6,
-              margin: const EdgeInsets.symmetric(horizontal: 1),
+              width: 5,
+              height: 8,
+              margin: const EdgeInsets.symmetric(horizontal: 1.5),
               decoration: BoxDecoration(
                 color: active ? color : Colors.white12,
-                borderRadius: BorderRadius.circular(1),
+                borderRadius: BorderRadius.circular(1.5),
               ),
             );
           }),

@@ -61,7 +61,7 @@ class SettingsOverlay extends StatelessWidget {
                   const Text(
                     'SHIP MOVEMENT STYLE',
                     style: TextStyle(
-                      fontSize: 12,
+                      fontSize: 14,
                       fontWeight: FontWeight.bold,
                       letterSpacing: 2,
                       color: Colors.cyanAccent,
@@ -98,7 +98,7 @@ class SettingsOverlay extends StatelessWidget {
                                   Text(
                                     preset.label.toUpperCase(),
                                     style: TextStyle(
-                                      fontSize: 14,
+                                      fontSize: 16,
                                       fontWeight: FontWeight.bold,
                                       color: isSelected ? Colors.cyanAccent : Colors.white,
                                     ),
@@ -106,7 +106,7 @@ class SettingsOverlay extends StatelessWidget {
                                   const SizedBox(height: 4),
                                   Text(
                                     'Acc: ${preset.acceleration.toInt()}  |  Max Speed: ${preset.maxSpeed.toInt()}  |  Friction: ${preset.friction.toStringAsFixed(1)}',
-                                    style: const TextStyle(fontSize: 10, color: Colors.white38),
+                                    style: const TextStyle(fontSize: 12.5, color: Colors.white60),
                                   ),
                                 ],
                               ),
@@ -137,7 +137,7 @@ class SettingsOverlay extends StatelessWidget {
                     child: const Text(
                       'SAVE & BACK TO MENU',
                       style: TextStyle(
-                        fontSize: 14,
+                        fontSize: 16,
                         fontWeight: FontWeight.bold,
                         letterSpacing: 1.5,
                       ),
