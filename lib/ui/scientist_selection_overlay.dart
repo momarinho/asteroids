@@ -376,7 +376,107 @@ class _ScientistSelectionOverlayState extends State<ScientistSelectionOverlay> w
                         },
                       ),
 
-                      const SizedBox(height: 18),
+                      const SizedBox(height: 16),
+
+                      // Tactical Briefing Bar for Selected Scientist
+                      Builder(
+                        builder: (context) {
+                          final selected = scientists[_selectedIndex];
+                          return Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                            decoration: BoxDecoration(
+                              color: selected.primaryColor.withOpacity(0.12),
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(
+                                color: selected.primaryColor.withOpacity(0.6),
+                                width: 1.2,
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: selected.primaryColor.withOpacity(0.2),
+                                  blurRadius: 10,
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(7),
+                                  decoration: BoxDecoration(
+                                    color: selected.primaryColor.withOpacity(0.25),
+                                    shape: BoxShape.circle,
+                                    border: Border.all(color: selected.primaryColor, width: 1.5),
+                                  ),
+                                  child: Icon(Icons.stars, color: selected.primaryColor, size: 22),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Wrap(
+                                        crossAxisAlignment: WrapCrossAlignment.center,
+                                        spacing: 8,
+                                        runSpacing: 4,
+                                        children: [
+                                          Text(
+                                            'MANOBRA DE EMERGÊNCIA (TECLA E):',
+                                            style: TextStyle(
+                                              fontFamily: 'Courier',
+                                              fontSize: 12.5,
+                                              fontWeight: FontWeight.bold,
+                                              color: selected.primaryColor,
+                                              letterSpacing: 1.0,
+                                            ),
+                                          ),
+                                          Text(
+                                            selected.specialAbilityName.toUpperCase(),
+                                            style: const TextStyle(
+                                              fontFamily: 'Courier',
+                                              fontSize: 12.5,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.white,
+                                              letterSpacing: 1.0,
+                                            ),
+                                          ),
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1.5),
+                                            decoration: BoxDecoration(
+                                              color: Colors.amber.withOpacity(0.2),
+                                              borderRadius: BorderRadius.circular(4),
+                                              border: Border.all(color: Colors.amberAccent, width: 1),
+                                            ),
+                                            child: const Text(
+                                              '1 USO POR PARTIDA',
+                                              style: TextStyle(
+                                                fontFamily: 'Courier',
+                                                fontSize: 10,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.amberAccent,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        '${selected.specialAbilityDesc} Use com sabedoria quando estiver em perigo crítico!',
+                                        style: const TextStyle(
+                                          fontSize: 12.5,
+                                          color: Colors.white70,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+
+                      const SizedBox(height: 14),
 
                       // Bottom Arcade Navigation Guide
                       Container(
@@ -630,30 +730,52 @@ class _ScientistSelectionOverlayState extends State<ScientistSelectionOverlay> w
 
             const SizedBox(height: 10),
 
-            // Special Power Badge
+            // Special Ability Card Box
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+              padding: const EdgeInsets.symmetric(horizontal: 9.0, vertical: 6.0),
               decoration: BoxDecoration(
-                color: scientist.primaryColor.withOpacity(0.12),
-                borderRadius: BorderRadius.circular(6),
-                border: Border.all(color: scientist.primaryColor.withOpacity(0.35)),
+                color: scientist.primaryColor.withOpacity(isSelected ? 0.16 : 0.08),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(
+                  color: isSelected
+                      ? scientist.primaryColor.withOpacity(0.8)
+                      : scientist.primaryColor.withOpacity(0.35),
+                  width: isSelected ? 1.5 : 1.0,
+                ),
               ),
-              child: Row(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.auto_awesome, color: scientist.primaryColor, size: 13),
-                  const SizedBox(width: 4),
-                  Expanded(
-                    child: Text(
-                      'ESPECIAL: ${scientist.specialAbilityName}',
-                      style: TextStyle(
-                        fontFamily: 'Courier',
-                        fontSize: 10.5,
-                        fontWeight: FontWeight.bold,
-                        color: scientist.primaryColor,
+                  Row(
+                    children: [
+                      Icon(Icons.auto_awesome, color: scientist.primaryColor, size: 14),
+                      const SizedBox(width: 5),
+                      Expanded(
+                        child: Text(
+                          'ESPECIAL: ${scientist.specialAbilityName}',
+                          style: TextStyle(
+                            fontFamily: 'Courier',
+                            fontSize: 11.5,
+                            fontWeight: FontWeight.bold,
+                            color: scientist.primaryColor,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                    ],
+                  ),
+                  const SizedBox(height: 3),
+                  Text(
+                    scientist.specialAbilityDesc,
+                    style: const TextStyle(
+                      fontSize: 10.5,
+                      height: 1.25,
+                      color: Colors.white,
                     ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ),
