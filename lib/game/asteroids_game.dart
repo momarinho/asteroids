@@ -248,6 +248,11 @@ class AsteroidsGame extends FlameGame with HasCollisionDetection, KeyboardEvents
     lives = GameConstants.playerLives;
     currentLevel = 1;
     credits = 0;
+    specialAvailable = true;
+    comboCount = 0;
+    comboTimer = 0.0;
+    topRecordBeaten = false;
+    fetchTopLeaderRecord();
 
     // Remove any running level manager or asteroid field
     if (levelManager != null) {
