@@ -12,6 +12,7 @@ import 'ui/stage_clear_overlay.dart';
 import 'ui/game_over_overlay.dart';
 import 'ui/leaderboard_overlay.dart';
 import 'ui/weapon_selection_overlay.dart';
+import 'ui/pause_overlay.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -82,6 +83,7 @@ class _GameScreenState extends State<GameScreen> {
           'gameOver': (context, game) => GameOverOverlay(game: game),
           'leaderboard': (context, game) => LeaderboardOverlay(game: game),
           'weaponSelection': (context, game) => WeaponSelectionOverlay(game: game),
+          'pause': (context, game) => PauseOverlay(game: game),
         },
         initialActiveOverlays: const ['scienceIntro'],
       ),

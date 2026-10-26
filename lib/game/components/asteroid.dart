@@ -14,6 +14,10 @@ class AsteroidComponent extends PositionComponent with HasGameReference<Asteroid
   late final List<double> pointsOffsets;
   late final double rotationSpeed;
 
+  late double maxHp;
+  late double hp;
+  double hitFlashTimer = 0.0;
+
   AsteroidComponent({
     required this.radius,
     required Vector2 position,
@@ -23,6 +27,16 @@ class AsteroidComponent extends PositionComponent with HasGameReference<Asteroid
     anchor = Anchor.center;
     size = Vector2.all(radius * 2);
     
+    // Scale HP with asteroid size
+    if (radius > GameConstants.asteroidMinRadius * 2.2) {
+      maxHp = 90.0; // Large
+    } else if (radius > GameConstants.asteroidMinRadius * 1.2) {
+      maxHp = 50.0; // Medium
+    } else {
+      maxHp = 25.0; // Small
+    }
+    hp = maxHp;
+
     final random = math.Random();
     numPoints = random.nextInt(7) + 8; // 8 to 14 points
     pointsOffsets = List.generate(
@@ -45,9 +59,42 @@ class AsteroidComponent extends PositionComponent with HasGameReference<Asteroid
   @override
   void update(double dt) {
     super.update(dt);
+    if (hitFlashTimer > 0) {
+      hitFlashTimer = math.max(0.0, hitFlashTimer - dt);
+    }
     position += velocity * dt;
     angle += rotationSpeed * dt;
     wrapAround();
+  }
+
+  bool takeDamage(double damage, Vector2 hitPos) {
+    hp -= damage;
+    hitFlashTimer = 0.12;
+
+    // Small rock sparks on hit
+    game.spawnExplosionParticles(
+      position: hitPos,
+      colorChoices: [Colors.orangeAccent, Colors.white, Colors.grey],
+      count: 4,
+      minSize: 1.5,
+      maxSize: 3.0,
+      minSpeed: 30.0,
+      maxSpeed: 90.0,
+    );
+
+    if (hp <= 0) {
+      split();
+      return true; // Destroyed
+    } else {
+      // Small damage number popup
+      game.spawnFloatingText(
+        hitPos,
+        '-${damage.toInt()}',
+        color: Colors.orangeAccent,
+        fontSize: 11.5,
+      );
+      return false; // Still alive
+    }
   }
 
   void wrapAround() {
@@ -71,10 +118,31 @@ class AsteroidComponent extends PositionComponent with HasGameReference<Asteroid
   void render(Canvas canvas) {
     canvas.translate(radius, radius);
 
+    final isFlashing = hitFlashTimer > 0;
     final paint = Paint()
-      ..color = Colors.white
+      ..color = isFlashing ? Colors.redAccent : Colors.white
       ..style = PaintingStyle.stroke
-      ..strokeWidth = GameConstants.lineWidth;
+      ..strokeWidth = isFlashing ? GameConstants.lineWidth * 1.8 : GameConstants.lineWidth;
+
+    if (isFlashing) {
+      final fillPaint = Paint()
+        ..color = Colors.redAccent.withOpacity(0.2)
+        ..style = PaintingStyle.fill;
+      final fillPath = Path();
+      for (var i = 0; i < numPoints; i++) {
+        final pointAngle = (2 * math.pi * i) / numPoints;
+        final r = radius * pointsOffsets[i];
+        final x = r * math.cos(pointAngle);
+        final y = r * math.sin(pointAngle);
+        if (i == 0) {
+          fillPath.moveTo(x, y);
+        } else {
+          fillPath.lineTo(x, y);
+        }
+      }
+      fillPath.close();
+      canvas.drawPath(fillPath, fillPaint);
+    }
 
     final path = Path();
     for (var i = 0; i < numPoints; i++) {

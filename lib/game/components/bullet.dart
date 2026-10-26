@@ -9,12 +9,14 @@ class BulletComponent extends PositionComponent with HasGameReference<AsteroidsG
   final double radius;
   final Vector2 velocity;
   double lifeTimer;
+  final double damage;
 
   BulletComponent({
     required Vector2 position,
     required this.radius,
     required this.velocity,
     required this.lifeTimer,
+    this.damage = 25.0,
   }) {
     this.position = position;
     anchor = Anchor.center;
@@ -60,9 +62,13 @@ class BulletComponent extends PositionComponent with HasGameReference<AsteroidsG
   void onCollisionStart(Set<Vector2> intersectionPoints, PositionComponent other) {
     super.onCollisionStart(intersectionPoints, other);
     if (other is AsteroidComponent) {
-      game.playSfx('asteroid_split.wav');
-      game.onAsteroidDestroyed(other.position, (other.radius * 5).toInt());
-      other.split();
+      final destroyed = other.takeDamage(damage, position);
+      if (destroyed) {
+        game.playSfx('asteroid_split.wav');
+        game.onAsteroidDestroyed(other.position, (other.radius * 5).toInt());
+      } else {
+        game.playSfx('asteroid_split.wav');
+      }
       removeFromParent();
     }
   }

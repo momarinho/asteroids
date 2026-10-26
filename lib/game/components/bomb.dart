@@ -8,6 +8,7 @@ import 'asteroid.dart';
 
 class BombComponent extends PositionComponent with HasGameReference<AsteroidsGame>, CollisionCallbacks {
   final Vector2 velocity;
+  final double damage;
   double fuseTimer = 1.1; // Max flight time if no asteroid is hit
   final double explosionRadius = 90.0; // Balanced: wide impact without trivializing the whole screen
   final double radius = 10.0;
@@ -16,6 +17,7 @@ class BombComponent extends PositionComponent with HasGameReference<AsteroidsGam
   BombComponent({
     required Vector2 position,
     required this.velocity,
+    this.damage = 120.0,
   }) {
     this.position = position;
     anchor = Anchor.center;
@@ -67,6 +69,7 @@ class BombComponent extends PositionComponent with HasGameReference<AsteroidsGam
       BombExplosionComponent(
         position: position.clone(),
         maxRadius: explosionRadius,
+        damage: damage,
       ),
     );
     removeFromParent();
@@ -103,6 +106,7 @@ class BombComponent extends PositionComponent with HasGameReference<AsteroidsGam
 
 class BombExplosionComponent extends PositionComponent with HasGameReference<AsteroidsGame> {
   final double maxRadius;
+  final double damage;
   final double duration = 0.5;
   double timer = 0.0;
   double radius = 1.0;
@@ -110,6 +114,7 @@ class BombExplosionComponent extends PositionComponent with HasGameReference<Ast
   BombExplosionComponent({
     required Vector2 position,
     required this.maxRadius,
+    this.damage = 120.0,
   }) {
     this.position = position;
     anchor = Anchor.center;
@@ -137,14 +142,22 @@ class BombExplosionComponent extends PositionComponent with HasGameReference<Ast
       maxSpeed: 300.0,
     );
 
-    // Instantly destroy/split asteroids in radius
+    // Damage / destroy asteroids in radius & track multi-kill
+    int destroyedCount = 0;
     final asteroids = game.world.children.whereType<AsteroidComponent>();
     for (final asteroid in List<AsteroidComponent>.from(asteroids)) {
       final distance = position.distanceTo(asteroid.position);
       if (distance <= maxRadius + asteroid.radius) {
-        game.onAsteroidDestroyed(asteroid.position, (asteroid.radius * 5).toInt());
-        asteroid.split();
+        final destroyed = asteroid.takeDamage(damage, asteroid.position);
+        if (destroyed) {
+          destroyedCount++;
+          game.onAsteroidDestroyed(asteroid.position, (asteroid.radius * 5).toInt());
+        }
       }
+    }
+
+    if (destroyedCount >= 2) {
+      game.onMultiKill(destroyedCount, position);
     }
   }
 

@@ -204,7 +204,7 @@ class _HudOverlayState extends State<HudOverlay> with SingleTickerProviderStateM
                             child: Align(
                               alignment: Alignment.centerLeft,
                               child: Container(
-                                width: (110 * (game.comboTimer / AsteroidsGame.comboWindow)).clamp(0.0, 110.0),
+                                width: (110 * (game.comboTimer / game.currentComboWindow)).clamp(0.0, 110.0),
                                 height: 4,
                                 decoration: BoxDecoration(
                                   color: game.comboCount >= 5
@@ -431,48 +431,85 @@ class _HudOverlayState extends State<HudOverlay> with SingleTickerProviderStateM
             ),
           ),
 
-          // Top Right: 3 Lives & Shield Indicator
+          // Top Right: 3 Lives, Shield Indicator & Pause Button
           Positioned(
             top: 0,
             right: 0,
-            child: IgnorePointer(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Row(
-                    children: List.generate(3, (index) {
-                      final isActive = index < livesLeft;
-                      return Padding(
-                        padding: const EdgeInsets.only(left: 6.0),
-                        child: Icon(
-                          Icons.favorite,
-                          color: isActive ? scientist.primaryColor : Colors.white24,
-                          size: 22,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // 3 Lives
+                    Row(
+                      children: List.generate(3, (index) {
+                        final isActive = index < livesLeft;
+                        return Padding(
+                          padding: const EdgeInsets.only(left: 6.0),
+                          child: Icon(
+                            Icons.favorite,
+                            color: isActive ? scientist.primaryColor : Colors.white24,
+                            size: 22,
+                          ),
+                        );
+                      }),
+                    ),
+                    const SizedBox(width: 14),
+
+                    // Pause Button
+                    GestureDetector(
+                      onTap: () {
+                        game.togglePause();
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.65),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: Colors.white24),
                         ),
-                      );
-                    }),
-                  ),
-                  const SizedBox(height: 8),
-                  if (isInvulnerable)
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: Colors.blue.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(4),
-                        border: Border.all(color: Colors.blueAccent),
-                      ),
-                      child: Text(
-                        'ESCUDO: ${invulTime.toStringAsFixed(1)}s',
-                        style: const TextStyle(
-                          fontFamily: 'Courier',
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.blueAccent,
+                        child: const Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.pause, color: Colors.white70, size: 16),
+                            SizedBox(width: 4),
+                            Text(
+                              'PAUSA',
+                              style: TextStyle(
+                                fontFamily: 'Courier',
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white70,
+                                letterSpacing: 1.0,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
-                ],
-              ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                if (isInvulnerable)
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Colors.blue.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(4),
+                      border: Border.all(color: Colors.blueAccent),
+                    ),
+                    child: Text(
+                      'ESCUDO: ${invulTime.toStringAsFixed(1)}s',
+                      style: const TextStyle(
+                        fontFamily: 'Courier',
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blueAccent,
+                      ),
+                    ),
+                  ),
+              ],
             ),
           ),
 
@@ -808,13 +845,13 @@ class _HudOverlayState extends State<HudOverlay> with SingleTickerProviderStateM
                       Icon(Icons.keyboard, color: Colors.white54, size: 16),
                       SizedBox(width: 8),
                       Text(
-                        'W/▲: ACELERAR  •  A/D: GIRAR  •  ESPAÇO: ATIRAR  •  SHIFT: DASH  •  E: ESPECIAL (1x)',
+                        'W/▲: ACELERAR  •  A/D: GIRAR  •  ESPAÇO: ATIRAR  •  SHIFT: DASH  •  E: ESPECIAL  •  ESC/P: PAUSA',
                         style: TextStyle(
                           fontFamily: 'Courier',
-                          fontSize: 10,
+                          fontSize: 9.5,
                           fontWeight: FontWeight.bold,
                           color: Colors.white70,
-                          letterSpacing: 1.1,
+                          letterSpacing: 1.0,
                         ),
                       ),
                     ],

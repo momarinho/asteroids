@@ -232,12 +232,64 @@ class AsteroidsGame extends FlameGame with HasCollisionDetection, KeyboardEvents
     } catch (_) {}
   }
 
+  bool isGamePaused = false;
+
+  double get currentComboWindow {
+    switch (player.weapon.name) {
+      case 'Laser Veloz':
+        return 2.0;
+      case 'Tiro Dispersor':
+        return 2.3;
+      case 'Laser Fotônico':
+        return 2.8;
+      case 'Lança-Bombas':
+        return 3.8;
+      default:
+        return 2.5;
+    }
+  }
+
+  void togglePause() {
+    if (state != GameState.playing) return;
+    if (isGamePaused) {
+      resumeGame();
+    } else {
+      pauseGame();
+    }
+  }
+
+  void pauseGame() {
+    if (state != GameState.playing || isGamePaused) return;
+    isGamePaused = true;
+    keysPressed.clear();
+    pauseEngine();
+    _safeAddOverlay('pause');
+  }
+
+  void resumeGame() {
+    if (!isGamePaused) return;
+    isGamePaused = false;
+    keysPressed.clear();
+    overlays.remove('pause');
+    resumeEngine();
+    gameFocusNode?.requestFocus();
+  }
+
   @override
   KeyEventResult onKeyEvent(KeyEvent event, Set<LogicalKeyboardKey> keysPressed) {
     if (state != GameState.playing) {
       this.keysPressed.clear();
       return KeyEventResult.ignored;
     }
+
+    if (event is KeyDownEvent) {
+      if (event.logicalKey == LogicalKeyboardKey.escape ||
+          event.logicalKey == LogicalKeyboardKey.keyP) {
+        togglePause();
+        return KeyEventResult.handled;
+      }
+    }
+
     this.keysPressed.clear();
     this.keysPressed.addAll(keysPressed);
     return KeyEventResult.handled;
@@ -541,7 +593,7 @@ class AsteroidsGame extends FlameGame with HasCollisionDetection, KeyboardEvents
   void onAsteroidDestroyed(Vector2 pos, int basePoints) {
     if (state != GameState.playing) return;
 
-    comboTimer = comboWindow;
+    comboTimer = currentComboWindow;
     comboCount++;
 
     int earned = basePoints;
@@ -584,6 +636,41 @@ class AsteroidsGame extends FlameGame with HasCollisionDetection, KeyboardEvents
         velocity: Vector2(0, -40),
       );
     }
+  }
+
+  void onMultiKill(int count, Vector2 pos) {
+    if (state != GameState.playing) return;
+
+    int bonus = 0;
+    String label = '';
+    Color color = Colors.amberAccent;
+
+    if (count == 2) {
+      bonus = 150;
+      label = '💥 DUPLO! +$bonus';
+      color = Colors.amberAccent;
+    } else if (count == 3) {
+      bonus = 300;
+      label = '💥 TRIPLO! +$bonus';
+      color = Colors.orangeAccent;
+    } else {
+      bonus = 500;
+      label = '💥 MULTI-KILL x$count! +$bonus';
+      color = Colors.redAccent;
+    }
+
+    score += bonus;
+    comboCount += (count - 1);
+    comboTimer = currentComboWindow; // Fully recharge the combo bar!
+    playSfx('powerup.wav');
+
+    spawnFloatingText(
+      pos + Vector2(0, -32),
+      label,
+      color: color,
+      fontSize: 16.0,
+      velocity: Vector2(0, -35),
+    );
   }
 
   Future<void> fetchTopLeaderRecord() async {
@@ -640,9 +727,11 @@ class AsteroidsGame extends FlameGame with HasCollisionDetection, KeyboardEvents
           final dist = diff.length;
           final pushDir = dist > 0 ? diff.normalized() : Vector2(1, 0);
           ast.velocity.setFrom(pushDir * 350.0);
-          if (dist < 140.0 && ast.radius <= GameConstants.asteroidMinRadius) {
-            onAsteroidDestroyed(ast.position, (ast.radius * 5).toInt());
-            ast.split();
+          if (dist < 140.0) {
+            final destroyed = ast.takeDamage(50.0, ast.position);
+            if (destroyed) {
+              onAsteroidDestroyed(ast.position, (ast.radius * 5).toInt());
+            }
           }
         }
         break;
@@ -659,6 +748,7 @@ class AsteroidsGame extends FlameGame with HasCollisionDetection, KeyboardEvents
             radius: 3.5,
             velocity: dir * 550.0,
             lifeTimer: 0.8,
+            damage: 25.0,
           );
           world.add(bullet);
         }
@@ -668,15 +758,17 @@ class AsteroidsGame extends FlameGame with HasCollisionDetection, KeyboardEvents
         // Varredura do Hubble: Destrói meteoros na linha de visada frontal e traseira + 3.0s de escudo
         player.invulnerableTimer = 3.0;
         final fwd = player.forward.normalized();
-        final asteroids = List<AsteroidComponent>.from(world.children.whereType<AsteroidComponent>());
-        for (final ast in asteroids) {
+        final asteroidsNancy = List<AsteroidComponent>.from(world.children.whereType<AsteroidComponent>());
+        for (final ast in asteroidsNancy) {
           final toAst = ast.position - player.position;
           final proj = toAst.dot(fwd);
           // Distance from line: length of projection perpendicular
           final perpDist = (toAst - (fwd * proj)).length;
           if (perpDist <= ast.radius + 45.0) {
-            onAsteroidDestroyed(ast.position, (ast.radius * 5).toInt());
-            ast.split();
+            final destroyed = ast.takeDamage(100.0, ast.position);
+            if (destroyed) {
+              onAsteroidDestroyed(ast.position, (ast.radius * 5).toInt());
+            }
           }
         }
         break;
@@ -688,6 +780,7 @@ class AsteroidsGame extends FlameGame with HasCollisionDetection, KeyboardEvents
           BombExplosionComponent(
             position: player.position.clone(),
             maxRadius: 160.0,
+            damage: 150.0,
           ),
         );
         break;

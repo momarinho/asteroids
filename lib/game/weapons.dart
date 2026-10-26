@@ -10,6 +10,7 @@ abstract class Weapon {
   double cooldown;
   double recoil;
   double muzzleFlashSize;
+  double damage;
   int level = 1;
   final int maxLevel = 3;
 
@@ -18,6 +19,7 @@ abstract class Weapon {
     required this.cooldown,
     required this.recoil,
     required this.muzzleFlashSize,
+    required this.damage,
   });
 
   bool fire(PlayerComponent player);
@@ -41,6 +43,7 @@ class Blaster extends Weapon {
           cooldown: GameConstants.playerShootCooldownSeconds,
           recoil: 25.0,
           muzzleFlashSize: 8.0,
+          damage: 50.0,
         );
 
   @override
@@ -51,6 +54,7 @@ class Blaster extends Weapon {
       radius: GameConstants.shotRadius,
       velocity: velocity,
       lifeTimer: GameConstants.shotLifetimeSeconds,
+      damage: damage,
     );
     player.game.world.add(bullet);
     return true;
@@ -61,9 +65,11 @@ class Blaster extends Weapon {
     if (level == 2) {
       cooldown = GameConstants.playerShootCooldownSeconds * 0.75;
       recoil = 18.0;
+      damage = 60.0;
     } else if (level == 3) {
       cooldown = GameConstants.playerShootCooldownSeconds * 0.5;
       recoil = 10.0;
+      damage = 75.0;
     }
   }
 }
@@ -75,6 +81,7 @@ class SpreadShot extends Weapon {
           cooldown: 0.5,
           recoil: 55.0,
           muzzleFlashSize: 12.0,
+          damage: 25.0,
         );
 
   @override
@@ -97,6 +104,7 @@ class SpreadShot extends Weapon {
         radius: 4.0,
         velocity: direction * baseSpeed,
         lifeTimer: 0.6,
+        damage: damage,
       );
       player.game.world.add(bullet);
     }
@@ -108,9 +116,11 @@ class SpreadShot extends Weapon {
     if (level == 2) {
       cooldown = 0.4;
       recoil = 40.0;
+      damage = 32.0;
     } else if (level == 3) {
       cooldown = 0.3;
       recoil = 25.0;
+      damage = 40.0;
     }
   }
 }
@@ -122,6 +132,7 @@ class RapidFire extends Weapon {
           cooldown: 0.15,
           recoil: 12.0,
           muzzleFlashSize: 6.0,
+          damage: 18.0,
         );
 
   @override
@@ -132,6 +143,7 @@ class RapidFire extends Weapon {
       radius: 3.0,
       velocity: velocity,
       lifeTimer: 0.8,
+      damage: damage,
     );
     player.game.world.add(bullet);
     return true;
@@ -142,9 +154,11 @@ class RapidFire extends Weapon {
     if (level == 2) {
       cooldown = 0.10;
       recoil = 8.0;
+      damage = 22.0;
     } else if (level == 3) {
       cooldown = 0.06;
       recoil = 4.0;
+      damage = 28.0;
     }
   }
 }
@@ -156,6 +170,7 @@ class BombLauncher extends Weapon {
           cooldown: 1.45,
           recoil: 135.0,
           muzzleFlashSize: 18.0,
+          damage: 120.0,
         );
 
   @override
@@ -164,6 +179,7 @@ class BombLauncher extends Weapon {
     final bomb = BombComponent(
       position: player.position + player.forward * player.radius,
       velocity: velocity,
+      damage: damage,
     );
     player.game.world.add(bomb);
     return true;
@@ -174,9 +190,11 @@ class BombLauncher extends Weapon {
     if (level == 2) {
       cooldown = 1.05;
       recoil = 80.0;
+      damage = 150.0;
     } else if (level == 3) {
       cooldown = 0.75;
       recoil = 45.0;
+      damage = 180.0;
     }
   }
 }

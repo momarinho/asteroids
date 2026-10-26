@@ -378,22 +378,22 @@ class _ScientistSelectionOverlayState extends State<ScientistSelectionOverlay> w
 
                       const SizedBox(height: 16),
 
-                      // Tactical Briefing Bar for Selected Scientist
+                      // Selected Scientist Historical Inspiration Banner
                       Builder(
                         builder: (context) {
                           final selected = scientists[_selectedIndex];
                           return Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
                             decoration: BoxDecoration(
                               color: selected.primaryColor.withOpacity(0.12),
-                              borderRadius: BorderRadius.circular(10),
+                              borderRadius: BorderRadius.circular(12),
                               border: Border.all(
-                                color: selected.primaryColor.withOpacity(0.6),
+                                color: selected.primaryColor.withOpacity(0.55),
                                 width: 1.2,
                               ),
                               boxShadow: [
                                 BoxShadow(
-                                  color: selected.primaryColor.withOpacity(0.2),
+                                  color: selected.primaryColor.withOpacity(0.18),
                                   blurRadius: 10,
                                 ),
                               ],
@@ -401,70 +401,102 @@ class _ScientistSelectionOverlayState extends State<ScientistSelectionOverlay> w
                             child: Row(
                               children: [
                                 Container(
-                                  padding: const EdgeInsets.all(7),
+                                  padding: const EdgeInsets.all(8),
                                   decoration: BoxDecoration(
-                                    color: selected.primaryColor.withOpacity(0.25),
+                                    color: selected.primaryColor.withOpacity(0.2),
                                     shape: BoxShape.circle,
                                     border: Border.all(color: selected.primaryColor, width: 1.5),
                                   ),
-                                  child: Icon(Icons.stars, color: selected.primaryColor, size: 22),
+                                  child: Icon(Icons.lightbulb_outline, color: selected.primaryColor, size: 24),
                                 ),
-                                const SizedBox(width: 12),
+                                const SizedBox(width: 14),
                                 Expanded(
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      Wrap(
-                                        crossAxisAlignment: WrapCrossAlignment.center,
-                                        spacing: 8,
-                                        runSpacing: 4,
+                                      Row(
                                         children: [
                                           Text(
-                                            'MANOBRA DE EMERGÊNCIA (TECLA E):',
+                                            'CURIOSIDADE CIENTÍFICA • ',
                                             style: TextStyle(
                                               fontFamily: 'Courier',
-                                              fontSize: 12.5,
+                                              fontSize: 12,
                                               fontWeight: FontWeight.bold,
                                               color: selected.primaryColor,
-                                              letterSpacing: 1.0,
+                                              letterSpacing: 1.1,
                                             ),
                                           ),
                                           Text(
-                                            selected.specialAbilityName.toUpperCase(),
+                                            selected.name.toUpperCase(),
                                             style: const TextStyle(
                                               fontFamily: 'Courier',
-                                              fontSize: 12.5,
+                                              fontSize: 12,
                                               fontWeight: FontWeight.bold,
                                               color: Colors.white,
                                               letterSpacing: 1.0,
                                             ),
                                           ),
-                                          Container(
-                                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1.5),
-                                            decoration: BoxDecoration(
-                                              color: Colors.amber.withOpacity(0.2),
-                                              borderRadius: BorderRadius.circular(4),
-                                              border: Border.all(color: Colors.amberAccent, width: 1),
-                                            ),
-                                            child: const Text(
-                                              '1 USO POR PARTIDA',
-                                              style: TextStyle(
-                                                fontFamily: 'Courier',
-                                                fontSize: 10,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.amberAccent,
-                                              ),
+                                          const SizedBox(width: 8),
+                                          Text(
+                                            '(${selected.role})',
+                                            style: TextStyle(
+                                              fontFamily: 'Courier',
+                                              fontSize: 11,
+                                              color: selected.accentColor,
                                             ),
                                           ),
                                         ],
                                       ),
-                                      const SizedBox(height: 4),
+                                      const SizedBox(height: 3),
                                       Text(
-                                        '${selected.specialAbilityDesc} Use com sabedoria quando estiver em perigo crítico!',
+                                        selected.funFact,
                                         style: const TextStyle(
-                                          fontSize: 12.5,
-                                          color: Colors.white70,
+                                          fontSize: 13.5,
+                                          height: 1.35,
+                                          fontWeight: FontWeight.w400,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(width: 14),
+                                // Subtle Special badge on the far right
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                  decoration: BoxDecoration(
+                                    color: Colors.black.withOpacity(0.55),
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(color: Colors.white24),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Icon(Icons.auto_awesome, color: selected.primaryColor, size: 12),
+                                          const SizedBox(width: 4),
+                                          Text(
+                                            selected.specialAbilityName,
+                                            style: TextStyle(
+                                              fontFamily: 'Courier',
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.bold,
+                                              color: selected.primaryColor,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 2),
+                                      const Text(
+                                        'Tecla E (1 uso)',
+                                        style: TextStyle(
+                                          fontFamily: 'Courier',
+                                          fontSize: 9.5,
+                                          color: Colors.white54,
                                         ),
                                       ),
                                     ],
@@ -685,7 +717,56 @@ class _ScientistSelectionOverlayState extends State<ScientistSelectionOverlay> w
 
             const SizedBox(height: 10),
 
-            // Weapon Title & Compact Attribute Bars
+            // Prominent Scientist Biography & Legacy Box
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 11.0, vertical: 9.0),
+              decoration: BoxDecoration(
+                color: scientist.primaryColor.withOpacity(isSelected ? 0.14 : 0.08),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                  color: scientist.primaryColor.withOpacity(isSelected ? 0.65 : 0.28),
+                  width: 1.2,
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    children: [
+                      Icon(Icons.auto_stories, color: scientist.primaryColor, size: 14),
+                      const SizedBox(width: 5),
+                      Text(
+                        'BIOGRAFIA & LEGADO',
+                        style: TextStyle(
+                          fontFamily: 'Courier',
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                          color: scientist.primaryColor,
+                          letterSpacing: 0.8,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 5),
+                  Text(
+                    scientist.shortBio,
+                    style: const TextStyle(
+                      fontSize: 13.5,
+                      height: 1.35,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.white,
+                    ),
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 10),
+
+            // Weapon Title, Mini Stats & Subtle Special Tag
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 7.0),
               decoration: BoxDecoration(
@@ -698,19 +779,44 @@ class _ScientistSelectionOverlayState extends State<ScientistSelectionOverlay> w
                 children: [
                   Row(
                     children: [
-                      const Icon(Icons.bolt, color: Colors.amberAccent, size: 16),
+                      const Icon(Icons.bolt, color: Colors.amberAccent, size: 15),
                       const SizedBox(width: 4),
                       Expanded(
                         child: Text(
                           scientist.weaponName,
                           style: const TextStyle(
                             fontFamily: 'Courier',
-                            fontSize: 13.5,
+                            fontSize: 13,
                             fontWeight: FontWeight.bold,
                             color: Colors.amberAccent,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      // Discrete Special Mention
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: scientist.primaryColor.withOpacity(0.12),
+                          borderRadius: BorderRadius.circular(4),
+                          border: Border.all(color: scientist.primaryColor.withOpacity(0.35)),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.auto_awesome, color: scientist.primaryColor, size: 10),
+                            const SizedBox(width: 3),
+                            Text(
+                              'Especial [E]',
+                              style: TextStyle(
+                                fontFamily: 'Courier',
+                                fontSize: 9.5,
+                                fontWeight: FontWeight.bold,
+                                color: scientist.primaryColor,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
@@ -725,76 +831,6 @@ class _ScientistSelectionOverlayState extends State<ScientistSelectionOverlay> w
                     ],
                   ),
                 ],
-              ),
-            ),
-
-            const SizedBox(height: 10),
-
-            // Special Ability Card Box
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 9.0, vertical: 6.0),
-              decoration: BoxDecoration(
-                color: scientist.primaryColor.withOpacity(isSelected ? 0.16 : 0.08),
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(
-                  color: isSelected
-                      ? scientist.primaryColor.withOpacity(0.8)
-                      : scientist.primaryColor.withOpacity(0.35),
-                  width: isSelected ? 1.5 : 1.0,
-                ),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Row(
-                    children: [
-                      Icon(Icons.auto_awesome, color: scientist.primaryColor, size: 14),
-                      const SizedBox(width: 5),
-                      Expanded(
-                        child: Text(
-                          'ESPECIAL: ${scientist.specialAbilityName}',
-                          style: TextStyle(
-                            fontFamily: 'Courier',
-                            fontSize: 11.5,
-                            fontWeight: FontWeight.bold,
-                            color: scientist.primaryColor,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 3),
-                  Text(
-                    scientist.specialAbilityDesc,
-                    style: const TextStyle(
-                      fontSize: 10.5,
-                      height: 1.25,
-                      color: Colors.white,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 10),
-
-            // Short Bio
-            SizedBox(
-              height: 44,
-              child: Text(
-                scientist.shortBio,
-                style: const TextStyle(
-                  fontSize: 13.5,
-                  height: 1.35,
-                  color: Colors.white70,
-                ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
               ),
             ),
 
