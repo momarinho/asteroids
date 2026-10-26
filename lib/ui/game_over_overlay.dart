@@ -85,8 +85,8 @@ class _GameOverOverlayState extends State<GameOverOverlay> {
             child: BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 8.0, sigmaY: 8.0),
               child: Container(
-                width: 540,
-                padding: const EdgeInsets.symmetric(vertical: 28.0, horizontal: 28.0),
+                width: 580,
+                padding: const EdgeInsets.symmetric(vertical: 26.0, horizontal: 26.0),
                 decoration: BoxDecoration(
                   color: Colors.black.withOpacity(0.85),
                   borderRadius: BorderRadius.circular(24),
@@ -151,9 +151,9 @@ class _GameOverOverlayState extends State<GameOverOverlay> {
                                 'PONTUAÇÃO',
                                 style: TextStyle(
                                   fontFamily: 'Courier',
-                                  fontSize: 13,
+                                  fontSize: 12,
                                   color: Colors.white54,
-                                  letterSpacing: 1.2,
+                                  letterSpacing: 1.1,
                                 ),
                               ),
                               const SizedBox(height: 2),
@@ -161,23 +161,47 @@ class _GameOverOverlayState extends State<GameOverOverlay> {
                                 '$score',
                                 style: const TextStyle(
                                   fontFamily: 'Courier',
-                                  fontSize: 32,
+                                  fontSize: 28,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.white,
                                 ),
                               ),
                             ],
                           ),
-                          Container(width: 1, height: 40, color: Colors.white24),
+                          Container(width: 1, height: 36, color: Colors.white24),
+                          Column(
+                            children: [
+                              const Text(
+                                'AMOSTRAS',
+                                style: TextStyle(
+                                  fontFamily: 'Courier',
+                                  fontSize: 12,
+                                  color: Colors.white54,
+                                  letterSpacing: 1.1,
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                '${game.samplesCollected}',
+                                style: const TextStyle(
+                                  fontFamily: 'Courier',
+                                  fontSize: 28,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.cyanAccent,
+                                ),
+                              ),
+                            ],
+                          ),
+                          Container(width: 1, height: 36, color: Colors.white24),
                           Column(
                             children: [
                               const Text(
                                 'CIENTISTA',
                                 style: TextStyle(
                                   fontFamily: 'Courier',
-                                  fontSize: 13,
+                                  fontSize: 12,
                                   color: Colors.white54,
-                                  letterSpacing: 1.2,
+                                  letterSpacing: 1.1,
                                 ),
                               ),
                               const SizedBox(height: 4),
@@ -185,7 +209,7 @@ class _GameOverOverlayState extends State<GameOverOverlay> {
                                 scientist.name,
                                 style: TextStyle(
                                   fontFamily: 'Courier',
-                                  fontSize: 16,
+                                  fontSize: 15,
                                   fontWeight: FontWeight.bold,
                                   color: scientist.primaryColor,
                                 ),
@@ -198,73 +222,104 @@ class _GameOverOverlayState extends State<GameOverOverlay> {
 
                     const SizedBox(height: 18),
 
-                    // Educational Fun Fact Card with Portrait
+                    // Educational Fun Fact Card with Prominent Hero Portrait
                     Container(
-                      padding: const EdgeInsets.all(14.0),
+                      padding: const EdgeInsets.all(16.0),
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
                           colors: [
-                            scientist.primaryColor.withOpacity(0.12),
+                            scientist.primaryColor.withOpacity(0.18),
                             scientist.accentColor.withOpacity(0.08),
                           ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
                         ),
-                        borderRadius: BorderRadius.circular(14),
-                        border: Border.all(color: scientist.primaryColor.withOpacity(0.4)),
+                        borderRadius: BorderRadius.circular(18),
+                        border: Border.all(
+                          color: scientist.primaryColor.withOpacity(0.6),
+                          width: 1.8,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: scientist.primaryColor.withOpacity(0.2),
+                            blurRadius: 18.0,
+                          ),
+                        ],
                       ),
                       child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(10),
-                            child: Image.asset(
-                              scientist.imagePath,
-                              width: 58,
-                              height: 58,
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) => Container(
-                                width: 58,
-                                height: 58,
-                                decoration: BoxDecoration(
-                                  color: scientist.primaryColor.withOpacity(0.2),
-                                  borderRadius: BorderRadius.circular(10),
+                          // Prominent Hero Portrait Frame (115x115)
+                          Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(
+                                color: scientist.primaryColor,
+                                width: 2.5,
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: scientist.primaryColor.withOpacity(0.45),
+                                  blurRadius: 16.0,
+                                  spreadRadius: 1.0,
                                 ),
-                                child: Center(
-                                  child: Icon(Icons.school, color: scientist.primaryColor, size: 28),
+                              ],
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(14),
+                              child: Image.asset(
+                                scientist.imagePath,
+                                width: 115,
+                                height: 115,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) => Container(
+                                  width: 115,
+                                  height: 115,
+                                  decoration: BoxDecoration(
+                                    color: scientist.primaryColor.withOpacity(0.2),
+                                    borderRadius: BorderRadius.circular(14),
+                                  ),
+                                  child: Center(
+                                    child: Icon(Icons.school, color: scientist.primaryColor, size: 48),
+                                  ),
                                 ),
                               ),
                             ),
                           ),
-                          const SizedBox(width: 14),
+                          const SizedBox(width: 18),
+                          // Curiosity Text
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
                               children: [
                                 Row(
                                   children: [
-                                    Icon(Icons.lightbulb, color: scientist.accentColor, size: 18),
+                                    Icon(Icons.auto_awesome, color: scientist.accentColor, size: 20),
                                     const SizedBox(width: 6),
                                     Expanded(
                                       child: Text(
-                                        'VOCÊ SABIA? • ${scientist.name.toUpperCase()}',
+                                        'LEGADO • ${scientist.name.toUpperCase()}',
                                         style: TextStyle(
                                           fontFamily: 'Courier',
-                                          fontSize: 13,
+                                          fontSize: 14,
                                           fontWeight: FontWeight.bold,
                                           color: scientist.accentColor,
-                                          letterSpacing: 1,
+                                          letterSpacing: 1.2,
                                         ),
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
                                   ],
                                 ),
-                                const SizedBox(height: 6),
+                                const SizedBox(height: 8),
                                 Text(
                                   scientist.funFact,
                                   style: const TextStyle(
-                                    fontSize: 14,
-                                    height: 1.4,
+                                    fontSize: 14.5,
+                                    height: 1.45,
                                     color: Colors.white,
+                                    fontWeight: FontWeight.w400,
                                   ),
                                 ),
                               ],

@@ -157,7 +157,13 @@ class BombExplosionComponent extends PositionComponent with HasGameReference<Ast
     }
 
     if (destroyedCount >= 2) {
-      game.onMultiKill(destroyedCount, position);
+      game.spawnFloatingText(
+        position + Vector2(0, -32),
+        '💥 IMPACTO MÚLTIPLO! (x$destroyedCount)',
+        color: Colors.amberAccent,
+        fontSize: 16.0,
+        velocity: Vector2(0, -30),
+      );
     }
   }
 

@@ -183,22 +183,31 @@ class AsteroidComponent extends PositionComponent with HasGameReference<Asteroid
 
     final random = math.Random();
 
-    // Rare reward: 12% chance to drop when an asteroid is completely shattered
-    if (radius <= GameConstants.asteroidMinRadius && random.nextDouble() < 0.12) {
+    // Science Fair: Chance to drop exploration samples or utility powerups based on asteroid size
+    double dropChance = 0.25;
+    if (radius >= 50.0) {
+      dropChance = 0.60;
+    } else if (radius >= 30.0) {
+      dropChance = 0.40;
+    }
+
+    if (random.nextDouble() < dropChance) {
       final roll = random.nextDouble();
       DropType dropType;
-      if (roll < 0.50) {
-        dropType = DropType.sample; // 50% Science Sample (+150 pts)
-      } else if (roll < 0.75) {
-        dropType = DropType.speedBoost; // 25% Thruster Boost
+      if (roll < 0.45) {
+        dropType = DropType.lunarSample; // 45% Lunar Sample (+100 pts)
+      } else if (roll < 0.70) {
+        dropType = DropType.rareHelium;  // 25% Rare Helium-3 (+250 pts)
+      } else if (roll < 0.80) {
+        dropType = DropType.darkMatter;  // 10% Dark Matter (+500 pts)
       } else if (roll < 0.90) {
-        dropType = DropType.shield; // 15% Photonic Shield
+        dropType = DropType.shield;      // 10% Photonic Shield (4s)
       } else {
-        dropType = DropType.health; // 10% Life Recovery Fragment
+        dropType = DropType.health;      // 10% Life Repair Fragment
       }
 
       final driftAngle = random.nextDouble() * 2 * math.pi;
-      final dropVel = Vector2(math.cos(driftAngle), math.sin(driftAngle)) * 25.0;
+      final dropVel = Vector2(math.cos(driftAngle), math.sin(driftAngle)) * 30.0;
 
       game.world.add(
         DropComponent(

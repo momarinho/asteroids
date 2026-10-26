@@ -63,10 +63,8 @@ class AsteroidsGame extends FlameGame with HasCollisionDetection, KeyboardEvents
   // Feature 1: One-time Special Ability per run
   bool specialAvailable = true;
 
-  // Feature 2: Combo System
-  int comboCount = 0;
-  double comboTimer = 0.0;
-  static const double comboWindow = 2.0;
+  // Feature 2: Scientific Samples Collected
+  int samplesCollected = 0;
 
   // Feature 3: Target Leader Record
   String? topLeaderName;
@@ -234,21 +232,6 @@ class AsteroidsGame extends FlameGame with HasCollisionDetection, KeyboardEvents
 
   bool isGamePaused = false;
 
-  double get currentComboWindow {
-    switch (player.weapon.name) {
-      case 'Laser Veloz':
-        return 2.0;
-      case 'Tiro Dispersor':
-        return 2.3;
-      case 'Laser Fotônico':
-        return 2.8;
-      case 'Lança-Bombas':
-        return 3.8;
-      default:
-        return 2.5;
-    }
-  }
-
   void togglePause() {
     if (state != GameState.playing) return;
     if (isGamePaused) {
@@ -301,8 +284,7 @@ class AsteroidsGame extends FlameGame with HasCollisionDetection, KeyboardEvents
     currentLevel = 1;
     credits = 0;
     specialAvailable = true;
-    comboCount = 0;
-    comboTimer = 0.0;
+    samplesCollected = 0;
     topRecordBeaten = false;
     fetchTopLeaderRecord();
 
@@ -410,14 +392,6 @@ class AsteroidsGame extends FlameGame with HasCollisionDetection, KeyboardEvents
       if (lowHealthWarnTimer <= 0) {
         lowHealthWarnTimer = 3.5;
         playSfx('low_health.wav');
-      }
-    }
-
-    // Update combo timer
-    if (comboTimer > 0) {
-      comboTimer = math.max(0.0, comboTimer - dt);
-      if (comboTimer <= 0) {
-        comboCount = 0;
       }
     }
   }
@@ -593,35 +567,8 @@ class AsteroidsGame extends FlameGame with HasCollisionDetection, KeyboardEvents
   void onAsteroidDestroyed(Vector2 pos, int basePoints) {
     if (state != GameState.playing) return;
 
-    comboTimer = currentComboWindow;
-    comboCount++;
-
-    int earned = basePoints;
-    if (comboCount >= 2) {
-      final multiplier = 1.0 + (comboCount - 1) * 0.15;
-      earned = (basePoints * multiplier).toInt();
-      score += earned;
-
-      spawnFloatingText(
-        pos,
-        '+$earned',
-        color: comboCount >= 4 ? Colors.amberAccent : Colors.cyanAccent,
-        fontSize: comboCount >= 4 ? 17.0 : 15.0,
-      );
-
-      final comboColor = comboCount >= 5
-          ? Colors.redAccent
-          : (comboCount >= 3 ? Colors.orangeAccent : Colors.yellowAccent);
-      spawnFloatingText(
-        pos + Vector2(0, -18),
-        'COMBO x$comboCount! 🔥',
-        color: comboColor,
-        fontSize: 13.0,
-      );
-    } else {
-      score += basePoints;
-      spawnFloatingText(pos, '+$basePoints', color: Colors.white, fontSize: 13.5);
-    }
+    score += basePoints;
+    spawnFloatingText(pos, '+$basePoints', color: Colors.white, fontSize: 13.5);
 
     // Check if player just beat top leader score
     if (!topRecordBeaten && topLeaderScore > 0 && score > topLeaderScore) {
@@ -636,41 +583,6 @@ class AsteroidsGame extends FlameGame with HasCollisionDetection, KeyboardEvents
         velocity: Vector2(0, -40),
       );
     }
-  }
-
-  void onMultiKill(int count, Vector2 pos) {
-    if (state != GameState.playing) return;
-
-    int bonus = 0;
-    String label = '';
-    Color color = Colors.amberAccent;
-
-    if (count == 2) {
-      bonus = 150;
-      label = '💥 DUPLO! +$bonus';
-      color = Colors.amberAccent;
-    } else if (count == 3) {
-      bonus = 300;
-      label = '💥 TRIPLO! +$bonus';
-      color = Colors.orangeAccent;
-    } else {
-      bonus = 500;
-      label = '💥 MULTI-KILL x$count! +$bonus';
-      color = Colors.redAccent;
-    }
-
-    score += bonus;
-    comboCount += (count - 1);
-    comboTimer = currentComboWindow; // Fully recharge the combo bar!
-    playSfx('powerup.wav');
-
-    spawnFloatingText(
-      pos + Vector2(0, -32),
-      label,
-      color: color,
-      fontSize: 16.0,
-      velocity: Vector2(0, -35),
-    );
   }
 
   Future<void> fetchTopLeaderRecord() async {
@@ -795,8 +707,7 @@ class AsteroidsGame extends FlameGame with HasCollisionDetection, KeyboardEvents
     timeRemaining = fairRoundDuration;
     missionSurvived = false;
     specialAvailable = true;
-    comboCount = 0;
-    comboTimer = 0.0;
+    samplesCollected = 0;
     topRecordBeaten = false;
     fetchTopLeaderRecord();
 

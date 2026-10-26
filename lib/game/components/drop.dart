@@ -6,10 +6,11 @@ import 'package:asteroids/game/asteroids_game.dart';
 import 'player.dart';
 
 enum DropType {
-  sample,     // Amostra de Minerais/Pesquisa (+150 pontos)
-  health,     // Fragmento de Vida (+1 Vida)
-  speedBoost, // Turbo Propulsor (+Velocidade)
-  shield,     // Escudo Protetor (+4s Invulnerabilidade)
+  lunarSample, // Fragmento Lunar (+100 pts)
+  rareHelium,  // Hélio-3 Raro (+250 pts)
+  darkMatter,  // Matéria Escura (+500 pts)
+  shield,      // Escudo Fotônico (4s Invulnerabilidade)
+  health,      // Cápsula de Reparo (+1 Vida)
 }
 
 class DropComponent extends PositionComponent with HasGameReference<AsteroidsGame>, CollisionCallbacks {
@@ -49,12 +50,12 @@ class DropComponent extends PositionComponent with HasGameReference<AsteroidsGam
 
     pulseTimer += dt * 4.0;
 
-    // Gentle magnetic pull towards player if within 140 pixels
+    // Gentle magnetic tractor pull towards player if within 160 pixels
     final player = game.player;
     final distToPlayer = (player.position - position).length;
-    if (distToPlayer < 140.0 && distToPlayer > 0.1) {
+    if (distToPlayer < 160.0 && distToPlayer > 0.1) {
       final pullDir = (player.position - position).normalized();
-      velocity += pullDir * 180.0 * dt;
+      velocity += pullDir * 240.0 * dt;
     }
 
     // Apply friction to drift velocity
@@ -89,31 +90,74 @@ class DropComponent extends PositionComponent with HasGameReference<AsteroidsGam
 
     Color particleColor;
     switch (type) {
-      case DropType.sample:
-        game.score += 150;
-        game.spawnFloatingText(position, "+150 AMOSTRA!", color: Colors.amberAccent, fontSize: 15.5);
+      case DropType.lunarSample:
+        game.score += 100;
+        game.samplesCollected++;
+        game.spawnFloatingText(
+          position,
+          "+100 AMOSTRA LUNAR!",
+          color: Colors.cyanAccent,
+          fontSize: 15.0,
+        );
+        particleColor = Colors.cyanAccent;
+        break;
+
+      case DropType.rareHelium:
+        game.score += 250;
+        game.samplesCollected++;
+        game.spawnFloatingText(
+          position,
+          "+250 HÉLIO-3 RARO!",
+          color: Colors.amberAccent,
+          fontSize: 16.0,
+        );
         particleColor = Colors.amberAccent;
         break;
+
+      case DropType.darkMatter:
+        game.score += 500;
+        game.samplesCollected++;
+        game.triggerScreenShake(duration: 0.2, intensity: 5.0);
+        game.spawnFloatingText(
+          position,
+          "+500 MATÉRIA ESCURA! 🌌",
+          color: const Color(0xFFE040FB),
+          fontSize: 17.5,
+          velocity: Vector2(0, -35),
+        );
+        particleColor = const Color(0xFFE040FB);
+        break;
+
+      case DropType.shield:
+        game.player.invulnerableTimer = 4.0;
+        game.spawnFloatingText(
+          position,
+          "ESCUDO 4s!",
+          color: Colors.lightBlueAccent,
+          fontSize: 15.0,
+        );
+        particleColor = Colors.lightBlueAccent;
+        break;
+
       case DropType.health:
         if (game.lives < 3) {
           game.lives += 1;
-          game.spawnFloatingText(position, "+1 VIDA!", color: Colors.greenAccent, fontSize: 15.5);
+          game.spawnFloatingText(
+            position,
+            "+1 VIDA!",
+            color: const Color(0xFF00E676),
+            fontSize: 15.0,
+          );
         } else {
           game.score += 100;
-          game.spawnFloatingText(position, "+100 PTS!", color: Colors.greenAccent, fontSize: 15.5);
+          game.spawnFloatingText(
+            position,
+            "+100 REPARO!",
+            color: const Color(0xFF00E676),
+            fontSize: 15.0,
+          );
         }
-        particleColor = Colors.greenAccent;
-        break;
-      case DropType.speedBoost:
-        game.player.movementMaxSpeed = math.min(420.0, game.player.movementMaxSpeed + 60.0);
-        game.player.movementAcceleration = math.min(900.0, game.player.movementAcceleration + 120.0);
-        game.spawnFloatingText(position, "TURBO ATIVADO!", color: Colors.orangeAccent, fontSize: 15.5);
-        particleColor = Colors.orangeAccent;
-        break;
-      case DropType.shield:
-        game.player.invulnerableTimer = 4.0;
-        game.spawnFloatingText(position, "ESCUDO 4s!", color: Colors.cyanAccent, fontSize: 15.5);
-        particleColor = Colors.cyanAccent;
+        particleColor = const Color(0xFF00E676);
         break;
     }
 
@@ -121,7 +165,7 @@ class DropComponent extends PositionComponent with HasGameReference<AsteroidsGam
     game.spawnExplosionParticles(
       position: position,
       colorChoices: [particleColor, Colors.white],
-      count: 16,
+      count: 18,
       minSize: 2.0,
       maxSize: 4.5,
       minSpeed: 60.0,
@@ -140,34 +184,46 @@ class DropComponent extends PositionComponent with HasGameReference<AsteroidsGam
 
     canvas.translate(radius, radius);
 
-    final pulseScale = 1.0 + math.sin(pulseTimer) * 0.15;
+    final pulseScale = 1.0 + math.sin(pulseTimer) * 0.18;
     Color mainColor;
 
     switch (type) {
-      case DropType.sample:
+      case DropType.lunarSample:
+        mainColor = Colors.cyanAccent;
+        break;
+      case DropType.rareHelium:
         mainColor = Colors.amberAccent;
+        break;
+      case DropType.darkMatter:
+        mainColor = const Color(0xFFE040FB);
+        break;
+      case DropType.shield:
+        mainColor = Colors.lightBlueAccent;
         break;
       case DropType.health:
         mainColor = const Color(0xFF00E676);
-        break;
-      case DropType.speedBoost:
-        mainColor = Colors.orangeAccent;
-        break;
-      case DropType.shield:
-        mainColor = Colors.cyanAccent;
         break;
     }
 
     // Outer glowing ring
     final glowPaint = Paint()
-      ..color = mainColor.withOpacity(0.25)
+      ..color = mainColor.withOpacity(type == DropType.darkMatter ? 0.45 : 0.28)
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 3.0;
+      ..strokeWidth = type == DropType.darkMatter ? 4.5 : 3.0;
     canvas.drawCircle(Offset.zero, radius * pulseScale, glowPaint);
+
+    if (type == DropType.darkMatter) {
+      // Secondary outer orbital halo for Dark Matter
+      final orbitPaint = Paint()
+        ..color = mainColor.withOpacity(0.3)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1.5;
+      canvas.drawCircle(Offset.zero, radius * (pulseScale + 0.3), orbitPaint);
+    }
 
     // Inner filled circle
     final innerPaint = Paint()
-      ..color = Colors.black.withOpacity(0.8)
+      ..color = Colors.black.withOpacity(0.85)
       ..style = PaintingStyle.fill;
     canvas.drawCircle(Offset.zero, radius * 0.85, innerPaint);
 
@@ -177,42 +233,56 @@ class DropComponent extends PositionComponent with HasGameReference<AsteroidsGam
       ..strokeWidth = 1.8;
     canvas.drawCircle(Offset.zero, radius * 0.85, borderPaint);
 
-    // Draw simple vector symbol inside
+    // Draw vector symbol inside
     final symbolPaint = Paint()
       ..color = mainColor
       ..style = PaintingStyle.fill;
 
     if (type == DropType.health) {
-      // Cross / Heart
+      // Cross
       canvas.drawRect(Rect.fromCenter(center: Offset.zero, width: 3, height: 10), symbolPaint);
       canvas.drawRect(Rect.fromCenter(center: Offset.zero, width: 10, height: 3), symbolPaint);
-    } else if (type == DropType.sample) {
-      // Diamond
+    } else if (type == DropType.lunarSample) {
+      // Diamond Crystal
       final path = Path()
-        ..moveTo(0, -5)
+        ..moveTo(0, -6)
         ..lineTo(5, 0)
-        ..lineTo(0, 5)
+        ..lineTo(0, 6)
         ..lineTo(-5, 0)
         ..close();
       canvas.drawPath(path, symbolPaint);
-    } else if (type == DropType.speedBoost) {
-      // Lightning bolt / Double chevron
-      final path = Path()
-        ..moveTo(1, -6)
-        ..lineTo(-4, 0)
-        ..lineTo(0, 0)
-        ..lineTo(-1, 6)
-        ..lineTo(4, 0)
-        ..lineTo(0, 0)
-        ..close();
+    } else if (type == DropType.rareHelium) {
+      // Star / Hexagon
+      final path = Path();
+      for (int i = 0; i < 6; i++) {
+        final a = (i * math.pi) / 3;
+        final r = (i % 2 == 0) ? 6.0 : 3.0;
+        final x = r * math.cos(a);
+        final y = r * math.sin(a);
+        if (i == 0) {
+          path.moveTo(x, y);
+        } else {
+          path.lineTo(x, y);
+        }
+      }
+      path.close();
       canvas.drawPath(path, symbolPaint);
+    } else if (type == DropType.darkMatter) {
+      // Cosmic core: circle + cross flares
+      canvas.drawCircle(Offset.zero, 3.5, symbolPaint);
+      final flarePaint = Paint()
+        ..color = mainColor
+        ..strokeWidth = 1.8
+        ..style = PaintingStyle.stroke;
+      canvas.drawLine(const Offset(-6, 0), const Offset(6, 0), flarePaint);
+      canvas.drawLine(const Offset(0, -6), const Offset(0, 6), flarePaint);
     } else if (type == DropType.shield) {
       // Shield circle outline
       final sPaint = Paint()
         ..color = mainColor
         ..style = PaintingStyle.stroke
         ..strokeWidth = 2.0;
-      canvas.drawCircle(Offset.zero, 4.0, sPaint);
+      canvas.drawCircle(Offset.zero, 4.5, sPaint);
     }
   }
 }

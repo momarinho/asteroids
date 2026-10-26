@@ -82,7 +82,7 @@ class _HudOverlayState extends State<HudOverlay> with SingleTickerProviderStateM
               ),
             ),
 
-          // Top Left: Score, Scientist Badge, Ship Name & Combo Meter
+          // Top Left: Score, Scientist Badge, Ship Name & Science Samples Badge
           Positioned(
             top: 0,
             left: 0,
@@ -136,91 +136,42 @@ class _HudOverlayState extends State<HudOverlay> with SingleTickerProviderStateM
                     ),
                   ),
 
-                  // Item 2: Combo Multiplier Badge & Gauge
-                  if (game.comboCount >= 2) ...[
-                    const SizedBox(height: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                      decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.8),
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(
-                          color: game.comboCount >= 5
-                              ? Colors.redAccent
-                              : (game.comboCount >= 3 ? Colors.amberAccent : Colors.cyanAccent),
-                          width: 1.5,
+                  // Item 2: Science Samples Collected Badge
+                  const SizedBox(height: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.7),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: Colors.cyanAccent.withOpacity(0.5),
+                        width: 1.2,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.cyanAccent.withOpacity(0.2),
+                          blurRadius: 6,
                         ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: (game.comboCount >= 5
-                                    ? Colors.red
-                                    : (game.comboCount >= 3 ? Colors.amber : Colors.cyan))
-                                .withOpacity(0.35),
-                            blurRadius: 8,
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                '🔥 COMBO x${game.comboCount}!',
-                                style: TextStyle(
-                                  fontFamily: 'Courier',
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.bold,
-                                  color: game.comboCount >= 5
-                                      ? Colors.redAccent
-                                      : (game.comboCount >= 3
-                                          ? Colors.amberAccent
-                                          : Colors.cyanAccent),
-                                ),
-                              ),
-                              const SizedBox(width: 6),
-                              Text(
-                                '+${((game.comboCount - 1) * 15)}%',
-                                style: const TextStyle(
-                                  fontFamily: 'Courier',
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.greenAccent,
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 3),
-                          // Combo timer bar
-                          Container(
-                            width: 110,
-                            height: 4,
-                            decoration: BoxDecoration(
-                              color: Colors.white12,
-                              borderRadius: BorderRadius.circular(2),
-                            ),
-                            child: Align(
-                              alignment: Alignment.centerLeft,
-                              child: Container(
-                                width: (110 * (game.comboTimer / game.currentComboWindow)).clamp(0.0, 110.0),
-                                height: 4,
-                                decoration: BoxDecoration(
-                                  color: game.comboCount >= 5
-                                      ? Colors.redAccent
-                                      : (game.comboCount >= 3
-                                          ? Colors.amberAccent
-                                          : Colors.cyanAccent),
-                                  borderRadius: BorderRadius.circular(2),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+                      ],
                     ),
-                  ],
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.biotech, color: Colors.cyanAccent, size: 16),
+                        const SizedBox(width: 6),
+                        Text(
+                          'AMOSTRAS: ${game.samplesCollected}',
+                          style: const TextStyle(
+                            fontFamily: 'Courier',
+                            fontSize: 11.5,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            letterSpacing: 1.1,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),

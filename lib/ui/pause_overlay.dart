@@ -171,7 +171,7 @@ class _PauseOverlayState extends State<PauseOverlay> {
 
                             const Divider(height: 22, color: Colors.white12),
 
-                            // Stats: Score & Time Remaining
+                            // Stats: Score, Samples & Time Remaining
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceAround,
                               children: [
@@ -194,6 +194,30 @@ class _PauseOverlayState extends State<PauseOverlay> {
                                         fontSize: 22,
                                         fontWeight: FontWeight.bold,
                                         color: Colors.white,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Container(width: 1, height: 32, color: Colors.white12),
+                                Column(
+                                  children: [
+                                    const Text(
+                                      'AMOSTRAS',
+                                      style: TextStyle(
+                                        fontFamily: 'Courier',
+                                        fontSize: 11,
+                                        color: Colors.white54,
+                                        letterSpacing: 1.1,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 3),
+                                    Text(
+                                      '${game.samplesCollected}',
+                                      style: const TextStyle(
+                                        fontFamily: 'Courier',
+                                        fontSize: 22,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.cyanAccent,
                                       ),
                                     ),
                                   ],
