@@ -142,7 +142,7 @@ class BombExplosionComponent extends PositionComponent with HasGameReference<Ast
     for (final asteroid in List<AsteroidComponent>.from(asteroids)) {
       final distance = position.distanceTo(asteroid.position);
       if (distance <= maxRadius + asteroid.radius) {
-        game.score += (asteroid.radius * 5).toInt();
+        game.onAsteroidDestroyed(asteroid.position, (asteroid.radius * 5).toInt());
         asteroid.split();
       }
     }

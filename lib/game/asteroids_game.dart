@@ -16,6 +16,7 @@ import 'components/bomb.dart';
 import 'components/starfield.dart';
 import 'components/joystick.dart';
 import 'components/drop.dart';
+import 'components/floating_text.dart';
 import 'weapons.dart';
 import 'level_manager.dart';
 import 'scientist.dart';
@@ -58,6 +59,19 @@ class AsteroidsGame extends FlameGame with HasCollisionDetection, KeyboardEvents
   double timeRemaining = fairRoundDuration;
   bool missionSurvived = false;
   String? participantName;
+
+  // Feature 1: One-time Special Ability per run
+  bool specialAvailable = true;
+
+  // Feature 2: Combo System
+  int comboCount = 0;
+  double comboTimer = 0.0;
+  static const double comboWindow = 2.0;
+
+  // Feature 3: Target Leader Record
+  String? topLeaderName;
+  int topLeaderScore = 0;
+  bool topRecordBeaten = false;
 
   // Settings selections
   int selectedMovementPresetIndex = 1; // 1 = Balanced
@@ -341,6 +355,14 @@ class AsteroidsGame extends FlameGame with HasCollisionDetection, KeyboardEvents
         playSfx('low_health.wav');
       }
     }
+
+    // Update combo timer
+    if (comboTimer > 0) {
+      comboTimer = math.max(0.0, comboTimer - dt);
+      if (comboTimer <= 0) {
+        comboCount = 0;
+      }
+    }
   }
 
   @override
@@ -499,6 +521,174 @@ class AsteroidsGame extends FlameGame with HasCollisionDetection, KeyboardEvents
     completeMission(survived: false);
   }
 
+  void spawnFloatingText(Vector2 position, String text, {Color color = Colors.white, double fontSize = 14.0, Vector2? velocity}) {
+    world.add(
+      FloatingTextComponent(
+        position: position.clone(),
+        text: text,
+        color: color,
+        fontSize: fontSize,
+        velocity: velocity,
+      ),
+    );
+  }
+
+  void onAsteroidDestroyed(Vector2 pos, int basePoints) {
+    if (state != GameState.playing) return;
+
+    comboTimer = comboWindow;
+    comboCount++;
+
+    int earned = basePoints;
+    if (comboCount >= 2) {
+      final multiplier = 1.0 + (comboCount - 1) * 0.15;
+      earned = (basePoints * multiplier).toInt();
+      score += earned;
+
+      spawnFloatingText(
+        pos,
+        '+$earned',
+        color: comboCount >= 4 ? Colors.amberAccent : Colors.cyanAccent,
+        fontSize: comboCount >= 4 ? 17.0 : 15.0,
+      );
+
+      final comboColor = comboCount >= 5
+          ? Colors.redAccent
+          : (comboCount >= 3 ? Colors.orangeAccent : Colors.yellowAccent);
+      spawnFloatingText(
+        pos + Vector2(0, -18),
+        'COMBO x$comboCount! 🔥',
+        color: comboColor,
+        fontSize: 13.0,
+      );
+    } else {
+      score += basePoints;
+      spawnFloatingText(pos, '+$basePoints', color: Colors.white, fontSize: 13.5);
+    }
+
+    // Check if player just beat top leader score
+    if (!topRecordBeaten && topLeaderScore > 0 && score > topLeaderScore) {
+      topRecordBeaten = true;
+      playSfx('powerup.wav');
+      triggerScreenShake(duration: 0.5, intensity: 10.0);
+      spawnFloatingText(
+        player.position + Vector2(0, -40),
+        '👑 NOVO RECORDE DA FEIRA!',
+        color: Colors.amberAccent,
+        fontSize: 20.0,
+        velocity: Vector2(0, -40),
+      );
+    }
+  }
+
+  Future<void> fetchTopLeaderRecord() async {
+    try {
+      final list = await ApiService.getFairLeaderboard(period: 'all', limit: 1);
+      if (list.isNotEmpty) {
+        final top = list.first;
+        topLeaderName = (top['username'] ?? 'Líder').toString().toUpperCase();
+        topLeaderScore = (top['score'] ?? 0) as int;
+      } else {
+        topLeaderName = 'PIONEIRO';
+        topLeaderScore = 10000;
+      }
+    } catch (_) {}
+  }
+
+  void triggerSpecial() {
+    if (!specialAvailable || state != GameState.playing) return;
+    specialAvailable = false;
+    playSfx('powerup.wav');
+    triggerScreenShake(duration: 0.6, intensity: 16.0);
+
+    // Visual shockwave particles
+    spawnExplosionParticles(
+      position: player.position,
+      colorChoices: [
+        selectedScientist.primaryColor,
+        selectedScientist.accentColor,
+        Colors.white,
+        Colors.amberAccent,
+      ],
+      count: 45,
+      minSize: 3.0,
+      maxSize: 6.0,
+      minSpeed: 100.0,
+      maxSpeed: 350.0,
+    );
+
+    // Floating text indicator
+    spawnFloatingText(
+      player.position + Vector2(0, -35),
+      '★ ESPECIAL ATIVADO! ★',
+      color: selectedScientist.primaryColor,
+      fontSize: 18,
+    );
+
+    switch (selectedScientist.id) {
+      case 'mae_jemison':
+        // Gravidade Zero: Empurra todos os meteoros para longe e concede 3.5s de invulnerabilidade
+        player.invulnerableTimer = 3.5;
+        final asteroids = List<AsteroidComponent>.from(world.children.whereType<AsteroidComponent>());
+        for (final ast in asteroids) {
+          final diff = ast.position - player.position;
+          final dist = diff.length;
+          final pushDir = dist > 0 ? diff.normalized() : Vector2(1, 0);
+          ast.velocity.setFrom(pushDir * 350.0);
+          if (dist < 140.0 && ast.radius <= GameConstants.asteroidMinRadius) {
+            onAsteroidDestroyed(ast.position, (ast.radius * 5).toInt());
+            ast.split();
+          }
+        }
+        break;
+
+      case 'margaret_hamilton':
+        // Overclock Quântico: 16 disparos de laser em círculo 360° ao redor da nave + 3.0s de escudo
+        player.invulnerableTimer = 3.0;
+        final step = (2 * math.pi) / 16;
+        for (int i = 0; i < 16; i++) {
+          final ang = i * step;
+          final dir = Vector2(math.cos(ang), math.sin(ang));
+          final bullet = BulletComponent(
+            position: player.position + dir * player.radius,
+            radius: 3.5,
+            velocity: dir * 550.0,
+            lifeTimer: 0.8,
+          );
+          world.add(bullet);
+        }
+        break;
+
+      case 'nancy_roman':
+        // Varredura do Hubble: Destrói meteoros na linha de visada frontal e traseira + 3.0s de escudo
+        player.invulnerableTimer = 3.0;
+        final fwd = player.forward.normalized();
+        final asteroids = List<AsteroidComponent>.from(world.children.whereType<AsteroidComponent>());
+        for (final ast in asteroids) {
+          final toAst = ast.position - player.position;
+          final proj = toAst.dot(fwd);
+          // Distance from line: length of projection perpendicular
+          final perpDist = (toAst - (fwd * proj)).length;
+          if (perpDist <= ast.radius + 45.0) {
+            onAsteroidDestroyed(ast.position, (ast.radius * 5).toInt());
+            ast.split();
+          }
+        }
+        break;
+
+      case 'peggy_whitson':
+        // Pulso de Plasma Orbital: Super explosão de 160px de raio ao redor da nave + 3.0s de escudo
+        player.invulnerableTimer = 3.0;
+        world.add(
+          BombExplosionComponent(
+            position: player.position.clone(),
+            maxRadius: 160.0,
+          ),
+        );
+        break;
+    }
+  }
+
   void startFairGame(Scientist scientist) {
     selectedScientist = scientist;
     score = 0;
@@ -506,6 +696,11 @@ class AsteroidsGame extends FlameGame with HasCollisionDetection, KeyboardEvents
     currentLevel = 1;
     timeRemaining = fairRoundDuration;
     missionSurvived = false;
+    specialAvailable = true;
+    comboCount = 0;
+    comboTimer = 0.0;
+    topRecordBeaten = false;
+    fetchTopLeaderRecord();
 
     if (levelManager != null) {
       levelManager = null;

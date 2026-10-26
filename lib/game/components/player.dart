@@ -214,6 +214,10 @@ class PlayerComponent extends PositionComponent with HasGameReference<AsteroidsG
       shoot();
     }
 
+    if (keys.contains(LogicalKeyboardKey.keyE)) {
+      game.triggerSpecial();
+    }
+
     // Weapon switching controls
     if (keys.contains(LogicalKeyboardKey.digit1) && unlockedWeapons.containsKey('blaster')) {
       setWeapon(unlockedWeapons['blaster']!);

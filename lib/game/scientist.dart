@@ -20,6 +20,8 @@ class Scientist {
   final String weaponName;
   final String weaponDescription;
   final String weaponStyle;
+  final String specialAbilityName;
+  final String specialAbilityDesc;
   final int cadenceRating; // 1 to 5
   final int areaRating; // 1 to 5
   final int powerRating; // 1 to 5
@@ -41,6 +43,8 @@ class Scientist {
     required this.weaponName,
     required this.weaponDescription,
     required this.weaponStyle,
+    required this.specialAbilityName,
+    required this.specialAbilityDesc,
     required this.cadenceRating,
     required this.areaRating,
     required this.powerRating,
@@ -64,6 +68,8 @@ class Scientist {
       weaponName: 'Tiro Dispersor',
       weaponDescription: 'Disparo em leque de 3 projéteis para cobrir amplas áreas do espaço.',
       weaponStyle: 'Disparo Triplo em Leque',
+      specialAbilityName: 'Repulsão Zero-G',
+      specialAbilityDesc: 'Onda de choque que empurra meteoros para longe e ativa escudo de 3.5s!',
       cadenceRating: 3,
       areaRating: 5,
       powerRating: 3,
@@ -85,6 +91,8 @@ class Scientist {
       weaponName: 'Laser Veloz',
       weaponDescription: 'Rajadas rápidas e contínuas de laser, como ciclos de processamento de código.',
       weaponStyle: 'Metralhadora de Laser',
+      specialAbilityName: 'Overclock Quântico',
+      specialAbilityDesc: 'Disparo radial de 16 lasers em círculo 360° e ativa escudo de 3s!',
       cadenceRating: 5,
       areaRating: 2,
       powerRating: 3,
@@ -106,6 +114,8 @@ class Scientist {
       weaponName: 'Laser Fotônico',
       weaponDescription: 'Laser concentrado de longo alcance com mira de precisão telescópica.',
       weaponStyle: 'Laser Concentrado',
+      specialAbilityName: 'Varredura do Hubble',
+      specialAbilityDesc: 'Feixe cósmico frontal e traseiro que limpa os meteoros + escudo de 3s!',
       cadenceRating: 3,
       areaRating: 2,
       powerRating: 4,
@@ -127,6 +137,8 @@ class Scientist {
       weaponName: 'Lança-Bombas',
       weaponDescription: 'Lança cargas explosivas de alta energia que pulverizam aglomerados de asteroides.',
       weaponStyle: 'Bombas de Plasma Explosivo',
+      specialAbilityName: 'Pulso de Plasma Orbital',
+      specialAbilityDesc: 'Super explosão em área circular massiva de 160px + escudo de 3s!',
       cadenceRating: 2,
       areaRating: 5,
       powerRating: 5,

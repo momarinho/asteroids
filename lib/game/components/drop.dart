@@ -91,23 +91,28 @@ class DropComponent extends PositionComponent with HasGameReference<AsteroidsGam
     switch (type) {
       case DropType.sample:
         game.score += 150;
+        game.spawnFloatingText(position, "+150 AMOSTRA!", color: Colors.amberAccent, fontSize: 15.5);
         particleColor = Colors.amberAccent;
         break;
       case DropType.health:
         if (game.lives < 3) {
           game.lives += 1;
+          game.spawnFloatingText(position, "+1 VIDA!", color: Colors.greenAccent, fontSize: 15.5);
         } else {
           game.score += 100;
+          game.spawnFloatingText(position, "+100 PTS!", color: Colors.greenAccent, fontSize: 15.5);
         }
         particleColor = Colors.greenAccent;
         break;
       case DropType.speedBoost:
         game.player.movementMaxSpeed = math.min(420.0, game.player.movementMaxSpeed + 60.0);
         game.player.movementAcceleration = math.min(900.0, game.player.movementAcceleration + 120.0);
+        game.spawnFloatingText(position, "TURBO ATIVADO!", color: Colors.orangeAccent, fontSize: 15.5);
         particleColor = Colors.orangeAccent;
         break;
       case DropType.shield:
         game.player.invulnerableTimer = 4.0;
+        game.spawnFloatingText(position, "ESCUDO 4s!", color: Colors.cyanAccent, fontSize: 15.5);
         particleColor = Colors.cyanAccent;
         break;
     }

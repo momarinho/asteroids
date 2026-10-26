@@ -630,6 +630,37 @@ class _ScientistSelectionOverlayState extends State<ScientistSelectionOverlay> w
 
             const SizedBox(height: 10),
 
+            // Special Power Badge
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+              decoration: BoxDecoration(
+                color: scientist.primaryColor.withOpacity(0.12),
+                borderRadius: BorderRadius.circular(6),
+                border: Border.all(color: scientist.primaryColor.withOpacity(0.35)),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.auto_awesome, color: scientist.primaryColor, size: 13),
+                  const SizedBox(width: 4),
+                  Expanded(
+                    child: Text(
+                      'ESPECIAL: ${scientist.specialAbilityName}',
+                      style: TextStyle(
+                        fontFamily: 'Courier',
+                        fontSize: 10.5,
+                        fontWeight: FontWeight.bold,
+                        color: scientist.primaryColor,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 10),
+
             // Short Bio
             SizedBox(
               height: 44,
