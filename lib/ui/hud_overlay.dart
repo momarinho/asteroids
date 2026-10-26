@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:asteroids/game/asteroids_game.dart';
 
@@ -48,8 +49,20 @@ class _HudOverlayState extends State<HudOverlay> with SingleTickerProviderStateM
     final dashCooldown = player.dashCooldownTimer;
     final currentWeapon = player.weapon;
 
-    return Container(
-      padding: const EdgeInsets.all(20.0),
+    return Focus(
+      autofocus: true,
+      onKeyEvent: (node, event) {
+        if (event is KeyDownEvent) {
+          if (event.logicalKey == LogicalKeyboardKey.escape ||
+              event.logicalKey == LogicalKeyboardKey.keyP) {
+            game.togglePause();
+            return KeyEventResult.handled;
+          }
+        }
+        return KeyEventResult.ignored;
+      },
+      child: Container(
+        padding: const EdgeInsets.all(20.0),
       child: Stack(
         children: [
           // Item 5: Last Life Dramatic Red Pulsing Vignette
@@ -812,6 +825,7 @@ class _HudOverlayState extends State<HudOverlay> with SingleTickerProviderStateM
             ),
         ],
       ),
-    );
+    ),
+  );
   }
 }

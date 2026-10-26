@@ -144,8 +144,33 @@ class AsteroidsGame extends FlameGame with HasCollisionDetection, KeyboardEvents
       playerUsername = profile['username'];
     }
 
+    // Register global hardware keyboard handler for instant pause detection
+    HardwareKeyboard.instance.addHandler(_handleGlobalKeyEvent);
+
     // Initial state set for Science Fair
     changeState(GameState.scienceIntro);
+  }
+
+  bool _handleGlobalKeyEvent(KeyEvent event) {
+    if (event is! KeyDownEvent) return false;
+
+    final key = event.logicalKey;
+    final isPauseKey = key == LogicalKeyboardKey.escape || key == LogicalKeyboardKey.keyP;
+
+    if (state == GameState.playing) {
+      if (isGamePaused) {
+        if (isPauseKey || key == LogicalKeyboardKey.space || key == LogicalKeyboardKey.enter) {
+          resumeGame();
+          return true;
+        }
+      } else {
+        if (isPauseKey) {
+          pauseGame();
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   void changeState(GameState newState) {
@@ -448,6 +473,7 @@ class AsteroidsGame extends FlameGame with HasCollisionDetection, KeyboardEvents
 
   @override
   void onRemove() {
+    HardwareKeyboard.instance.removeHandler(_handleGlobalKeyEvent);
     for (final p in _sfxPlayers) {
       try {
         p.dispose();

@@ -6,6 +6,13 @@ echo "========================================================="
 echo "   ASTEROIDS - FEIRA DE CIENCIAS: MULHERES NA CIENCIA"
 echo "========================================================="
 
+# Libera a porta 8080 caso já esteja ocupada por um processo anterior
+PORT_PID=$(lsof -t -i:8080 2>/dev/null || true)
+if [ ! -z "$PORT_PID" ]; then
+    kill -9 $PORT_PID 2>/dev/null || true
+    sleep 0.5
+fi
+
 # Inicia servidor local em segundo plano
 cd "$DIR/go-backend"
 ./server &

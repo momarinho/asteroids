@@ -5,6 +5,9 @@ echo    ASTEROIDS - FEIRA DE CIENCIAS: MULHERES NA CIENCIA
 echo =========================================================
 echo [1/2] Iniciando servidor local e banco de dados SQLite...
 
+rem Libera a porta 8080 caso esteja em uso por uma instancia anterior
+for /f "tokens=5" %%a in ('netstat -aon 2^>nul ^| findstr :8080') do taskkill /f /pid %%a >nul 2>&1
+
 cd /d "%~dp0go-backend"
 start "Asteroids Server" server.exe
 

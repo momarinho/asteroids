@@ -14,6 +14,7 @@ class PauseOverlay extends StatefulWidget {
 
 class _PauseOverlayState extends State<PauseOverlay> {
   final FocusNode _focusNode = FocusNode();
+  int _selectedButtonIndex = 0; // 0 = Continuar Partida, 1 = Voltar ao Menu
 
   @override
   void initState() {
@@ -34,10 +35,35 @@ class _PauseOverlayState extends State<PauseOverlay> {
   KeyEventResult _handleKeyEvent(FocusNode node, KeyEvent event) {
     if (event is KeyDownEvent) {
       if (event.logicalKey == LogicalKeyboardKey.escape ||
-          event.logicalKey == LogicalKeyboardKey.keyP ||
-          event.logicalKey == LogicalKeyboardKey.space ||
-          event.logicalKey == LogicalKeyboardKey.enter) {
+          event.logicalKey == LogicalKeyboardKey.keyP) {
         widget.game.resumeGame();
+        return KeyEventResult.handled;
+      }
+      if (event.logicalKey == LogicalKeyboardKey.arrowDown ||
+          event.logicalKey == LogicalKeyboardKey.keyS) {
+        setState(() {
+          _selectedButtonIndex = 1;
+        });
+        widget.game.playSfx('menu_select.wav');
+        return KeyEventResult.handled;
+      }
+      if (event.logicalKey == LogicalKeyboardKey.arrowUp ||
+          event.logicalKey == LogicalKeyboardKey.keyW) {
+        setState(() {
+          _selectedButtonIndex = 0;
+        });
+        widget.game.playSfx('menu_select.wav');
+        return KeyEventResult.handled;
+      }
+      if (event.logicalKey == LogicalKeyboardKey.enter ||
+          event.logicalKey == LogicalKeyboardKey.numpadEnter ||
+          event.logicalKey == LogicalKeyboardKey.space) {
+        if (_selectedButtonIndex == 0) {
+          widget.game.resumeGame();
+        } else {
+          widget.game.resumeGame();
+          widget.game.changeState(GameState.scientistSelection);
+        }
         return KeyEventResult.handled;
       }
     }
@@ -105,10 +131,12 @@ class _PauseOverlayState extends State<PauseOverlay> {
                       ),
                       const SizedBox(height: 6),
                       const Text(
-                        'Pressione ESC ou Espaço para continuar',
+                        'ESC / P: Continuar  •  ▲/▼: Selecionar  •  ENTER: Confirmar',
                         style: TextStyle(
-                          fontSize: 12,
+                          fontFamily: 'Courier',
+                          fontSize: 11,
                           color: Colors.white54,
+                          letterSpacing: 0.8,
                         ),
                       ),
 
@@ -255,16 +283,31 @@ class _PauseOverlayState extends State<PauseOverlay> {
                       const SizedBox(height: 24),
 
                       // Action Button 1: Continuar
-                      SizedBox(
+                      Container(
                         width: double.infinity,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
+                            color: _selectedButtonIndex == 0 ? Colors.white : Colors.transparent,
+                            width: 2.0,
+                          ),
+                          boxShadow: _selectedButtonIndex == 0
+                              ? [
+                                  BoxShadow(
+                                    color: scientist.primaryColor.withOpacity(0.6),
+                                    blurRadius: 12,
+                                  ),
+                                ]
+                              : null,
+                        ),
                         child: ElevatedButton.icon(
                           onPressed: () {
                             game.resumeGame();
                           },
                           icon: const Icon(Icons.play_arrow, size: 22),
-                          label: const Text(
-                            'CONTINUAR PARTIDA',
-                            style: TextStyle(
+                          label: Text(
+                            _selectedButtonIndex == 0 ? '► CONTINUAR PARTIDA' : 'CONTINUAR PARTIDA',
+                            style: const TextStyle(
                               fontFamily: 'Courier',
                               fontSize: 15,
                               fontWeight: FontWeight.bold,
@@ -276,10 +319,9 @@ class _PauseOverlayState extends State<PauseOverlay> {
                             foregroundColor: Colors.black,
                             padding: const EdgeInsets.symmetric(vertical: 14),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
+                              borderRadius: BorderRadius.circular(8),
                             ),
                             elevation: 8,
-                            shadowColor: scientist.primaryColor.withOpacity(0.5),
                           ),
                         ),
                       ),
@@ -287,29 +329,48 @@ class _PauseOverlayState extends State<PauseOverlay> {
                       const SizedBox(height: 12),
 
                       // Action Button 2: Voltar ao Menu
-                      SizedBox(
+                      Container(
                         width: double.infinity,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
+                            color: _selectedButtonIndex == 1 ? Colors.white : Colors.transparent,
+                            width: 2.0,
+                          ),
+                          boxShadow: _selectedButtonIndex == 1
+                              ? [
+                                  BoxShadow(
+                                    color: Colors.white.withOpacity(0.3),
+                                    blurRadius: 10,
+                                  ),
+                                ]
+                              : null,
+                        ),
                         child: OutlinedButton.icon(
                           onPressed: () {
                             game.resumeGame();
                             game.changeState(GameState.scientistSelection);
                           },
                           icon: const Icon(Icons.arrow_back, size: 18),
-                          label: const Text(
-                            'VOLTAR AO MENU',
+                          label: Text(
+                            _selectedButtonIndex == 1 ? '► VOLTAR AO MENU' : 'VOLTAR AO MENU',
                             style: TextStyle(
                               fontFamily: 'Courier',
                               fontSize: 13,
                               fontWeight: FontWeight.bold,
                               letterSpacing: 1.1,
+                              color: _selectedButtonIndex == 1 ? Colors.white : Colors.white70,
                             ),
                           ),
                           style: OutlinedButton.styleFrom(
                             foregroundColor: Colors.white70,
-                            side: const BorderSide(color: Colors.white24),
+                            backgroundColor: _selectedButtonIndex == 1 ? Colors.white12 : Colors.transparent,
+                            side: BorderSide(
+                              color: _selectedButtonIndex == 1 ? Colors.white70 : Colors.white24,
+                            ),
                             padding: const EdgeInsets.symmetric(vertical: 12),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
+                              borderRadius: BorderRadius.circular(8),
                             ),
                           ),
                         ),
