@@ -10,6 +10,7 @@ class BulletComponent extends PositionComponent with HasGameReference<AsteroidsG
   final Vector2 velocity;
   double lifeTimer;
   final double damage;
+  final Color color;
 
   BulletComponent({
     required Vector2 position,
@@ -17,6 +18,7 @@ class BulletComponent extends PositionComponent with HasGameReference<AsteroidsG
     required this.velocity,
     required this.lifeTimer,
     this.damage = 25.0,
+    this.color = Colors.white,
   }) {
     this.position = position;
     anchor = Anchor.center;
@@ -78,7 +80,7 @@ class BulletComponent extends PositionComponent with HasGameReference<AsteroidsG
     canvas.translate(radius, radius);
 
     final paint = Paint()
-      ..color = Colors.white
+      ..color = color
       ..style = PaintingStyle.stroke
       ..strokeWidth = GameConstants.lineWidth;
 

@@ -719,37 +719,48 @@ class AsteroidsGame extends FlameGame with HasCollisionDetection, KeyboardEvents
 
     switch (selectedScientist.id) {
       case 'mae_jemison':
-        // Gravidade Zero: Desacelera todos os meteoros no espaço + repele e causa dano nos próximos + 4.0s de escudo
-        player.invulnerableTimer = 4.0;
-        final asteroids = List<AsteroidComponent>.from(world.children.whereType<AsteroidComponent>());
-        for (final ast in asteroids) {
-          final diff = ast.position - player.position;
-          final dist = diff.length;
-          final pushDir = dist > 0 ? diff.normalized() : Vector2(1, 0);
+        // Super Dispersor 360°: 3 ondas concêntricas de projéteis (12 por onda = 36 projéteis) + 3.0s de escudo
+        player.invulnerableTimer = 3.0;
 
-          // Efeito Gravidade Zero: Desacelera a velocidade dos meteoros para 35% (câmera lenta suave)
-          // NUNCA aumenta a velocidade para 350 (evita o bug de hipervelocidade)
-          ast.velocity.scale(0.35);
+        // Configuração das 3 fileiras/anéis concêntricos (rápida, média e curta)
+        final waves = [
+          (speed: 560.0, angleOffset: 0.0, color: const Color(0xFF00E676)),
+          (speed: 480.0, angleOffset: math.pi / 12, color: const Color(0xFF00E5FF)),
+          (speed: 400.0, angleOffset: 0.0, color: Colors.greenAccent),
+        ];
 
-          // Meteoros próximos sofrem repulsão suave e dano para limpar a área ao redor
-          if (dist < 180.0) {
-            ast.position += pushDir * math.min(90.0, 180.0 - dist);
-            final destroyed = ast.takeDamage(60.0, ast.position);
-            if (destroyed) {
-              onAsteroidDestroyed(ast.position, (ast.radius * 5).toInt());
-            }
+        const bulletsPerWave = 12;
+        const step = (2 * math.pi) / bulletsPerWave;
+
+        for (final wave in waves) {
+          for (int i = 0; i < bulletsPerWave; i++) {
+            final ang = (i * step) + wave.angleOffset;
+            final dir = Vector2(math.cos(ang), math.sin(ang));
+            final bullet = BulletComponent(
+              position: player.position + dir * (player.radius + 2.0),
+              radius: 3.2,
+              velocity: dir * wave.speed,
+              lifeTimer: 0.75,
+              damage: 18.0,
+              color: wave.color,
+            );
+            world.add(bullet);
           }
         }
 
-        // Onda visual cósmica em roxo/ciano expandindo da nave
+        // Explosão de partículas temáticas nas cores da Dra. Mae Jemison
         spawnExplosionParticles(
           position: player.position,
-          colorChoices: [Colors.purpleAccent, Colors.cyanAccent, Colors.white],
+          colorChoices: [
+            const Color(0xFF00E676),
+            const Color(0xFF00E5FF),
+            Colors.white,
+          ],
           count: 36,
           minSize: 3.0,
           maxSize: 6.0,
-          minSpeed: 70.0,
-          maxSpeed: 220.0,
+          minSpeed: 80.0,
+          maxSpeed: 240.0,
         );
         break;
 

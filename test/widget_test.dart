@@ -44,6 +44,7 @@ void main() {
     test('Scientist findById returns correct scientist or default', () {
       final mae = Scientist.findById('mae_jemison');
       expect(mae.name, 'Mae Jemison');
+      expect(mae.specialAbilityName, 'Super Dispersor 360°');
 
       final unknown = Scientist.findById('unknown_id');
       expect(unknown.id, Scientist.defaultScientist.id);
