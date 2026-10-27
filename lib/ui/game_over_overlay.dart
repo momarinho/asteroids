@@ -165,7 +165,7 @@ class _GameOverOverlayState extends State<GameOverOverlay> {
                               Icon(Icons.workspace_premium, color: Color(0xFFFFD700), size: 20),
                               SizedBox(width: 8),
                               Text(
-                                '🏅 MEDALHA DE HONRA: SOBREVIVENTE ESPACIAL (+1000 PTS BÔNUS!)',
+                                '🏅 MEDALHA DE HONRA: SOBREVIVENTE ESPACIAL (+3000 PTS BÔNUS!)',
                                 style: TextStyle(
                                   fontFamily: 'Courier',
                                   fontSize: 12.5,
@@ -582,9 +582,9 @@ class _GameOverOverlayState extends State<GameOverOverlay> {
 }
 
   String _getScientificRank(int score, bool survived) {
-    if (survived || score >= 5000) {
+    if (survived || score >= 25000) {
       return 'COMANDANTE DA FROTA CÓSMICA 👑';
-    } else if (score >= 2500) {
+    } else if (score >= 12000) {
       return 'PESQUISADOR(A) SENIOR DO ESPAÇO 🪐';
     } else {
       return 'CADETE ESPACIAL DA FEIRA 🚀';

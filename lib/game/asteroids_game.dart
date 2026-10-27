@@ -819,7 +819,7 @@ class AsteroidsGame extends FlameGame with HasCollisionDetection, KeyboardEvents
           if (perpDist <= ast.radius + 45.0) {
             final destroyed = ast.takeDamage(100.0, ast.position);
             if (destroyed) {
-              onAsteroidDestroyed(ast.position, (ast.radius * 5).toInt());
+              onAsteroidDestroyed(ast.position, (ast.radius * 16).toInt());
             }
           }
         }
@@ -886,7 +886,7 @@ class AsteroidsGame extends FlameGame with HasCollisionDetection, KeyboardEvents
 
     missionSurvived = survived;
     if (survived) {
-      score += 1000; // Full 3-minute survival bonus
+      score += 3000; // Full 3-minute survival bonus (calibrated for fair play)
       if (!topRecordBeaten && topLeaderScore > 0 && score > topLeaderScore) {
         topRecordBeaten = true;
       }

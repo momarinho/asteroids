@@ -151,7 +151,7 @@ class BombExplosionComponent extends PositionComponent with HasGameReference<Ast
         final destroyed = asteroid.takeDamage(damage, asteroid.position);
         if (destroyed) {
           destroyedCount++;
-          game.onAsteroidDestroyed(asteroid.position, (asteroid.radius * 5).toInt());
+          game.onAsteroidDestroyed(asteroid.position, (asteroid.radius * 16).toInt());
         }
       }
     }
