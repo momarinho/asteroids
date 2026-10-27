@@ -11,6 +11,7 @@ import 'components/player.dart';
 import 'components/asteroid_field.dart';
 import 'components/particle.dart';
 import 'components/asteroid.dart';
+import 'components/comet.dart';
 import 'components/bullet.dart';
 import 'components/bomb.dart';
 import 'components/starfield.dart';
@@ -70,6 +71,12 @@ class AsteroidsGame extends FlameGame with HasCollisionDetection, KeyboardEvents
   String? topLeaderName;
   int topLeaderScore = 0;
   bool topRecordBeaten = false;
+
+  // Feature 4: Surprise Celestial Event (Comet Halley Flyby)
+  bool cometWarningTriggered = false;
+  bool cometSpawned = false;
+  double cometAlertTimer = 0.0;
+  String? cometAlertMessage;
 
   // Settings selections
   int selectedMovementPresetIndex = 1; // 1 = Balanced
@@ -304,6 +311,10 @@ class AsteroidsGame extends FlameGame with HasCollisionDetection, KeyboardEvents
     specialAvailable = true;
     samplesCollected = 0;
     topRecordBeaten = false;
+    cometWarningTriggered = false;
+    cometSpawned = false;
+    cometAlertTimer = 0.0;
+    cometAlertMessage = null;
     fetchTopLeaderRecord();
 
     // Remove any running level manager or asteroid field
@@ -390,9 +401,27 @@ class AsteroidsGame extends FlameGame with HasCollisionDetection, KeyboardEvents
       shakeTimer = math.max(0.0, shakeTimer - dt);
     }
 
-    // Science Fair 120-second countdown timer
+    // Science Fair 150-second countdown timer & Celestial Events
     if (state == GameState.playing) {
       timeRemaining -= dt;
+      if (cometAlertTimer > 0) {
+        cometAlertTimer = math.max(0.0, cometAlertTimer - dt);
+      }
+
+      // Mid-game surprise event: Comet Halley warning at 95s (55s played)
+      if (!cometWarningTriggered && timeRemaining <= 95.0 && timeRemaining > 91.0) {
+        cometWarningTriggered = true;
+        cometAlertTimer = 4.0;
+        cometAlertMessage = '☄️ ALERTA CIENTÍFICO: Cometa Halley se aproximando!';
+        playSfx('low_health.wav');
+      }
+
+      // Spawn Comet at 91s remaining (59s played)
+      if (cometWarningTriggered && !cometSpawned && timeRemaining <= 91.0) {
+        cometSpawned = true;
+        spawnComet();
+      }
+
       if (timeRemaining <= 0) {
         timeRemaining = 0;
         completeMission(survived: true);
@@ -604,6 +633,37 @@ class AsteroidsGame extends FlameGame with HasCollisionDetection, KeyboardEvents
     }
   }
 
+  void spawnComet() {
+    if (state != GameState.playing) return;
+    final random = math.Random();
+
+    // Pick a diagonal flyby trajectory across the screen
+    final fromLeft = random.nextBool();
+    final fromTop = random.nextBool();
+
+    final startX = fromLeft ? -20.0 : GameConstants.screenWidth + 20.0;
+    final startY = fromTop
+        ? random.nextDouble() * 220.0
+        : GameConstants.screenHeight - random.nextDouble() * 220.0;
+
+    final dirX = fromLeft ? 1.0 : -1.0;
+    final dirY = fromTop
+        ? (0.35 + random.nextDouble() * 0.35)
+        : -(0.35 + random.nextDouble() * 0.35);
+
+    final dir = Vector2(dirX, dirY).normalized();
+    final velocity = dir * 175.0; // Fast and sweeping
+
+    final comet = CometComponent(
+      position: Vector2(startX, startY),
+      velocity: velocity,
+    );
+
+    world.add(comet);
+    playSfx('powerup.wav');
+    triggerScreenShake(duration: 0.3, intensity: 6.0);
+  }
+
   Future<void> fetchTopLeaderRecord() async {
     try {
       final list = await ApiService.getFairLeaderboard(period: 'all', limit: 1);
@@ -745,6 +805,10 @@ class AsteroidsGame extends FlameGame with HasCollisionDetection, KeyboardEvents
     specialAvailable = true;
     samplesCollected = 0;
     topRecordBeaten = false;
+    cometWarningTriggered = false;
+    cometSpawned = false;
+    cometAlertTimer = 0.0;
+    cometAlertMessage = null;
     fetchTopLeaderRecord();
 
     if (levelManager != null) {

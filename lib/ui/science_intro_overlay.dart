@@ -126,22 +126,25 @@ class _ScienceIntroOverlayState extends State<ScienceIntroOverlay> {
                           borderRadius: BorderRadius.circular(30),
                           border: Border.all(color: Colors.cyanAccent.withOpacity(0.6)),
                         ),
-                        child: const Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(Icons.auto_awesome, color: Colors.cyanAccent, size: 18),
-                            SizedBox(width: 8),
-                            Text(
-                              'FEIRA DE CIÊNCIAS • MULHERES NA CIÊNCIA',
-                              style: TextStyle(
-                                fontFamily: 'Courier',
-                                fontSize: 13.5,
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: 2,
-                                color: Colors.cyanAccent,
+                        child: const FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.auto_awesome, color: Colors.cyanAccent, size: 18),
+                              SizedBox(width: 8),
+                              Text(
+                                'FEIRA DE CIÊNCIAS • MULHERES NA CIÊNCIA',
+                                style: TextStyle(
+                                  fontFamily: 'Courier',
+                                  fontSize: 13.5,
+                                  fontWeight: FontWeight.bold,
+                                  letterSpacing: 1.5,
+                                  color: Colors.cyanAccent,
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
 

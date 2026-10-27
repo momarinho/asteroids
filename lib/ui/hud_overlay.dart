@@ -377,6 +377,52 @@ class _HudOverlayState extends State<HudOverlay> with SingleTickerProviderStateM
                         ),
                       ),
                     ],
+                    if (game.cometAlertTimer > 0 && game.cometAlertMessage != null) ...[
+                      const SizedBox(height: 8),
+                      Builder(
+                        builder: (context) {
+                          final pulse = (math.sin(DateTime.now().millisecondsSinceEpoch / 140) + 1) / 2;
+                          return Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: Colors.black.withOpacity(0.9),
+                              borderRadius: BorderRadius.circular(14),
+                              border: Border.all(
+                                color: const Color(0xFF00E5FF).withOpacity(0.6 + pulse * 0.4),
+                                width: 2.0,
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: const Color(0xFF00E5FF).withOpacity(0.35 + pulse * 0.45),
+                                  blurRadius: 14,
+                                  spreadRadius: 2,
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(Icons.auto_awesome, color: Color(0xFF00E5FF), size: 16),
+                                const SizedBox(width: 8),
+                                Text(
+                                  game.cometAlertMessage!,
+                                  style: const TextStyle(
+                                    fontFamily: 'Courier',
+                                    fontSize: 12.5,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                    letterSpacing: 1.1,
+                                    shadows: [
+                                      Shadow(color: Color(0xFF00E5FF), blurRadius: 6),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                    ],
                   ],
                 ),
               ),

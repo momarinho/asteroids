@@ -11,6 +11,7 @@ enum DropType {
   darkMatter,  // Matéria Escura (+500 pts)
   shield,      // Escudo Fotônico (4s Invulnerabilidade)
   health,      // Cápsula de Reparo (+1 Vida)
+  cometDust,   // Poeira Estelar do Cometa (+1000 pts + Reparo/Escudo)
 }
 
 class DropComponent extends PositionComponent with HasGameReference<AsteroidsGame>, CollisionCallbacks {
@@ -159,6 +160,25 @@ class DropComponent extends PositionComponent with HasGameReference<AsteroidsGam
         }
         particleColor = const Color(0xFF00E676);
         break;
+
+      case DropType.cometDust:
+        game.score += 1000;
+        game.samplesCollected += 2;
+        if (game.lives < 3) {
+          game.lives += 1;
+        } else {
+          game.player.invulnerableTimer = 5.0;
+        }
+        game.triggerScreenShake(duration: 0.35, intensity: 8.0);
+        game.spawnFloatingText(
+          position,
+          "+1000 POEIRA DO COMETA! ☄️",
+          color: const Color(0xFF00E5FF),
+          fontSize: 18.0,
+          velocity: Vector2(0, -40),
+        );
+        particleColor = const Color(0xFF00E5FF);
+        break;
     }
 
     // Explosion particles upon pickup
@@ -203,19 +223,22 @@ class DropComponent extends PositionComponent with HasGameReference<AsteroidsGam
       case DropType.health:
         mainColor = const Color(0xFF00E676);
         break;
+      case DropType.cometDust:
+        mainColor = const Color(0xFF00E5FF);
+        break;
     }
 
     // Outer glowing ring
     final glowPaint = Paint()
-      ..color = mainColor.withOpacity(type == DropType.darkMatter ? 0.45 : 0.28)
+      ..color = mainColor.withOpacity((type == DropType.darkMatter || type == DropType.cometDust) ? 0.48 : 0.28)
       ..style = PaintingStyle.stroke
-      ..strokeWidth = type == DropType.darkMatter ? 4.5 : 3.0;
+      ..strokeWidth = (type == DropType.darkMatter || type == DropType.cometDust) ? 4.5 : 3.0;
     canvas.drawCircle(Offset.zero, radius * pulseScale, glowPaint);
 
-    if (type == DropType.darkMatter) {
-      // Secondary outer orbital halo for Dark Matter
+    if (type == DropType.darkMatter || type == DropType.cometDust) {
+      // Secondary outer orbital halo
       final orbitPaint = Paint()
-        ..color = mainColor.withOpacity(0.3)
+        ..color = (type == DropType.cometDust ? Colors.amberAccent : mainColor).withOpacity(0.35)
         ..style = PaintingStyle.stroke
         ..strokeWidth = 1.5;
       canvas.drawCircle(Offset.zero, radius * (pulseScale + 0.3), orbitPaint);
@@ -283,6 +306,14 @@ class DropComponent extends PositionComponent with HasGameReference<AsteroidsGam
         ..style = PaintingStyle.stroke
         ..strokeWidth = 2.0;
       canvas.drawCircle(Offset.zero, 4.5, sPaint);
+    } else if (type == DropType.cometDust) {
+      // Comet nucleus core + star flare ring
+      canvas.drawCircle(Offset.zero, 3.5, symbolPaint);
+      final ringPaint = Paint()
+        ..color = Colors.amberAccent
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1.3;
+      canvas.drawCircle(Offset.zero, 6.5, ringPaint);
     }
   }
 }
