@@ -26,6 +26,7 @@ class Scientist {
   final int areaRating; // 1 to 5
   final int powerRating; // 1 to 5
   final String kidTip;
+  final String launchQuote;
   final String imagePath;
   final Color primaryColor;
   final Color accentColor;
@@ -49,6 +50,7 @@ class Scientist {
     required this.areaRating,
     required this.powerRating,
     required this.kidTip,
+    required this.launchQuote,
     required this.imagePath,
     required this.primaryColor,
     required this.accentColor,
@@ -74,6 +76,7 @@ class Scientist {
       areaRating: 5,
       powerRating: 3,
       kidTip: 'Dispara 3 tiros de uma vez só! Ótima para cobrir a tela e acertar sem precisar mirar com precisão.',
+      launchQuote: 'Sistemas de propulsão e pesquisa ativos! O espaço pertence a quem ousa explorar. Vamos catalogar essas amostras!',
       imagePath: 'assets/images/scientists/mae_jemison.png',
       primaryColor: const Color(0xFF00E676), // Emerald Green
       accentColor: const Color(0xFF00E5FF), // Light Cyan
@@ -97,6 +100,7 @@ class Scientist {
       areaRating: 2,
       powerRating: 3,
       kidTip: 'Disparos contínuos e ultrarrápidos! Ideal para quem tem dedo ágil e adora atirar sem parar.',
+      launchQuote: 'Sistemas de navegação Apollo online! Cada linha de código foi testada para essa missão. Mantenha o foco, piloto!',
       imagePath: 'assets/images/scientists/margaret_hamilton.png',
       primaryColor: const Color(0xFF2979FF), // Electric Blue
       accentColor: const Color(0xFFFFFFFF), // Pure White
@@ -120,6 +124,7 @@ class Scientist {
       areaRating: 2,
       powerRating: 4,
       kidTip: 'Tiro rápido e de longo alcance! Destrói meteoros distantes antes que cheguem perto da nave.',
+      launchQuote: 'Sensores ópticos e lentes calibradas! Há segredos fantásticos nos esperando entre esses asteroides.',
       imagePath: 'assets/images/scientists/nancy_roman.png',
       primaryColor: const Color(0xFFE040FB), // Cosmic Magenta/Purple
       accentColor: const Color(0xFFFFD700), // Gold
@@ -143,6 +148,7 @@ class Scientist {
       areaRating: 5,
       powerRating: 5,
       kidTip: 'Lança bombas pesadas que causam uma super explosão, destruindo vários meteoros juntos!',
+      launchQuote: 'Comandante pronta na ponte! Já estive mais de 600 dias em órbita: calma nas manobras e cumpra a missão!',
       imagePath: 'assets/images/scientists/peggy_whitson.png',
       primaryColor: const Color(0xFFFF6D00), // Solar Orange
       accentColor: const Color(0xFFECEFF1), // Silver

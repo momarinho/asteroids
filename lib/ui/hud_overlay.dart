@@ -857,6 +857,133 @@ class _HudOverlayState extends State<HudOverlay> with SingleTickerProviderStateM
                 ),
               ),
             ),
+
+          // Retro Sci-Fi / RPG Transmission Dialogue Box at Launch
+          if (game.showLaunchTransmission)
+            Positioned(
+              bottom: game.isMobile ? 120 : 35,
+              left: 20,
+              right: 20,
+              child: Center(
+                child: GestureDetector(
+                  onTap: () => game.dismissLaunchTransmission(),
+                  child: Container(
+                    constraints: const BoxConstraints(maxWidth: 720),
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+                    decoration: BoxDecoration(
+                      color: const Color(0xF00A0F1D), // Dark cosmic glass
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: scientist.primaryColor,
+                        width: 2.0,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: scientist.primaryColor.withOpacity(0.4),
+                          blurRadius: 18,
+                          spreadRadius: 2,
+                        ),
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.8),
+                          blurRadius: 12,
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        // Scientist Avatar / Radio Portrait
+                        Container(
+                          width: 66,
+                          height: 66,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(color: scientist.accentColor, width: 2.0),
+                            boxShadow: [
+                              BoxShadow(
+                                color: scientist.primaryColor.withOpacity(0.5),
+                                blurRadius: 10,
+                              ),
+                            ],
+                            image: DecorationImage(
+                              image: AssetImage(scientist.imagePath),
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 14),
+
+                        // Dialogue text & metadata
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              // Comms Frequency & Name Header
+                              Row(
+                                children: [
+                                  Container(
+                                    width: 8,
+                                    height: 8,
+                                    decoration: const BoxDecoration(
+                                      color: Color(0xFF00E676),
+                                      shape: BoxShape.circle,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    'CANAL ABERTO • ${scientist.name.toUpperCase()} (${scientist.role.toUpperCase()})',
+                                    style: TextStyle(
+                                      fontFamily: 'Courier',
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.bold,
+                                      color: scientist.accentColor,
+                                      letterSpacing: 1.1,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 5),
+
+                              // Scientist Inspiring Launch Phrase
+                              Text(
+                                '"${scientist.launchQuote}"',
+                                style: const TextStyle(
+                                  fontFamily: 'Courier',
+                                  fontSize: 13.0,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                  height: 1.3,
+                                  letterSpacing: 0.8,
+                                ),
+                              ),
+                              const SizedBox(height: 5),
+
+                              // Dismiss Prompt
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  Text(
+                                    'Pressione qualquer botão para continuar ▶',
+                                    style: TextStyle(
+                                      fontFamily: 'Courier',
+                                      fontSize: 9.5,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white.withOpacity(0.65),
+                                      letterSpacing: 1.0,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
         ],
       ),
     );

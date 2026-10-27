@@ -182,24 +182,55 @@ class _ScienceIntroOverlayState extends State<ScienceIntroOverlay> {
 
                       const SizedBox(height: 20),
 
-                      // Story Narrative
+                      // Story Narrative / Mission Briefing
                       Container(
-                        padding: const EdgeInsets.all(16.0),
+                        padding: const EdgeInsets.symmetric(horizontal: 18.0, vertical: 14.0),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.04),
+                          color: Colors.cyan.withOpacity(0.06),
                           borderRadius: BorderRadius.circular(14),
-                          border: Border.all(color: Colors.white12),
+                          border: Border.all(color: Colors.cyanAccent.withOpacity(0.35)),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.cyan.withOpacity(0.08),
+                              blurRadius: 10,
+                            ),
+                          ],
                         ),
-                        child: const Text(
-                          'Pilote naves lendárias inspiradas nas maiores cientistas e astronautas da história!\n'
-                          'Sobreviva à tempestade de asteroides, colete fragmentos de pesquisa e conquiste '
-                          'seu lugar no topo do ranking dos melhores pilotos da feira!',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 15,
-                            height: 1.5,
-                            color: Colors.white70,
-                          ),
+                        child: Column(
+                          children: [
+                            FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Icon(Icons.satellite_alt, color: Colors.cyanAccent, size: 16),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    'COMUNICADO DA BASE ESPACIAL • OPERAÇÃO PIONEIRAS 2026',
+                                    style: TextStyle(
+                                      fontFamily: 'Courier',
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.bold,
+                                      letterSpacing: 1.2,
+                                      color: Colors.cyanAccent.shade100,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            const Text(
+                              'A Terra detectou um cinturão de asteroides repleto de minerais raros e do lendário Cometa Halley!\n'
+                              'Assuma o comando de naves inspiradas em 4 cientistas pioneiras, colete dados vitais para a ciência '
+                              'e sobreviva aos 3 minutos de tempestade estelar!',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 14.5,
+                                height: 1.45,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
 

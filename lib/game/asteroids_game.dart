@@ -78,6 +78,14 @@ class AsteroidsGame extends FlameGame with HasCollisionDetection, KeyboardEvents
   double cometAlertTimer = 0.0;
   String? cometAlertMessage;
 
+  // Feature 5: Launch Transmission Dialogue Box
+  bool showLaunchTransmission = false;
+  double launchTransmissionTimer = 0.0;
+
+  void dismissLaunchTransmission() {
+    showLaunchTransmission = false;
+  }
+
   // Settings selections
   int selectedMovementPresetIndex = 1; // 1 = Balanced
   int selectedWeaponIndex = 0; // 0 = Blaster
@@ -162,6 +170,10 @@ class AsteroidsGame extends FlameGame with HasCollisionDetection, KeyboardEvents
 
   bool _handleGlobalKeyEvent(KeyEvent event) {
     if (event is! KeyDownEvent) return false;
+
+    if (state == GameState.playing && showLaunchTransmission) {
+      showLaunchTransmission = false;
+    }
 
     final key = event.logicalKey;
     final isPauseKey = key == LogicalKeyboardKey.escape || key == LogicalKeyboardKey.keyP;
@@ -298,6 +310,10 @@ class AsteroidsGame extends FlameGame with HasCollisionDetection, KeyboardEvents
       return KeyEventResult.ignored;
     }
 
+    if (showLaunchTransmission && keysPressed.isNotEmpty) {
+      showLaunchTransmission = false;
+    }
+
     this.keysPressed.clear();
     this.keysPressed.addAll(keysPressed);
     return KeyEventResult.handled;
@@ -315,6 +331,8 @@ class AsteroidsGame extends FlameGame with HasCollisionDetection, KeyboardEvents
     cometSpawned = false;
     cometAlertTimer = 0.0;
     cometAlertMessage = null;
+    showLaunchTransmission = true;
+    launchTransmissionTimer = 5.0;
     fetchTopLeaderRecord();
 
     // Remove any running level manager or asteroid field
@@ -404,6 +422,12 @@ class AsteroidsGame extends FlameGame with HasCollisionDetection, KeyboardEvents
     // Science Fair 180-second (3-minute) countdown timer & Celestial Events
     if (state == GameState.playing) {
       timeRemaining -= dt;
+      if (showLaunchTransmission) {
+        launchTransmissionTimer -= dt;
+        if (launchTransmissionTimer <= 0) {
+          showLaunchTransmission = false;
+        }
+      }
       if (cometAlertTimer > 0) {
         cometAlertTimer = math.max(0.0, cometAlertTimer - dt);
       }
@@ -829,6 +853,8 @@ class AsteroidsGame extends FlameGame with HasCollisionDetection, KeyboardEvents
     cometSpawned = false;
     cometAlertTimer = 0.0;
     cometAlertMessage = null;
+    showLaunchTransmission = true;
+    launchTransmissionTimer = 5.0;
     fetchTopLeaderRecord();
 
     if (levelManager != null) {

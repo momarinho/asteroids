@@ -190,81 +190,125 @@ class _GameOverOverlayState extends State<GameOverOverlay> {
                         borderRadius: BorderRadius.circular(14),
                         border: Border.all(color: Colors.white12),
                       ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          Column(
-                            children: [
-                              const Text(
-                                'PONTUAÇÃO',
-                                style: TextStyle(
-                                  fontFamily: 'Courier',
-                                  fontSize: 12,
-                                  color: Colors.white54,
-                                  letterSpacing: 1.1,
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            Column(
+                              children: [
+                                const Text(
+                                  'DADOS TRANSMITIDOS',
+                                  style: TextStyle(
+                                    fontFamily: 'Courier',
+                                    fontSize: 11,
+                                    color: Colors.white54,
+                                    letterSpacing: 1.1,
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                '$score',
-                                style: const TextStyle(
-                                  fontFamily: 'Courier',
-                                  fontSize: 28,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
+                                const SizedBox(height: 2),
+                                Text(
+                                  '$score pts',
+                                  style: const TextStyle(
+                                    fontFamily: 'Courier',
+                                    fontSize: 26,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
                                 ),
-                              ),
-                            ],
-                          ),
-                          Container(width: 1, height: 36, color: Colors.white24),
-                          Column(
-                            children: [
-                              const Text(
-                                'AMOSTRAS',
-                                style: TextStyle(
-                                  fontFamily: 'Courier',
-                                  fontSize: 12,
-                                  color: Colors.white54,
-                                  letterSpacing: 1.1,
+                              ],
+                            ),
+                            const SizedBox(width: 24),
+                            Container(width: 1, height: 36, color: Colors.white24),
+                            const SizedBox(width: 24),
+                            Column(
+                              children: [
+                                const Text(
+                                  'AMOSTRAS',
+                                  style: TextStyle(
+                                    fontFamily: 'Courier',
+                                    fontSize: 12,
+                                    color: Colors.white54,
+                                    letterSpacing: 1.1,
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                '${game.samplesCollected}',
-                                style: const TextStyle(
-                                  fontFamily: 'Courier',
-                                  fontSize: 28,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.cyanAccent,
+                                const SizedBox(height: 2),
+                                Text(
+                                  '${game.samplesCollected}',
+                                  style: const TextStyle(
+                                    fontFamily: 'Courier',
+                                    fontSize: 28,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.cyanAccent,
+                                  ),
                                 ),
-                              ),
-                            ],
-                          ),
-                          Container(width: 1, height: 36, color: Colors.white24),
-                          Column(
-                            children: [
-                              const Text(
-                                'CIENTISTA',
-                                style: TextStyle(
-                                  fontFamily: 'Courier',
-                                  fontSize: 12,
-                                  color: Colors.white54,
-                                  letterSpacing: 1.1,
+                              ],
+                            ),
+                            const SizedBox(width: 24),
+                            Container(width: 1, height: 36, color: Colors.white24),
+                            const SizedBox(width: 24),
+                            Column(
+                              children: [
+                                const Text(
+                                  'CIENTISTA',
+                                  style: TextStyle(
+                                    fontFamily: 'Courier',
+                                    fontSize: 12,
+                                    color: Colors.white54,
+                                    letterSpacing: 1.1,
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                scientist.name,
-                                style: TextStyle(
-                                  fontFamily: 'Courier',
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.bold,
-                                  color: scientist.primaryColor,
+                                const SizedBox(height: 4),
+                                Text(
+                                  scientist.name,
+                                  style: TextStyle(
+                                    fontFamily: 'Courier',
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.bold,
+                                    color: scientist.primaryColor,
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                    // Patent / Scientific Rank Badge
+                    Container(
+                      margin: const EdgeInsets.only(top: 10),
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withOpacity(0.65),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: Colors.cyanAccent.withOpacity(0.5), width: 1.2),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.cyanAccent.withOpacity(0.15),
+                            blurRadius: 10,
                           ),
                         ],
+                      ),
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.military_tech, color: Colors.cyanAccent, size: 18),
+                            const SizedBox(width: 8),
+                            Text(
+                              'PATENTE ATRIBUÍDA: ${_getScientificRank(score, survived)}',
+                              style: const TextStyle(
+                                fontFamily: 'Courier',
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.cyanAccent,
+                                letterSpacing: 1.1,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
 
@@ -536,4 +580,14 @@ class _GameOverOverlayState extends State<GameOverOverlay> {
     ),
   );
 }
+
+  String _getScientificRank(int score, bool survived) {
+    if (survived || score >= 5000) {
+      return 'COMANDANTE DA FROTA CÓSMICA 👑';
+    } else if (score >= 2500) {
+      return 'PESQUISADOR(A) SENIOR DO ESPAÇO 🪐';
+    } else {
+      return 'CADETE ESPACIAL DA FEIRA 🚀';
+    }
+  }
 }
