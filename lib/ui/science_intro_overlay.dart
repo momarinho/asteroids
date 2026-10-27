@@ -209,7 +209,7 @@ class _ScienceIntroOverlayState extends State<ScienceIntroOverlay> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          _buildBadge(Icons.timer, 'TEMPO', '2:30 MIN', Colors.amberAccent),
+                          _buildBadge(Icons.timer, 'TEMPO', '3:00 MIN', Colors.amberAccent),
                           _buildBadge(Icons.favorite, 'VIDAS', '3 CHANCES', Colors.redAccent),
                           _buildBadge(Icons.emoji_events, 'DESAFIO', 'RANKING AO VIVO', Colors.cyanAccent),
                         ],

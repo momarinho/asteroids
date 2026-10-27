@@ -105,32 +105,80 @@ class _GameOverOverlayState extends State<GameOverOverlay> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     // Status Header
-                    Text(
-                      survived ? 'MISSÃO CONCLUÍDA! 🚀' : 'MISSÃO FINALIZADA',
-                      style: TextStyle(
-                        fontFamily: 'Courier',
-                        fontSize: 32,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 2.5,
-                        color: survived ? Colors.greenAccent : Colors.orangeAccent,
-                        shadows: [
-                          Shadow(
-                            color: survived ? Colors.green : Colors.orange,
-                            blurRadius: 12,
-                          ),
-                        ],
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        survived ? '🎉 MISSÃO CONCLUÍDA! 🚀' : 'MISSÃO FINALIZADA',
+                        style: TextStyle(
+                          fontFamily: 'Courier',
+                          fontSize: 32,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 2.5,
+                          color: survived ? Colors.greenAccent : Colors.orangeAccent,
+                          shadows: [
+                            Shadow(
+                              color: survived ? Colors.green : Colors.orange,
+                              blurRadius: 12,
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       survived
-                          ? 'Parabéns! Você sobreviveu aos 2:30 min no espaço!'
+                          ? 'Parabéns! Você sobreviveu aos 3 minutos completos no espaço!'
                           : 'Sua nave foi abatida pelos asteroides.',
-                      style: const TextStyle(
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
                         fontSize: 15,
-                        color: Colors.white70,
+                        fontWeight: survived ? FontWeight.bold : FontWeight.normal,
+                        color: survived ? Colors.greenAccent.shade100 : Colors.white70,
                       ),
                     ),
+
+                    if (survived) ...[
+                      const SizedBox(height: 10),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              const Color(0xFFFFD700).withOpacity(0.25),
+                              Colors.greenAccent.withOpacity(0.25),
+                            ],
+                          ),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(color: const Color(0xFFFFD700), width: 1.5),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.amber.withOpacity(0.3),
+                              blurRadius: 12,
+                            ),
+                          ],
+                        ),
+                        child: const FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.workspace_premium, color: Color(0xFFFFD700), size: 20),
+                              SizedBox(width: 8),
+                              Text(
+                                '🏅 MEDALHA DE HONRA: SOBREVIVENTE ESPACIAL (+1000 PTS BÔNUS!)',
+                                style: TextStyle(
+                                  fontFamily: 'Courier',
+                                  fontSize: 12.5,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFFFFD700),
+                                  letterSpacing: 1.0,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
 
                     const SizedBox(height: 16),
 

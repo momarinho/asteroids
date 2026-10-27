@@ -246,16 +246,16 @@ class _HudOverlayState extends State<HudOverlay> with SingleTickerProviderStateM
                         color: Colors.black.withOpacity(0.75),
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(
-                          color: timeRemaining <= 25
+                          color: timeRemaining <= 30
                               ? Colors.redAccent
-                              : (timeRemaining <= 45 ? Colors.amberAccent : scientist.primaryColor.withOpacity(0.7)),
+                              : (timeRemaining <= 60 ? Colors.amberAccent : scientist.primaryColor.withOpacity(0.7)),
                           width: 1.5,
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: (timeRemaining <= 25
+                            color: (timeRemaining <= 30
                                     ? Colors.red
-                                    : (timeRemaining <= 45 ? Colors.amber : scientist.primaryColor))
+                                    : (timeRemaining <= 60 ? Colors.amber : scientist.primaryColor))
                                 .withOpacity(0.25),
                             blurRadius: 12,
                           ),
@@ -266,9 +266,9 @@ class _HudOverlayState extends State<HudOverlay> with SingleTickerProviderStateM
                         children: [
                           Icon(
                             Icons.timer_outlined,
-                            color: timeRemaining <= 25
+                            color: timeRemaining <= 30
                                 ? Colors.redAccent
-                                : (timeRemaining <= 45 ? Colors.amberAccent : scientist.primaryColor),
+                                : (timeRemaining <= 60 ? Colors.amberAccent : scientist.primaryColor),
                             size: 20,
                           ),
                           const SizedBox(width: 8),
@@ -279,9 +279,9 @@ class _HudOverlayState extends State<HudOverlay> with SingleTickerProviderStateM
                               fontSize: 22,
                               fontWeight: FontWeight.bold,
                               letterSpacing: 2,
-                              color: timeRemaining <= 25
+                              color: timeRemaining <= 30
                                   ? Colors.redAccent
-                                  : (timeRemaining <= 45 ? Colors.amberAccent : Colors.white),
+                                  : (timeRemaining <= 60 ? Colors.amberAccent : Colors.white),
                             ),
                           ),
                         ],
@@ -322,7 +322,7 @@ class _HudOverlayState extends State<HudOverlay> with SingleTickerProviderStateM
                         ),
                       ),
                     ],
-                    if (timeRemaining <= 25) ...[
+                    if (timeRemaining <= 30) ...[
                       const SizedBox(height: 4),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
@@ -349,7 +349,7 @@ class _HudOverlayState extends State<HudOverlay> with SingleTickerProviderStateM
                           ],
                         ),
                       ),
-                    ] else if (timeRemaining <= 45) ...[
+                    ] else if (timeRemaining <= 60) ...[
                       const SizedBox(height: 4),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),

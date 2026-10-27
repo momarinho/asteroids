@@ -56,7 +56,7 @@ class AsteroidsGame extends FlameGame with HasCollisionDetection, KeyboardEvents
   
   // Science Fair mode properties
   Scientist selectedScientist = Scientist.defaultScientist;
-  static const double fairRoundDuration = 150.0; // 2 minutes and 30 seconds
+  static const double fairRoundDuration = 180.0; // 3 minutes
   double timeRemaining = fairRoundDuration;
   bool missionSurvived = false;
   String? participantName;
@@ -401,23 +401,23 @@ class AsteroidsGame extends FlameGame with HasCollisionDetection, KeyboardEvents
       shakeTimer = math.max(0.0, shakeTimer - dt);
     }
 
-    // Science Fair 150-second countdown timer & Celestial Events
+    // Science Fair 180-second (3-minute) countdown timer & Celestial Events
     if (state == GameState.playing) {
       timeRemaining -= dt;
       if (cometAlertTimer > 0) {
         cometAlertTimer = math.max(0.0, cometAlertTimer - dt);
       }
 
-      // Mid-game surprise event: Comet Halley warning at 95s (55s played)
-      if (!cometWarningTriggered && timeRemaining <= 95.0 && timeRemaining > 91.0) {
+      // Mid-game surprise event: Comet Halley warning at 105s remaining (75s played)
+      if (!cometWarningTriggered && timeRemaining <= 105.0 && timeRemaining > 101.0) {
         cometWarningTriggered = true;
         cometAlertTimer = 4.0;
         cometAlertMessage = '☄️ ALERTA CIENTÍFICO: Cometa Halley se aproximando!';
         playSfx('low_health.wav');
       }
 
-      // Spawn Comet at 91s remaining (59s played)
-      if (cometWarningTriggered && !cometSpawned && timeRemaining <= 91.0) {
+      // Spawn Comet at 101s remaining (79s played)
+      if (cometWarningTriggered && !cometSpawned && timeRemaining <= 101.0) {
         cometSpawned = true;
         spawnComet();
       }
@@ -849,7 +849,10 @@ class AsteroidsGame extends FlameGame with HasCollisionDetection, KeyboardEvents
 
     missionSurvived = survived;
     if (survived) {
-      score += 500; // Survival bonus
+      score += 1000; // Full 3-minute survival bonus
+      if (!topRecordBeaten && topLeaderScore > 0 && score > topLeaderScore) {
+        topRecordBeaten = true;
+      }
       playSfx('powerup.wav');
     } else {
       playSfx('player_hit.wav');

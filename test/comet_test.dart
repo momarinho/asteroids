@@ -24,8 +24,10 @@ void main() {
       expect(comet.wrapsLeft, equals(4));
     });
 
-    test('AsteroidsGame has comet tracking fields configured', () {
+    test('AsteroidsGame has 3-minute (180s) round duration and comet tracking fields configured', () {
       final game = AsteroidsGame();
+      expect(AsteroidsGame.fairRoundDuration, equals(180.0));
+      expect(game.timeRemaining, equals(180.0));
       expect(game.cometWarningTriggered, isFalse);
       expect(game.cometSpawned, isFalse);
       expect(game.cometAlertTimer, equals(0.0));

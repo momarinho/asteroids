@@ -25,24 +25,24 @@ class AsteroidField extends Component with HasGameReference<AsteroidsGame> {
     difficultyTimer += dt;
 
     double spawnInterval;
-    if (difficultyTimer < 45.0) {
-      // Fase 1 (0-45s): Introdução suave e tranquila (onboarding para crianças)
-      final p = difficultyTimer / 45.0;
+    if (difficultyTimer < 50.0) {
+      // Fase 1 (0-50s): Introdução suave e tranquila (onboarding para crianças)
+      final p = difficultyTimer / 50.0;
       spawnInterval = 3.2 - (p * 1.0); // 3.2s -> 2.2s
       speedMultiplier = 0.55 + (p * 0.30); // 0.55x -> 0.85x
-    } else if (difficultyTimer < 90.0) {
-      // Fase 2 (45-90s): Ritmo Arcade progressivo equilibrado
-      final p = (difficultyTimer - 45.0) / 45.0;
+    } else if (difficultyTimer < 105.0) {
+      // Fase 2 (50-105s): Ritmo Arcade progressivo equilibrado
+      final p = (difficultyTimer - 50.0) / 55.0;
       spawnInterval = 2.2 - (p * 0.90); // 2.2s -> 1.30s
       speedMultiplier = 0.85 + (p * 0.40); // 0.85x -> 1.25x
-    } else if (difficultyTimer < 125.0) {
-      // Fase 3 (90-125s): Pressão Crescente
-      final p = (difficultyTimer - 90.0) / 35.0;
+    } else if (difficultyTimer < 150.0) {
+      // Fase 3 (105-150s): Pressão Crescente
+      final p = (difficultyTimer - 105.0) / 45.0;
       spawnInterval = 1.30 - (p * 0.60); // 1.30s -> 0.70s
       speedMultiplier = 1.25 + (p * 0.50); // 1.25x -> 1.75x
     } else {
-      // Fase 4 (125-150s - Últimos 25s): HIPER TEMPESTADE FINAL (Muito difícil)
-      final p = ((difficultyTimer - 125.0) / 25.0).clamp(0.0, 1.0);
+      // Fase 4 (150-180s - Últimos 30s): HIPER TEMPESTADE FINAL (Muito difícil)
+      final p = ((difficultyTimer - 150.0) / 30.0).clamp(0.0, 1.0);
       spawnInterval = 0.70 - (p * 0.44); // 0.70s -> 0.26s!!
       speedMultiplier = 1.75 + (p * 0.90); // 1.75x -> 2.65x!!
     }
@@ -52,7 +52,7 @@ class AsteroidField extends Component with HasGameReference<AsteroidsGame> {
       _spawnAsteroid();
 
       // Na tempestade final, alta frequência de spawns duplos!
-      if (difficultyTimer >= 125.0 && math.Random().nextDouble() < 0.65) {
+      if (difficultyTimer >= 150.0 && math.Random().nextDouble() < 0.65) {
         _spawnAsteroid();
       }
     }
@@ -101,7 +101,7 @@ class AsteroidField extends Component with HasGameReference<AsteroidsGame> {
 
     // Kind/Size: In phase 1, spawn large asteroids (kind 2 or 3) for easy target practice
     final int kind;
-    if (difficultyTimer < 45.0) {
+    if (difficultyTimer < 50.0) {
       kind = random.nextBool() ? 2 : 3;
     } else {
       kind = random.nextInt(GameConstants.asteroidKinds) + 1;
