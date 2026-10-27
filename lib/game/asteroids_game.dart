@@ -637,25 +637,34 @@ class AsteroidsGame extends FlameGame with HasCollisionDetection, KeyboardEvents
     if (state != GameState.playing) return;
     final random = math.Random();
 
-    // Pick a diagonal flyby trajectory across the screen
-    final fromLeft = random.nextBool();
-    final fromTop = random.nextBool();
+    // Pick an edge to spawn from: 0 = Left, 1 = Right, 2 = Top, 3 = Bottom
+    final edge = random.nextInt(4);
+    Vector2 spawnPos;
+    switch (edge) {
+      case 0: // Left
+        spawnPos = Vector2(-35.0, 100.0 + random.nextDouble() * (GameConstants.screenHeight - 200.0));
+        break;
+      case 1: // Right
+        spawnPos = Vector2(GameConstants.screenWidth + 35.0, 100.0 + random.nextDouble() * (GameConstants.screenHeight - 200.0));
+        break;
+      case 2: // Top
+        spawnPos = Vector2(100.0 + random.nextDouble() * (GameConstants.screenWidth - 200.0), -35.0);
+        break;
+      default: // Bottom
+        spawnPos = Vector2(100.0 + random.nextDouble() * (GameConstants.screenWidth - 200.0), GameConstants.screenHeight + 35.0);
+        break;
+    }
 
-    final startX = fromLeft ? -20.0 : GameConstants.screenWidth + 20.0;
-    final startY = fromTop
-        ? random.nextDouble() * 220.0
-        : GameConstants.screenHeight - random.nextDouble() * 220.0;
+    // Direct trajectory across the central play area (near player zone)
+    final targetX = (GameConstants.screenWidth / 2) + (random.nextDouble() - 0.5) * 400.0;
+    final targetY = (GameConstants.screenHeight / 2) + (random.nextDouble() - 0.5) * 260.0;
+    final targetPoint = Vector2(targetX, targetY);
 
-    final dirX = fromLeft ? 1.0 : -1.0;
-    final dirY = fromTop
-        ? (0.35 + random.nextDouble() * 0.35)
-        : -(0.35 + random.nextDouble() * 0.35);
-
-    final dir = Vector2(dirX, dirY).normalized();
-    final velocity = dir * 175.0; // Fast and sweeping
+    final dir = (targetPoint - spawnPos).normalized();
+    final velocity = dir * 105.0; // Calibrated speed (105 px/s): approachable and pursuable
 
     final comet = CometComponent(
-      position: Vector2(startX, startY),
+      position: spawnPos,
       velocity: velocity,
     );
 

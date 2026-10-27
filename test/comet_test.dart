@@ -10,18 +10,18 @@ void main() {
       expect(DropType.values.contains(DropType.cometDust), isTrue);
     });
 
-    test('CometComponent has small hitbox and sturdy HP', () {
+    test('CometComponent has calibrated hitbox and sturdy HP', () {
       final comet = CometComponent(
         position: Vector2(100, 100),
         velocity: Vector2(150, 80),
       );
 
-      // Hitbox is small (radius 16.0)
-      expect(comet.radius, equals(16.0));
+      // Hitbox radius 25.0 (medium asteroid size, balanced for fair interception)
+      expect(comet.radius, equals(25.0));
       // Sturdy HP (140.0) higher than a large asteroid (90.0)
       expect(comet.maxHp, equals(140.0));
       expect(comet.hp, equals(140.0));
-      expect(comet.wrapsLeft, equals(3));
+      expect(comet.wrapsLeft, equals(4));
     });
 
     test('AsteroidsGame has comet tracking fields configured', () {

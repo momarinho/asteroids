@@ -8,7 +8,7 @@ import 'drop.dart';
 import 'particle.dart';
 
 class CometComponent extends AsteroidComponent {
-  int wrapsLeft = 3; // Allows up to 3 screen crossings before escaping to deep space
+  int wrapsLeft = 4; // Allows up to 4 screen crossings so players have ample time to engage
   double tailParticleTimer = 0.0;
   double auraTimer = 0.0;
   bool isEscaping = false;
@@ -16,8 +16,8 @@ class CometComponent extends AsteroidComponent {
   CometComponent({
     required super.position,
     required super.velocity,
-  }) : super(radius: 16.0) { // Small hitbox as requested
-    maxHp = 140.0; // Sturdy HP for challenge
+  }) : super(radius: 25.0) { // Increased to 25px (medium size) for a fair and reachable hitbox
+    maxHp = 140.0; // Sturdy HP
     hp = maxHp;
   }
 
@@ -246,9 +246,9 @@ class CometComponent extends AsteroidComponent {
     canvas.drawPath(path, borderPaint);
 
     // 3. Mini Sci-Fi HP Bar floating directly above the comet
-    final barWidth = 32.0;
-    final barHeight = 4.0;
-    final barY = -radius - 12.0;
+    final barWidth = 42.0;
+    final barHeight = 4.5;
+    final barY = -radius - 14.0;
 
     // HP background
     final bgPaint = Paint()..color = Colors.black.withOpacity(0.8);
