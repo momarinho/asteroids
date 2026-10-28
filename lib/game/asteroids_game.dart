@@ -224,11 +224,11 @@ class AsteroidsGame extends FlameGame with HasCollisionDetection, KeyboardEvents
         try {
           FlameAudio.bgm.stop();
         } catch (_) {}
-        // Cleanup game entities
         _removeAllAsteroidsAndProjectiles();
         break;
       case GameState.settings:
         _safeAddOverlay('settings');
+        _removeAllAsteroidsAndProjectiles();
         break;
       case GameState.playing:
         _safeAddOverlay('hud');
@@ -243,12 +243,14 @@ class AsteroidsGame extends FlameGame with HasCollisionDetection, KeyboardEvents
         break;
       case GameState.stageClear:
         _safeAddOverlay('stageClear');
+        _removeAllAsteroidsAndProjectiles();
         break;
       case GameState.gameOver:
         _safeAddOverlay('gameOver');
         try {
           FlameAudio.bgm.stop();
         } catch (_) {}
+        _removeAllAsteroidsAndProjectiles();
         break;
       case GameState.leaderboard:
         _safeAddOverlay('leaderboard');
@@ -257,6 +259,7 @@ class AsteroidsGame extends FlameGame with HasCollisionDetection, KeyboardEvents
             FlameAudio.bgm.play('music.wav', volume: 0.6);
           }
         } catch (_) {}
+        _removeAllAsteroidsAndProjectiles();
         break;
     }
   }
@@ -400,12 +403,25 @@ class AsteroidsGame extends FlameGame with HasCollisionDetection, KeyboardEvents
   }
 
   void _removeAllAsteroidsAndProjectiles() {
+    // 1. Remove qualquer gerador de meteoros (AsteroidField / LevelManager)
+    final fieldsToRemove = world.children.whereType<AsteroidField>();
+    for (final f in List<AsteroidField>.from(fieldsToRemove)) {
+      f.removeFromParent();
+    }
+    asteroidField = null;
+
+    if (levelManager != null) {
+      levelManager = null;
+    }
+
+    // 2. Remove todas as entidades dinâmicas de jogo
     final childrenToRemove = world.children.where((child) =>
         child is AsteroidComponent ||
         child is BulletComponent ||
         child is BombComponent ||
         child is BombExplosionComponent ||
         child is ParticleComponent ||
+        child is FloatingTextComponent ||
         child is DropComponent);
     for (final child in List.from(childrenToRemove)) {
       child.removeFromParent();

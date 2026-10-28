@@ -17,7 +17,14 @@ class AsteroidField extends Component with HasGameReference<AsteroidsGame> {
   void update(double dt) {
     super.update(dt);
     
-    if (mode == 'campaign') {
+    // NUNCA spawnar meteoros fora do estado de partida ativa
+    if (game.state != GameState.playing || mode == 'campaign') {
+      return;
+    }
+
+    // Limite máximo de meteoros ativos simultaneamente para manter performance a 60 FPS
+    final activeAsteroids = game.world.children.whereType<AsteroidComponent>().length;
+    if (activeAsteroids >= 24) {
       return;
     }
 
@@ -59,6 +66,9 @@ class AsteroidField extends Component with HasGameReference<AsteroidsGame> {
   }
 
   void _spawnAsteroid() {
+    if (game.state != GameState.playing) return;
+    if (game.world.children.whereType<AsteroidComponent>().length >= 24) return;
+
     final random = math.Random();
     final screenWidth = GameConstants.screenWidth;
     final screenHeight = GameConstants.screenHeight;
