@@ -46,7 +46,7 @@ class SettingsOverlay extends StatelessWidget {
                       Text(
                         'SETTINGS',
                         style: TextStyle(
-                          fontFamily: 'Courier',
+                          fontFamily: 'Rajdhani',
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
                           letterSpacing: 3,

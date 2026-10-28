@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
+import 'package:asteroids/game/glow.dart';
 
 class ParticleComponent extends PositionComponent {
   final Vector2 velocity;
@@ -35,12 +36,8 @@ class ParticleComponent extends PositionComponent {
   void render(Canvas canvas) {
     final ratio = (lifetime / initialLifetime).clamp(0.0, 1.0);
     final currentRadius = math.max(1.0, initialSize * ratio);
-    final alpha = (ratio * 255).clamp(0.0, 255.0).toInt();
 
-    final paint = Paint()
-      ..color = color.withAlpha(alpha)
-      ..style = PaintingStyle.fill;
-
-    canvas.drawCircle(Offset.zero, currentRadius, paint);
+    // Brilho aditivo: as faíscas "queimam" mais forte no começo e esvaem suave.
+    Glow.spark(canvas, Offset.zero, currentRadius, color, math.sqrt(ratio));
   }
 }

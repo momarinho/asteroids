@@ -3,6 +3,7 @@ import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
 import 'package:asteroids/constants.dart';
 import 'package:asteroids/game/asteroids_game.dart';
+import 'package:asteroids/game/glow.dart';
 import 'asteroid.dart';
 import 'drop.dart';
 import 'particle.dart';
@@ -210,12 +211,17 @@ class CometComponent extends AsteroidComponent {
     final isFlashing = hitFlashTimer > 0;
     final pulse = (math.sin(auraTimer) + 1.0) / 2.0;
 
-    // 1. Outer glowing cosmic aura
-    final haloPaint = Paint()
-      ..color = (isFlashing ? Colors.redAccent : const Color(0xFF00E5FF)).withOpacity(0.25 + pulse * 0.25)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 3.5 + pulse * 2.0;
-    canvas.drawCircle(Offset.zero, radius + 3.0 + pulse * 2.5, haloPaint);
+    // 1. Outer glowing cosmic aura (pulsing neon ring + soft additive bloom)
+    final auraColor = isFlashing ? Colors.redAccent : const Color(0xFF00E5FF);
+    Glow.orb(canvas, Offset.zero, radius * 0.9, auraColor, intensity: 0.8 + pulse * 0.5);
+    Glow.strokeCircle(
+      canvas,
+      Offset.zero,
+      radius + 3.0 + pulse * 2.5,
+      auraColor,
+      width: 2.0 + pulse * 1.5,
+      intensity: 1.2,
+    );
 
     // 2. Faceted crystalline ice nucleus
     final path = Path();
@@ -239,11 +245,13 @@ class CometComponent extends AsteroidComponent {
     canvas.drawPath(path, nucleusPaint);
 
     // Outline border
-    final borderPaint = Paint()
-      ..color = isFlashing ? Colors.white : const Color(0xFF00E5FF)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2.2;
-    canvas.drawPath(path, borderPaint);
+    Glow.heroStrokePath(
+      canvas,
+      path,
+      isFlashing ? Colors.white : const Color(0xFF00E5FF),
+      width: 2.2,
+      intensity: 1.3,
+    );
 
     // 3. Mini Sci-Fi HP Bar floating directly above the comet
     final barWidth = 42.0;

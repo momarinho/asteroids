@@ -110,15 +110,15 @@ class _GameOverOverlayState extends State<GameOverOverlay> {
                       child: Text(
                         survived ? '🎉 MISSÃO CONCLUÍDA! 🚀' : 'MISSÃO FINALIZADA',
                         style: TextStyle(
-                          fontFamily: 'Courier',
-                          fontSize: 32,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 2.5,
+                          fontFamily: 'Orbitron',
+                          fontVariations: const [FontVariation('wght', 800)],
+                          fontSize: 26,
+                          letterSpacing: 2,
                           color: survived ? Colors.greenAccent : Colors.orangeAccent,
                           shadows: [
                             Shadow(
                               color: survived ? Colors.green : Colors.orange,
-                              blurRadius: 12,
+                              blurRadius: 16,
                             ),
                           ],
                         ),
@@ -167,7 +167,7 @@ class _GameOverOverlayState extends State<GameOverOverlay> {
                               Text(
                                 '🏅 MEDALHA DE HONRA: SOBREVIVENTE ESPACIAL (+3000 PTS BÔNUS!)',
                                 style: TextStyle(
-                                  fontFamily: 'Courier',
+                                  fontFamily: 'Rajdhani',
                                   fontSize: 12.5,
                                   fontWeight: FontWeight.bold,
                                   color: Color(0xFFFFD700),
@@ -200,7 +200,7 @@ class _GameOverOverlayState extends State<GameOverOverlay> {
                                 const Text(
                                   'DADOS TRANSMITIDOS',
                                   style: TextStyle(
-                                    fontFamily: 'Courier',
+                                    fontFamily: 'Rajdhani',
                                     fontSize: 11,
                                     color: Colors.white54,
                                     letterSpacing: 1.1,
@@ -210,10 +210,11 @@ class _GameOverOverlayState extends State<GameOverOverlay> {
                                 Text(
                                   '$score pts',
                                   style: const TextStyle(
-                                    fontFamily: 'Courier',
-                                    fontSize: 26,
-                                    fontWeight: FontWeight.bold,
+                                    fontFamily: 'Orbitron',
+                                    fontVariations: [FontVariation('wght', 800)],
+                                    fontSize: 22,
                                     color: Colors.white,
+                                    shadows: [Shadow(color: Color(0x8800E5FF), blurRadius: 10)],
                                   ),
                                 ),
                               ],
@@ -226,7 +227,7 @@ class _GameOverOverlayState extends State<GameOverOverlay> {
                                 const Text(
                                   'AMOSTRAS',
                                   style: TextStyle(
-                                    fontFamily: 'Courier',
+                                    fontFamily: 'Rajdhani',
                                     fontSize: 12,
                                     color: Colors.white54,
                                     letterSpacing: 1.1,
@@ -236,7 +237,7 @@ class _GameOverOverlayState extends State<GameOverOverlay> {
                                 Text(
                                   '${game.samplesCollected}',
                                   style: const TextStyle(
-                                    fontFamily: 'Courier',
+                                    fontFamily: 'Rajdhani',
                                     fontSize: 28,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.cyanAccent,
@@ -252,7 +253,7 @@ class _GameOverOverlayState extends State<GameOverOverlay> {
                                 const Text(
                                   'CIENTISTA',
                                   style: TextStyle(
-                                    fontFamily: 'Courier',
+                                    fontFamily: 'Rajdhani',
                                     fontSize: 12,
                                     color: Colors.white54,
                                     letterSpacing: 1.1,
@@ -262,7 +263,7 @@ class _GameOverOverlayState extends State<GameOverOverlay> {
                                 Text(
                                   scientist.name,
                                   style: TextStyle(
-                                    fontFamily: 'Courier',
+                                    fontFamily: 'Rajdhani',
                                     fontSize: 15,
                                     fontWeight: FontWeight.bold,
                                     color: scientist.primaryColor,
@@ -300,7 +301,7 @@ class _GameOverOverlayState extends State<GameOverOverlay> {
                             Text(
                               'PATENTE ATRIBUÍDA: ${_getScientificRank(score, survived)}',
                               style: const TextStyle(
-                                fontFamily: 'Courier',
+                                fontFamily: 'Rajdhani',
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.cyanAccent,
@@ -393,7 +394,7 @@ class _GameOverOverlayState extends State<GameOverOverlay> {
                                       child: Text(
                                         'LEGADO • ${scientist.name.toUpperCase()}',
                                         style: TextStyle(
-                                          fontFamily: 'Courier',
+                                          fontFamily: 'Rajdhani',
                                           fontSize: 14,
                                           fontWeight: FontWeight.bold,
                                           color: scientist.accentColor,
@@ -429,7 +430,7 @@ class _GameOverOverlayState extends State<GameOverOverlay> {
                       child: Text(
                         'DIGITE SEU NOME PARA O RANKING DA FEIRA:',
                         style: TextStyle(
-                          fontFamily: 'Courier',
+                          fontFamily: 'Rajdhani',
                           fontSize: 13,
                           fontWeight: FontWeight.bold,
                           color: Colors.white70,
@@ -446,7 +447,7 @@ class _GameOverOverlayState extends State<GameOverOverlay> {
                       maxLength: 14,
                       buildCounter: (context, {required currentLength, required isFocused, maxLength}) => null,
                       style: const TextStyle(
-                        fontFamily: 'Courier',
+                        fontFamily: 'Rajdhani',
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
@@ -455,7 +456,7 @@ class _GameOverOverlayState extends State<GameOverOverlay> {
                       decoration: InputDecoration(
                         hintText: 'SEU NOME / APELIDO',
                         hintStyle: const TextStyle(
-                          fontFamily: 'Courier',
+                          fontFamily: 'Rajdhani',
                           fontSize: 15,
                           color: Colors.white24,
                         ),
@@ -489,7 +490,7 @@ class _GameOverOverlayState extends State<GameOverOverlay> {
                             label: Text(
                               _isSaving ? 'SALVANDO...' : 'SALVAR NO RANKING [ENTER]',
                               style: const TextStyle(
-                                fontFamily: 'Courier',
+                                fontFamily: 'Rajdhani',
                                 fontSize: 15,
                                 fontWeight: FontWeight.bold,
                                 letterSpacing: 1,
@@ -529,7 +530,7 @@ class _GameOverOverlayState extends State<GameOverOverlay> {
                             child: const Text(
                               'PULAR [ESC]',
                               style: TextStyle(
-                                fontFamily: 'Courier',
+                                fontFamily: 'Rajdhani',
                                 fontSize: 14,
                                 letterSpacing: 1,
                               ),
@@ -559,7 +560,7 @@ class _GameOverOverlayState extends State<GameOverOverlay> {
                             Text(
                               '[DIGITE SEU NOME]   •   [ENTER]: SALVAR NO RANKING   •   [ESC]: PULAR',
                               style: TextStyle(
-                                fontFamily: 'Courier',
+                                fontFamily: 'Rajdhani',
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white70,

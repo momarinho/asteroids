@@ -39,7 +39,7 @@ class FloatingTextComponent extends PositionComponent {
     final textSpan = TextSpan(
       text: text,
       style: TextStyle(
-        fontFamily: 'Courier',
+        fontFamily: 'Rajdhani',
         fontSize: fontSize,
         fontWeight: FontWeight.bold,
         color: color.withAlpha(alpha),

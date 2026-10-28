@@ -66,6 +66,20 @@ flutter:
     - assets/sounds/
     - assets/images/scientists/
 
+  # Fontes empacotadas (licença OFL) para funcionar 100% offline na feira:
+  # - Orbitron (variável): títulos, placar e cronômetro
+  # - Rajdhani: textos de interface e HUD
+  fonts:
+    - family: Orbitron
+      fonts:
+        - asset: assets/fonts/Orbitron.ttf
+    - family: Rajdhani
+      fonts:
+        - asset: assets/fonts/Rajdhani-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Rajdhani-Bold.ttf
+          weight: 700
+
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
 

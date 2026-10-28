@@ -5,6 +5,7 @@ import 'package:flame/collisions.dart';
 import 'package:flutter/material.dart';
 import 'package:asteroids/constants.dart';
 import 'package:asteroids/game/asteroids_game.dart';
+import 'package:asteroids/game/glow.dart';
 import 'package:asteroids/game/weapons.dart';
 import 'package:asteroids/game/scientist.dart';
 import 'asteroid.dart';
@@ -288,11 +289,7 @@ class PlayerComponent extends PositionComponent with HasGameReference<AsteroidsG
 
     // Muzzle flash rendering
     if (muzzleFlashTimer > 0) {
-      final flashPaint = Paint()..color = Colors.yellow;
-      canvas.drawCircle(Offset(0, -radius), muzzleFlashSize, flashPaint);
-      
-      final innerFlashPaint = Paint()..color = Colors.white;
-      canvas.drawCircle(Offset(0, -radius), muzzleFlashSize * 0.5, innerFlashPaint);
+      Glow.orb(canvas, Offset(0, -radius), muzzleFlashSize * 0.7, Colors.yellowAccent, intensity: 1.2);
     }
   }
 
@@ -300,11 +297,6 @@ class PlayerComponent extends PositionComponent with HasGameReference<AsteroidsG
     final design = scientist?.shipDesign ?? ShipDesign.deltaJet;
     final primary = scientist?.primaryColor ?? Colors.white;
     final accent = scientist?.accentColor ?? Colors.cyanAccent;
-
-    final primaryPaint = Paint()
-      ..color = primary
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = GameConstants.lineWidth;
 
     final accentPaint = Paint()
       ..color = accent
@@ -319,16 +311,19 @@ class PlayerComponent extends PositionComponent with HasGameReference<AsteroidsG
     if (isThrusting) {
       final flameFlicker = (DateTime.now().millisecondsSinceEpoch % 150) / 150.0;
       final flameLength = radius * (0.6 + flameFlicker * 0.5);
-      final flamePaint = Paint()
-        ..color = accent.withOpacity(0.8)
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 2.0;
 
       final flamePath = Path()
         ..moveTo(-radius * 0.25, radius * 0.7)
         ..lineTo(0, radius * 0.7 + flameLength)
         ..lineTo(radius * 0.25, radius * 0.7);
-      canvas.drawPath(flamePath, flamePaint);
+      Glow.strokePath(canvas, flamePath, accent, width: 2.0, intensity: 1.4);
+
+      // Núcleo quente da chama, quase branco
+      final corePath = Path()
+        ..moveTo(-radius * 0.12, radius * 0.72)
+        ..lineTo(0, radius * 0.72 + flameLength * 0.55)
+        ..lineTo(radius * 0.12, radius * 0.72);
+      Glow.strokePath(canvas, corePath, Glow.mix(accent, Colors.white, 0.8), width: 1.5, intensity: 0.8);
     }
 
     switch (design) {
@@ -346,7 +341,7 @@ class PlayerComponent extends PositionComponent with HasGameReference<AsteroidsG
           ..close();
 
         canvas.drawPath(path, fillPaint);
-        canvas.drawPath(path, primaryPaint);
+        Glow.heroStrokePath(canvas, path, primary, width: GameConstants.lineWidth);
 
         // Cockpit canopy
         final cockpit = Path()
@@ -370,7 +365,7 @@ class PlayerComponent extends PositionComponent with HasGameReference<AsteroidsG
           ..close();
 
         canvas.drawPath(path, fillPaint);
-        canvas.drawPath(path, primaryPaint);
+        Glow.heroStrokePath(canvas, path, primary, width: GameConstants.lineWidth);
 
         // Outer data wings / stabilizer struts
         final wingLines = Path()
@@ -396,7 +391,7 @@ class PlayerComponent extends PositionComponent with HasGameReference<AsteroidsG
           const Radius.circular(3),
         );
         canvas.drawRRect(barrel, fillPaint);
-        canvas.drawRRect(barrel, primaryPaint);
+        Glow.heroStrokePath(canvas, Path()..addRRect(barrel), primary, width: GameConstants.lineWidth);
 
         // Optical aperture at top
         canvas.drawCircle(Offset(0, -radius * 0.8), radius * 0.26, accentPaint);
@@ -429,7 +424,7 @@ class PlayerComponent extends PositionComponent with HasGameReference<AsteroidsG
           ..close();
 
         canvas.drawPath(path, fillPaint);
-        canvas.drawPath(path, primaryPaint);
+        Glow.heroStrokePath(canvas, path, primary, width: GameConstants.lineWidth);
 
         // Central science module
         canvas.drawCircle(Offset(0, radius * 0.05), radius * 0.28, accentPaint);

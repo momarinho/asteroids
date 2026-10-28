@@ -52,7 +52,7 @@ class StageClearOverlay extends StatelessWidget {
                   Text(
                     'STAGE $level CLEAR!',
                     style: const TextStyle(
-                      fontFamily: 'Courier',
+                      fontFamily: 'Rajdhani',
                       fontSize: 36,
                       fontWeight: FontWeight.bold,
                       letterSpacing: 3,
@@ -159,7 +159,7 @@ class StageClearOverlay extends StatelessWidget {
         Text(
           value,
           style: TextStyle(
-            fontFamily: 'Courier',
+            fontFamily: 'Rajdhani',
             fontSize: 16,
             fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
             color: color,

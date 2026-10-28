@@ -2,6 +2,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:asteroids/constants.dart';
 import 'package:asteroids/game/asteroids_game.dart';
 
 class HudOverlay extends StatefulWidget {
@@ -16,15 +17,67 @@ class HudOverlay extends StatefulWidget {
 class _HudOverlayState extends State<HudOverlay> with SingleTickerProviderStateMixin {
   late final Ticker _ticker;
 
+  // Placar animado: o número exibido "corre" até a pontuação real
+  double _displayScore = 0.0;
+  int _lastScore = 0;
+  double _scorePulse = 0.0;
+  Duration _lastElapsed = Duration.zero;
+
   @override
   void initState() {
     super.initState();
-    _ticker = createTicker((_) {
+    _lastScore = widget.game.score;
+    _displayScore = widget.game.score.toDouble();
+    _ticker = createTicker((elapsed) {
+      final dt = ((elapsed - _lastElapsed).inMicroseconds / 1000000.0).clamp(0.0, 0.1);
+      _lastElapsed = elapsed;
+      _tickScore(dt);
       if (mounted) {
         setState(() {});
       }
     });
     _ticker.start();
+  }
+
+  void _tickScore(double dt) {
+    final target = widget.game.score;
+    if (target < _lastScore) {
+      // Nova partida: reinicia sem animar
+      _displayScore = target.toDouble();
+      _scorePulse = 0.0;
+    } else if (target > _lastScore) {
+      _scorePulse = 1.0;
+    }
+    _lastScore = target;
+
+    final diff = target - _displayScore;
+    if (diff.abs() < 1.0) {
+      _displayScore = target.toDouble();
+    } else {
+      _displayScore += diff * math.min(1.0, dt * 7.0);
+    }
+    _scorePulse = math.max(0.0, _scorePulse - dt * 3.5);
+  }
+
+  /// Formata com separador de milhar no padrão brasileiro (12.450).
+  String _formatScore(int value) {
+    final digits = value.toString();
+    final buffer = StringBuffer();
+    for (var i = 0; i < digits.length; i++) {
+      final remaining = digits.length - i;
+      buffer.write(digits[i]);
+      if (remaining > 1 && remaining % 3 == 1) buffer.write('.');
+    }
+    return buffer.toString();
+  }
+
+  /// Cor do cronômetro: tema da cientista → âmbar → vermelho, de forma gradual.
+  Color _timeColor(double t, Color primary) {
+    if (t >= 90) return primary;
+    if (t >= 60) return Color.lerp(Colors.amberAccent, primary, (t - 60) / 30)!;
+    if (t >= 35) return Colors.amberAccent;
+    if (t >= 25) return Color.lerp(Colors.redAccent, Colors.amberAccent, (t - 25) / 10)!;
+    return Colors.redAccent;
   }
 
   @override
@@ -40,7 +93,6 @@ class _HudOverlayState extends State<HudOverlay> with SingleTickerProviderStateM
     final scientist = game.selectedScientist;
 
     final livesLeft = game.lives;
-    final score = game.score;
     final timeRemaining = game.timeRemaining;
 
     final isInvulnerable = player.isInvulnerable();
@@ -91,15 +143,45 @@ class _HudOverlayState extends State<HudOverlay> with SingleTickerProviderStateM
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'PONTOS: $score',
-                    style: const TextStyle(
-                      fontFamily: 'Courier',
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                      shadows: [Shadow(color: Colors.cyan, blurRadius: 4)],
-                    ),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 4),
+                        child: Text(
+                          'PONTOS',
+                          style: TextStyle(
+                            fontFamily: 'Rajdhani',
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 2,
+                            color: Colors.white.withOpacity(0.6),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Transform.scale(
+                        scale: 1.0 + 0.14 * _scorePulse,
+                        alignment: Alignment.bottomLeft,
+                        child: Text(
+                          _formatScore(_displayScore.round()),
+                          style: TextStyle(
+                            fontFamily: 'Orbitron',
+                            fontVariations: const [FontVariation('wght', 800)],
+                            fontSize: 26,
+                            color: Color.lerp(Colors.white, scientist.accentColor, _scorePulse * 0.8),
+                            shadows: [
+                              Shadow(
+                                color: Color.lerp(Colors.cyan, scientist.primaryColor, _scorePulse)!
+                                    .withOpacity(0.7 + _scorePulse * 0.3),
+                                blurRadius: 8 + _scorePulse * 10,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 6),
                   Container(
@@ -117,7 +199,7 @@ class _HudOverlayState extends State<HudOverlay> with SingleTickerProviderStateM
                         Text(
                           scientist.name.toUpperCase(),
                           style: TextStyle(
-                            fontFamily: 'Courier',
+                            fontFamily: 'Rajdhani',
                             fontSize: 11,
                             fontWeight: FontWeight.bold,
                             color: scientist.primaryColor,
@@ -131,7 +213,7 @@ class _HudOverlayState extends State<HudOverlay> with SingleTickerProviderStateM
                   Text(
                     'NAVE: ${scientist.shipName}',
                     style: TextStyle(
-                      fontFamily: 'Courier',
+                      fontFamily: 'Rajdhani',
                       fontSize: 10,
                       color: scientist.accentColor,
                     ),
@@ -163,7 +245,7 @@ class _HudOverlayState extends State<HudOverlay> with SingleTickerProviderStateM
                         Text(
                           'AMOSTRAS: ${game.samplesCollected}',
                           style: const TextStyle(
-                            fontFamily: 'Courier',
+                            fontFamily: 'Rajdhani',
                             fontSize: 11.5,
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
@@ -227,7 +309,7 @@ class _HudOverlayState extends State<HudOverlay> with SingleTickerProviderStateM
                                 ? '👑 NOVO RECORDE DA FEIRA! (#1) 👑'
                                 : '🏆 LÍDER: ${(game.topLeaderName != null && game.topLeaderName!.isNotEmpty) ? game.topLeaderName : "RECORDE"} (${game.topLeaderScore} pts)',
                             style: TextStyle(
-                              fontFamily: 'Courier',
+                              fontFamily: 'Rajdhani',
                               fontSize: 11,
                               fontWeight: FontWeight.bold,
                               color: game.topRecordBeaten
@@ -240,52 +322,85 @@ class _HudOverlayState extends State<HudOverlay> with SingleTickerProviderStateM
                       ),
                     ),
 
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.75),
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(
-                          color: timeRemaining <= 30
-                              ? Colors.redAccent
-                              : (timeRemaining <= 60 ? Colors.amberAccent : scientist.primaryColor.withOpacity(0.7)),
-                          width: 1.5,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: (timeRemaining <= 30
-                                    ? Colors.red
-                                    : (timeRemaining <= 60 ? Colors.amber : scientist.primaryColor))
-                                .withOpacity(0.25),
-                            blurRadius: 12,
-                          ),
-                        ],
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.timer_outlined,
-                            color: timeRemaining <= 30
-                                ? Colors.redAccent
-                                : (timeRemaining <= 60 ? Colors.amberAccent : scientist.primaryColor),
-                            size: 20,
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            '${(timeRemaining ~/ 60).toString().padLeft(2, '0')}:${(timeRemaining.toInt() % 60).toString().padLeft(2, '0')}',
-                            style: TextStyle(
-                              fontFamily: 'Courier',
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
-                              letterSpacing: 2,
-                              color: timeRemaining <= 30
-                                  ? Colors.redAccent
-                                  : (timeRemaining <= 60 ? Colors.amberAccent : Colors.white),
+                    Builder(
+                      builder: (context) {
+                        final timeColor = _timeColor(timeRemaining, scientist.primaryColor);
+                        // Pulso do brilho nos últimos 30s para aumentar a tensão
+                        final urgency = timeRemaining <= 30
+                            ? (math.sin(DateTime.now().millisecondsSinceEpoch / 180) + 1) / 2
+                            : 0.0;
+                        final progress = (timeRemaining / AsteroidsGame.fairRoundDuration).clamp(0.0, 1.0);
+
+                        return Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                              decoration: BoxDecoration(
+                                color: Colors.black.withOpacity(0.75),
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(
+                                  color: timeColor.withOpacity(0.85),
+                                  width: 1.5,
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: timeColor.withOpacity(0.25 + urgency * 0.35),
+                                    blurRadius: 12 + urgency * 8,
+                                  ),
+                                ],
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(Icons.timer_outlined, color: timeColor, size: 20),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    '${(timeRemaining ~/ 60).toString().padLeft(2, '0')}:${(timeRemaining.toInt() % 60).toString().padLeft(2, '0')}',
+                                    style: TextStyle(
+                                      fontFamily: 'Orbitron',
+                                      fontVariations: const [FontVariation('wght', 800)],
+                                      fontSize: 20,
+                                      letterSpacing: 2,
+                                      color: Color.lerp(Colors.white, timeColor, timeRemaining <= 60 ? 1.0 : 0.0),
+                                      shadows: [
+                                        Shadow(color: timeColor.withOpacity(0.7), blurRadius: 8),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
+                            const SizedBox(height: 5),
+                            // Barra de progresso do tempo restante
+                            Container(
+                              width: 150,
+                              height: 5,
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.10),
+                                borderRadius: BorderRadius.circular(3),
+                              ),
+                              child: Align(
+                                alignment: Alignment.centerLeft,
+                                child: FractionallySizedBox(
+                                  widthFactor: progress,
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(3),
+                                      gradient: LinearGradient(
+                                        colors: [timeColor.withOpacity(0.55), timeColor],
+                                      ),
+                                      boxShadow: [
+                                        BoxShadow(color: timeColor.withOpacity(0.55), blurRadius: 6),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        );
+                      },
                     ),
                     if (livesLeft == 1) ...[
                       const SizedBox(height: 5),
@@ -311,7 +426,7 @@ class _HudOverlayState extends State<HudOverlay> with SingleTickerProviderStateM
                             Text(
                               '⚠️ ALERTA CRÍTICO: ÚLTIMA VIDA! ⚠️',
                               style: TextStyle(
-                                fontFamily: 'Courier',
+                                fontFamily: 'Rajdhani',
                                 fontSize: 11,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white,
@@ -339,7 +454,7 @@ class _HudOverlayState extends State<HudOverlay> with SingleTickerProviderStateM
                             Text(
                               'HIPER TEMPESTADE DE METEOROS!',
                               style: TextStyle(
-                                fontFamily: 'Courier',
+                                fontFamily: 'Rajdhani',
                                 fontSize: 10,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.yellowAccent,
@@ -366,7 +481,7 @@ class _HudOverlayState extends State<HudOverlay> with SingleTickerProviderStateM
                             Text(
                               'ALERTA: METEOROS SE APROXIMANDO!',
                               style: TextStyle(
-                                fontFamily: 'Courier',
+                                fontFamily: 'Rajdhani',
                                 fontSize: 10,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.amberAccent,
@@ -407,7 +522,7 @@ class _HudOverlayState extends State<HudOverlay> with SingleTickerProviderStateM
                                 Text(
                                   game.cometAlertMessage!,
                                   style: const TextStyle(
-                                    fontFamily: 'Courier',
+                                    fontFamily: 'Rajdhani',
                                     fontSize: 12.5,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.white,
@@ -475,7 +590,7 @@ class _HudOverlayState extends State<HudOverlay> with SingleTickerProviderStateM
                             Text(
                               'PAUSA',
                               style: TextStyle(
-                                fontFamily: 'Courier',
+                                fontFamily: 'Rajdhani',
                                 fontSize: 10,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white70,
@@ -500,7 +615,7 @@ class _HudOverlayState extends State<HudOverlay> with SingleTickerProviderStateM
                     child: Text(
                       'ESCUDO: ${invulTime.toStringAsFixed(1)}s',
                       style: const TextStyle(
-                        fontFamily: 'Courier',
+                        fontFamily: 'Rajdhani',
                         fontSize: 10,
                         fontWeight: FontWeight.bold,
                         color: Colors.blueAccent,
@@ -524,9 +639,9 @@ class _HudOverlayState extends State<HudOverlay> with SingleTickerProviderStateM
                     children: [
                       // Active Weapon Card
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                         decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.6),
+                          color: Colors.black.withOpacity(0.7),
                           borderRadius: BorderRadius.circular(10),
                           border: Border.all(color: Colors.white24),
                         ),
@@ -537,46 +652,54 @@ class _HudOverlayState extends State<HudOverlay> with SingleTickerProviderStateM
                             Text(
                               currentWeapon.name.toUpperCase(),
                               style: const TextStyle(
-                                fontFamily: 'Courier',
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
+                                fontFamily: 'Orbitron',
+                                fontVariations: [FontVariation('wght', 700)],
+                                fontSize: 12,
+                                letterSpacing: 0.8,
                                 color: Colors.white,
                               ),
                             ),
-                            const SizedBox(height: 4),
+                            const SizedBox(height: 3),
                             Text(
-                              'LEVEL ${currentWeapon.level}',
-                              style: const TextStyle(
-                                fontFamily: 'Courier',
+                              'NÍVEL ${currentWeapon.level}',
+                              style: TextStyle(
+                                fontFamily: 'Rajdhani',
                                 fontSize: 10,
-                                color: Colors.cyanAccent,
+                                fontWeight: FontWeight.bold,
+                                color: scientist.accentColor,
                               ),
                             ),
-                            const SizedBox(height: 6),
+                            const SizedBox(height: 5),
                             // Cooldown bar
                             Row(
                               children: [
                                 const Text(
                                   'CD ',
-                                  style: TextStyle(fontFamily: 'Courier', fontSize: 8, color: Colors.white54),
+                                  style: TextStyle(fontFamily: 'Rajdhani', fontSize: 8, color: Colors.white54),
                                 ),
                                 Container(
-                                  width: 80,
-                                  height: 6,
+                                  width: 76,
+                                  height: 5,
                                   decoration: BoxDecoration(
-                                    color: Colors.white10,
+                                    color: Colors.white12,
                                     borderRadius: BorderRadius.circular(3),
                                   ),
                                   child: Align(
                                     alignment: Alignment.centerLeft,
                                     child: Container(
                                       width: shootCooldown <= 0
-                                          ? 80
-                                          : (80 * (1 - (shootCooldown / currentWeapon.cooldown))).clamp(0.0, 80.0),
-                                      height: 6,
+                                          ? 76
+                                          : (76 * (1 - (shootCooldown / currentWeapon.cooldown))).clamp(0.0, 76.0),
+                                      height: 5,
                                       decoration: BoxDecoration(
                                         color: shootCooldown <= 0 ? Colors.greenAccent : Colors.orangeAccent,
                                         borderRadius: BorderRadius.circular(3),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: (shootCooldown <= 0 ? Colors.greenAccent : Colors.orangeAccent).withOpacity(0.5),
+                                            blurRadius: 4,
+                                          ),
+                                        ],
                                       ),
                                     ),
                                   ),
@@ -586,112 +709,216 @@ class _HudOverlayState extends State<HudOverlay> with SingleTickerProviderStateM
                           ],
                         ),
                       ),
-                      const SizedBox(width: 15),
+                      const SizedBox(width: 12),
 
-                      // Dash Status
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                        decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.6),
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(
-                            color: dashCooldown <= 0 ? Colors.cyan.withOpacity(0.5) : Colors.white24,
-                          ),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              'DASH',
-                              style: TextStyle(
-                                fontFamily: 'Courier',
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                                color: dashCooldown <= 0 ? Colors.cyanAccent : Colors.white60,
+                      // Dash Status with Radial Progress Ring
+                      Builder(
+                        builder: (context) {
+                          final isReady = dashCooldown <= 0;
+                          final progress = isReady
+                              ? 1.0
+                              : (1.0 - (dashCooldown / GameConstants.playerDashCooldownSeconds)).clamp(0.0, 1.0);
+                          final dashPulse = isReady
+                              ? (math.sin(DateTime.now().millisecondsSinceEpoch / 250) + 1) / 2
+                              : 0.0;
+
+                          return Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
+                            decoration: BoxDecoration(
+                              color: Colors.black.withOpacity(0.7),
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(
+                                color: isReady
+                                    ? Colors.cyanAccent.withOpacity(0.55 + dashPulse * 0.35)
+                                    : Colors.white24,
+                                width: isReady ? 1.4 : 1.0,
                               ),
+                              boxShadow: isReady
+                                  ? [
+                                      BoxShadow(
+                                        color: Colors.cyanAccent.withOpacity(0.25 + dashPulse * 0.25),
+                                        blurRadius: 8 + dashPulse * 4,
+                                      ),
+                                    ]
+                                  : null,
                             ),
-                            const SizedBox(height: 4),
-                            Text(
-                              dashCooldown <= 0 ? 'READY' : '${dashCooldown.toStringAsFixed(1)}s',
-                              style: TextStyle(
-                                fontFamily: 'Courier',
-                                fontSize: 10,
-                                color: dashCooldown <= 0 ? Colors.cyanAccent : Colors.white38,
-                              ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                SizedBox(
+                                  width: 26,
+                                  height: 26,
+                                  child: Stack(
+                                    alignment: Alignment.center,
+                                    children: [
+                                      CircularProgressIndicator(
+                                        value: progress,
+                                        strokeWidth: 2.5,
+                                        backgroundColor: Colors.white12,
+                                        valueColor: AlwaysStoppedAnimation<Color>(
+                                          isReady ? Colors.cyanAccent : Colors.cyan.withOpacity(0.5),
+                                        ),
+                                      ),
+                                      Icon(
+                                        Icons.bolt,
+                                        size: 15,
+                                        color: isReady ? Colors.cyanAccent : Colors.white38,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      'DASH',
+                                      style: TextStyle(
+                                        fontFamily: 'Orbitron',
+                                        fontVariations: const [FontVariation('wght', 700)],
+                                        fontSize: 10,
+                                        letterSpacing: 1.0,
+                                        color: isReady ? Colors.cyanAccent : Colors.white60,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      isReady ? 'PRONTO' : '${dashCooldown.toStringAsFixed(1)}s',
+                                      style: TextStyle(
+                                        fontFamily: 'Rajdhani',
+                                        fontSize: 9.5,
+                                        fontWeight: FontWeight.bold,
+                                        color: isReady ? Colors.cyanAccent : Colors.white38,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
+                          );
+                        },
                       ),
                     ],
                   ),
                 ),
-                const SizedBox(width: 15),
+                const SizedBox(width: 12),
 
                 // Item 1: Special Ability Card (Clickable or [E])
                 GestureDetector(
                   onTap: () {
                     game.triggerSpecial();
                   },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
-                    decoration: BoxDecoration(
-                      color: game.specialAvailable
-                          ? scientist.primaryColor.withOpacity(0.18)
-                          : Colors.black.withOpacity(0.6),
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(
-                        color: game.specialAvailable
-                            ? scientist.primaryColor
-                            : Colors.white24,
-                        width: game.specialAvailable ? 1.5 : 1.0,
-                      ),
-                      boxShadow: game.specialAvailable
-                          ? [
-                              BoxShadow(
-                                color: scientist.primaryColor.withOpacity(0.35),
-                                blurRadius: 10,
-                                spreadRadius: 1,
-                              )
-                            ]
-                          : null,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Row(
+                  child: Builder(
+                    builder: (context) {
+                      final isReady = game.specialAvailable;
+                      final specialPulse = isReady
+                          ? (math.sin(DateTime.now().millisecondsSinceEpoch / 180) + 1) / 2
+                          : 0.0;
+                      final glowColor = isReady ? scientist.primaryColor : Colors.white24;
+
+                      return Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: isReady
+                              ? scientist.primaryColor.withOpacity(0.16 + specialPulse * 0.10)
+                              : Colors.black.withOpacity(0.7),
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
+                            color: isReady
+                                ? scientist.primaryColor.withOpacity(0.7 + specialPulse * 0.3)
+                                : Colors.white24,
+                            width: isReady ? 1.6 : 1.0,
+                          ),
+                          boxShadow: isReady
+                              ? [
+                                  BoxShadow(
+                                    color: scientist.primaryColor.withOpacity(0.35 + specialPulse * 0.35),
+                                    blurRadius: 10 + specialPulse * 8,
+                                    spreadRadius: 1,
+                                  ),
+                                ]
+                              : null,
+                        ),
+                        child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(
-                              game.specialAvailable ? Icons.auto_awesome : Icons.check_circle_outline,
-                              color: game.specialAvailable ? scientist.primaryColor : Colors.white38,
-                              size: 14,
-                            ),
-                            const SizedBox(width: 5),
-                            Text(
-                              'ESPECIAL [E]',
-                              style: TextStyle(
-                                fontFamily: 'Courier',
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                                color: game.specialAvailable ? scientist.primaryColor : Colors.white38,
+                            Container(
+                              width: 28,
+                              height: 28,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: isReady
+                                    ? scientist.primaryColor.withOpacity(0.25)
+                                    : Colors.white10,
+                                border: Border.all(
+                                  color: glowColor,
+                                  width: 1.5,
+                                ),
                               ),
+                              child: Icon(
+                                isReady ? Icons.auto_awesome : Icons.check_circle_outline,
+                                color: isReady ? const Color(0xFFFFD700) : Colors.white38,
+                                size: 15,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      scientist.specialAbilityName.toUpperCase(),
+                                      style: TextStyle(
+                                        fontFamily: 'Rajdhani',
+                                        fontSize: 11.5,
+                                        fontWeight: FontWeight.bold,
+                                        letterSpacing: 0.8,
+                                        color: isReady ? Colors.white : Colors.white38,
+                                      ),
+                                    ),
+                                    if (isReady) ...[
+                                      const SizedBox(width: 6),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                                        decoration: BoxDecoration(
+                                          color: Colors.amber.withOpacity(0.3),
+                                          borderRadius: BorderRadius.circular(4),
+                                          border: Border.all(color: Colors.amberAccent, width: 0.8),
+                                        ),
+                                        child: const Text(
+                                          '[E]',
+                                          style: TextStyle(
+                                            fontFamily: 'Orbitron',
+                                            fontSize: 8.5,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.amberAccent,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ],
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  isReady ? '1 CARGA PRONTA' : 'JÁ UTILIZADO',
+                                  style: TextStyle(
+                                    fontFamily: 'Rajdhani',
+                                    fontSize: 9,
+                                    fontWeight: FontWeight.bold,
+                                    color: isReady ? Colors.amberAccent : Colors.white24,
+                                    letterSpacing: 0.8,
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),
-                        const SizedBox(height: 4),
-                        Text(
-                          game.specialAvailable ? '1 USO DISPONÍVEL' : 'JÁ UTILIZADO',
-                          style: TextStyle(
-                            fontFamily: 'Courier',
-                            fontSize: 9.5,
-                            fontWeight: FontWeight.bold,
-                            color: game.specialAvailable ? Colors.amberAccent : Colors.white24,
-                          ),
-                        ),
-                      ],
-                    ),
+                      );
+                    },
                   ),
                 ),
               ],
@@ -711,75 +938,107 @@ class _HudOverlayState extends State<HudOverlay> with SingleTickerProviderStateM
                     onTap: () {
                       game.triggerSpecial();
                     },
-                    child: Container(
-                      width: 56,
-                      height: 56,
-                      decoration: BoxDecoration(
-                        color: game.specialAvailable
-                            ? scientist.primaryColor.withOpacity(0.2)
-                            : Colors.white10,
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: game.specialAvailable
-                              ? scientist.primaryColor
-                              : Colors.white24,
-                          width: 2,
-                        ),
-                        boxShadow: game.specialAvailable
-                            ? [
-                                BoxShadow(
-                                  color: scientist.primaryColor.withOpacity(0.4),
-                                  blurRadius: 10,
-                                  spreadRadius: 1,
-                                )
-                              ]
-                            : [],
-                      ),
-                      child: Icon(
-                        game.specialAvailable ? Icons.auto_awesome : Icons.lock_outline,
-                        color: game.specialAvailable
-                            ? scientist.primaryColor
-                            : Colors.white24,
-                        size: 26,
-                      ),
+                    child: Builder(
+                      builder: (context) {
+                        final isReady = game.specialAvailable;
+                        final pulse = isReady
+                            ? (math.sin(DateTime.now().millisecondsSinceEpoch / 180) + 1) / 2
+                            : 0.0;
+
+                        return Container(
+                          width: 56,
+                          height: 56,
+                          decoration: BoxDecoration(
+                            color: isReady
+                                ? scientist.primaryColor.withOpacity(0.22 + pulse * 0.12)
+                                : Colors.white10,
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: isReady
+                                  ? scientist.primaryColor.withOpacity(0.8 + pulse * 0.2)
+                                  : Colors.white24,
+                              width: isReady ? 2.5 : 1.5,
+                            ),
+                            boxShadow: isReady
+                                ? [
+                                    BoxShadow(
+                                      color: scientist.primaryColor.withOpacity(0.4 + pulse * 0.3),
+                                      blurRadius: 10 + pulse * 6,
+                                      spreadRadius: 1,
+                                    ),
+                                  ]
+                                : [],
+                          ),
+                          child: Icon(
+                            isReady ? Icons.auto_awesome : Icons.lock_outline,
+                            color: isReady ? const Color(0xFFFFD700) : Colors.white24,
+                            size: 26,
+                          ),
+                        );
+                      },
                     ),
                   ),
                   const SizedBox(width: 14),
 
-                  // Dash Button (smaller, blue/cyan glowing icon button)
+                  // Dash Button (with radial cooldown ring)
                   GestureDetector(
                     onTapDown: (_) {
                       game.mobileDashPressed = true;
                     },
-                    child: Container(
-                      width: 56,
-                      height: 56,
-                      decoration: BoxDecoration(
-                        color: Colors.cyan.withOpacity(0.15),
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: player.dashCooldownTimer <= 0
-                              ? Colors.cyanAccent
-                              : Colors.white24,
-                          width: 2,
-                        ),
-                        boxShadow: player.dashCooldownTimer <= 0
-                            ? [
-                                BoxShadow(
-                                  color: Colors.cyan.withOpacity(0.3),
-                                  blurRadius: 8,
-                                  spreadRadius: 1,
-                                )
-                              ]
-                            : [],
-                      ),
-                      child: Icon(
-                        Icons.bolt,
-                        color: player.dashCooldownTimer <= 0
-                            ? Colors.cyanAccent
-                            : Colors.white24,
-                        size: 28,
-                      ),
+                    child: Builder(
+                      builder: (context) {
+                        final isReady = player.dashCooldownTimer <= 0;
+                        final progress = isReady
+                            ? 1.0
+                            : (1.0 - (player.dashCooldownTimer / GameConstants.playerDashCooldownSeconds)).clamp(0.0, 1.0);
+                        final pulse = isReady
+                            ? (math.sin(DateTime.now().millisecondsSinceEpoch / 250) + 1) / 2
+                            : 0.0;
+
+                        return SizedBox(
+                          width: 56,
+                          height: 56,
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              Container(
+                                width: 56,
+                                height: 56,
+                                decoration: BoxDecoration(
+                                  color: Colors.cyan.withOpacity(0.15),
+                                  shape: BoxShape.circle,
+                                  boxShadow: isReady
+                                      ? [
+                                          BoxShadow(
+                                            color: Colors.cyanAccent.withOpacity(0.35 + pulse * 0.25),
+                                            blurRadius: 8 + pulse * 4,
+                                            spreadRadius: 1,
+                                          ),
+                                        ]
+                                      : [],
+                                ),
+                              ),
+                              SizedBox(
+                                width: 54,
+                                height: 54,
+                                child: CircularProgressIndicator(
+                                  value: progress,
+                                  strokeWidth: 3.0,
+                                  backgroundColor: Colors.white12,
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    isReady ? Colors.cyanAccent : Colors.cyan.withOpacity(0.5),
+                                  ),
+                                ),
+                              ),
+                              Icon(
+                                Icons.bolt,
+                                color: isReady ? Colors.cyanAccent : Colors.white30,
+                                size: 28,
+                              ),
+                            ],
+                          ),
+                        );
+                      },
                     ),
                   ),
                   const SizedBox(width: 20),
@@ -799,18 +1058,18 @@ class _HudOverlayState extends State<HudOverlay> with SingleTickerProviderStateM
                       width: 76,
                       height: 76,
                       decoration: BoxDecoration(
-                        color: Colors.redAccent.withOpacity(0.15),
+                        color: Colors.redAccent.withOpacity(0.18),
                         shape: BoxShape.circle,
                         border: Border.all(
                           color: Colors.redAccent,
-                          width: 2,
+                          width: 2.5,
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.redAccent.withOpacity(0.3),
-                            blurRadius: 12,
+                            color: Colors.redAccent.withOpacity(0.35),
+                            blurRadius: 14,
                             spreadRadius: 2,
-                          )
+                          ),
                         ],
                       ),
                       child: const Icon(
@@ -845,7 +1104,7 @@ class _HudOverlayState extends State<HudOverlay> with SingleTickerProviderStateM
                       Text(
                         'W/▲: ACELERAR  •  A/D: GIRAR  •  ESPAÇO: ATIRAR  •  SHIFT: DASH  •  E: ESPECIAL  •  ESC/P: PAUSA',
                         style: TextStyle(
-                          fontFamily: 'Courier',
+                          fontFamily: 'Rajdhani',
                           fontSize: 9.5,
                           fontWeight: FontWeight.bold,
                           color: Colors.white70,
@@ -934,7 +1193,7 @@ class _HudOverlayState extends State<HudOverlay> with SingleTickerProviderStateM
                                   Text(
                                     'CANAL ABERTO • ${scientist.name.toUpperCase()} (${scientist.role.toUpperCase()})',
                                     style: TextStyle(
-                                      fontFamily: 'Courier',
+                                      fontFamily: 'Rajdhani',
                                       fontSize: 11,
                                       fontWeight: FontWeight.bold,
                                       color: scientist.accentColor,
@@ -949,7 +1208,7 @@ class _HudOverlayState extends State<HudOverlay> with SingleTickerProviderStateM
                               Text(
                                 '"${scientist.launchQuote}"',
                                 style: const TextStyle(
-                                  fontFamily: 'Courier',
+                                  fontFamily: 'Rajdhani',
                                   fontSize: 13.0,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.white,
@@ -966,7 +1225,7 @@ class _HudOverlayState extends State<HudOverlay> with SingleTickerProviderStateM
                                   Text(
                                     'Pressione qualquer botão para continuar ▶',
                                     style: TextStyle(
-                                      fontFamily: 'Courier',
+                                      fontFamily: 'Rajdhani',
                                       fontSize: 9.5,
                                       fontWeight: FontWeight.bold,
                                       color: Colors.white.withOpacity(0.65),

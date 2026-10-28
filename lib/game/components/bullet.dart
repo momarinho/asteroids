@@ -3,6 +3,7 @@ import 'package:flame/collisions.dart';
 import 'package:flutter/material.dart';
 import 'package:asteroids/constants.dart';
 import 'package:asteroids/game/asteroids_game.dart';
+import 'package:asteroids/game/glow.dart';
 import 'asteroid.dart';
 
 class BulletComponent extends PositionComponent with HasGameReference<AsteroidsGame>, CollisionCallbacks {
@@ -10,7 +11,7 @@ class BulletComponent extends PositionComponent with HasGameReference<AsteroidsG
   final Vector2 velocity;
   double lifeTimer;
   final double damage;
-  final Color color;
+  final Color? color;
 
   BulletComponent({
     required Vector2 position,
@@ -18,7 +19,7 @@ class BulletComponent extends PositionComponent with HasGameReference<AsteroidsG
     required this.velocity,
     required this.lifeTimer,
     this.damage = 25.0,
-    this.color = Colors.white,
+    this.color,
   }) {
     this.position = position;
     anchor = Anchor.center;
@@ -79,11 +80,8 @@ class BulletComponent extends PositionComponent with HasGameReference<AsteroidsG
   void render(Canvas canvas) {
     canvas.translate(radius, radius);
 
-    final paint = Paint()
-      ..color = color
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = GameConstants.lineWidth;
-
-    canvas.drawCircle(Offset.zero, radius, paint);
+    // Sem cor explícita, o tiro assume a cor-tema da cientista escolhida.
+    final tint = color ?? game.selectedScientist.primaryColor;
+    Glow.orb(canvas, Offset.zero, radius * 0.85, tint);
   }
 }

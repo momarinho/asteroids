@@ -136,7 +136,7 @@ class _ScienceIntroOverlayState extends State<ScienceIntroOverlay> {
                               Text(
                                 'FEIRA DE CIÊNCIAS • MULHERES NA CIÊNCIA',
                                 style: TextStyle(
-                                  fontFamily: 'Courier',
+                                  fontFamily: 'Rajdhani',
                                   fontSize: 13.5,
                                   fontWeight: FontWeight.bold,
                                   letterSpacing: 1.5,
@@ -151,28 +151,35 @@ class _ScienceIntroOverlayState extends State<ScienceIntroOverlay> {
                       const SizedBox(height: 18),
 
                       // Main Title
-                      const Text(
-                        'MISSÃO COSMOS',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontFamily: 'Courier',
-                          fontSize: 38,
-                          fontWeight: FontWeight.w900,
-                          letterSpacing: 4,
-                          color: Colors.white,
-                          shadows: [
-                            Shadow(
-                              color: Colors.cyanAccent,
-                              blurRadius: 16,
-                            ),
-                          ],
+                      const FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          'MISSÃO COSMOS',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontFamily: 'Orbitron',
+                            fontVariations: [FontVariation('wght', 900)],
+                            fontSize: 38,
+                            letterSpacing: 3,
+                            color: Colors.white,
+                            shadows: [
+                              Shadow(
+                                color: Colors.cyanAccent,
+                                blurRadius: 18,
+                              ),
+                              Shadow(
+                                color: Color(0x6600E5FF),
+                                blurRadius: 36,
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                       const Text(
                         'PIONEIRAS DA EXPLORAÇÃO ESPACIAL',
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          fontFamily: 'Courier',
+                          fontFamily: 'Rajdhani',
                           fontSize: 15,
                           letterSpacing: 2.5,
                           fontWeight: FontWeight.bold,
@@ -208,7 +215,7 @@ class _ScienceIntroOverlayState extends State<ScienceIntroOverlay> {
                                   Text(
                                     'COMUNICADO DA BASE ESPACIAL • OPERAÇÃO PIONEIRAS 2026',
                                     style: TextStyle(
-                                      fontFamily: 'Courier',
+                                      fontFamily: 'Rajdhani',
                                       fontSize: 11,
                                       fontWeight: FontWeight.bold,
                                       letterSpacing: 1.2,
@@ -270,7 +277,7 @@ class _ScienceIntroOverlayState extends State<ScienceIntroOverlay> {
                               label: Text(
                                 _selectedMenuIndex == 0 ? '► INICIAR MISSÃO' : 'INICIAR MISSÃO',
                                 style: TextStyle(
-                                  fontFamily: 'Courier',
+                                  fontFamily: 'Rajdhani',
                                   fontSize: 15,
                                   fontWeight: FontWeight.bold,
                                   letterSpacing: 1.2,
@@ -315,7 +322,7 @@ class _ScienceIntroOverlayState extends State<ScienceIntroOverlay> {
                               label: Text(
                                 _selectedMenuIndex == 1 ? '► RANKING DA FEIRA' : 'RANKING DA FEIRA',
                                 style: TextStyle(
-                                  fontFamily: 'Courier',
+                                  fontFamily: 'Rajdhani',
                                   fontSize: 15,
                                   fontWeight: FontWeight.bold,
                                   letterSpacing: 1.2,
@@ -362,7 +369,7 @@ class _ScienceIntroOverlayState extends State<ScienceIntroOverlay> {
                               Text(
                                 '◄ / ►: ESCOLHER   •   [ESPAÇO / ENTER]: CONFIRMAR   •   [R]: RANKING',
                                 style: TextStyle(
-                                  fontFamily: 'Courier',
+                                  fontFamily: 'Rajdhani',
                                   fontSize: 12,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.white70,
@@ -392,7 +399,7 @@ class _ScienceIntroOverlayState extends State<ScienceIntroOverlay> {
         Text(
           label,
           style: const TextStyle(
-            fontFamily: 'Courier',
+            fontFamily: 'Rajdhani',
             fontSize: 11.5,
             color: Colors.white54,
             letterSpacing: 1.2,
@@ -401,7 +408,7 @@ class _ScienceIntroOverlayState extends State<ScienceIntroOverlay> {
         Text(
           value,
           style: TextStyle(
-            fontFamily: 'Courier',
+            fontFamily: 'Rajdhani',
             fontSize: 14,
             fontWeight: FontWeight.bold,
             color: color,

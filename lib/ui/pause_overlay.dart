@@ -120,7 +120,7 @@ class _PauseOverlayState extends State<PauseOverlay> {
                           const Text(
                             'JOGO PAUSADO',
                             style: TextStyle(
-                              fontFamily: 'Courier',
+                              fontFamily: 'Rajdhani',
                               fontSize: 26,
                               fontWeight: FontWeight.bold,
                               letterSpacing: 2.5,
@@ -133,7 +133,7 @@ class _PauseOverlayState extends State<PauseOverlay> {
                       const Text(
                         'ESC / P: Continuar  •  ▲/▼: Selecionar  •  ENTER: Confirmar',
                         style: TextStyle(
-                          fontFamily: 'Courier',
+                          fontFamily: 'Rajdhani',
                           fontSize: 11,
                           color: Colors.white54,
                           letterSpacing: 0.8,
@@ -177,7 +177,7 @@ class _PauseOverlayState extends State<PauseOverlay> {
                                       Text(
                                         scientist.name,
                                         style: TextStyle(
-                                          fontFamily: 'Courier',
+                                          fontFamily: 'Rajdhani',
                                           fontSize: 16,
                                           fontWeight: FontWeight.bold,
                                           color: scientist.primaryColor,
@@ -208,7 +208,7 @@ class _PauseOverlayState extends State<PauseOverlay> {
                                     const Text(
                                       'PONTOS',
                                       style: TextStyle(
-                                        fontFamily: 'Courier',
+                                        fontFamily: 'Rajdhani',
                                         fontSize: 11,
                                         color: Colors.white54,
                                         letterSpacing: 1.1,
@@ -218,7 +218,7 @@ class _PauseOverlayState extends State<PauseOverlay> {
                                     Text(
                                       '$score',
                                       style: const TextStyle(
-                                        fontFamily: 'Courier',
+                                        fontFamily: 'Rajdhani',
                                         fontSize: 22,
                                         fontWeight: FontWeight.bold,
                                         color: Colors.white,
@@ -232,7 +232,7 @@ class _PauseOverlayState extends State<PauseOverlay> {
                                     const Text(
                                       'AMOSTRAS',
                                       style: TextStyle(
-                                        fontFamily: 'Courier',
+                                        fontFamily: 'Rajdhani',
                                         fontSize: 11,
                                         color: Colors.white54,
                                         letterSpacing: 1.1,
@@ -242,7 +242,7 @@ class _PauseOverlayState extends State<PauseOverlay> {
                                     Text(
                                       '${game.samplesCollected}',
                                       style: const TextStyle(
-                                        fontFamily: 'Courier',
+                                        fontFamily: 'Rajdhani',
                                         fontSize: 22,
                                         fontWeight: FontWeight.bold,
                                         color: Colors.cyanAccent,
@@ -256,7 +256,7 @@ class _PauseOverlayState extends State<PauseOverlay> {
                                     const Text(
                                       'TEMPO RESTANTE',
                                       style: TextStyle(
-                                        fontFamily: 'Courier',
+                                        fontFamily: 'Rajdhani',
                                         fontSize: 11,
                                         color: Colors.white54,
                                         letterSpacing: 1.1,
@@ -266,7 +266,7 @@ class _PauseOverlayState extends State<PauseOverlay> {
                                     Text(
                                       '$minutes:$seconds',
                                       style: TextStyle(
-                                        fontFamily: 'Courier',
+                                        fontFamily: 'Rajdhani',
                                         fontSize: 22,
                                         fontWeight: FontWeight.bold,
                                         color: timeRemaining <= 30 ? Colors.redAccent : Colors.cyanAccent,
@@ -308,7 +308,7 @@ class _PauseOverlayState extends State<PauseOverlay> {
                           label: Text(
                             _selectedButtonIndex == 0 ? '► CONTINUAR PARTIDA' : 'CONTINUAR PARTIDA',
                             style: const TextStyle(
-                              fontFamily: 'Courier',
+                              fontFamily: 'Rajdhani',
                               fontSize: 15,
                               fontWeight: FontWeight.bold,
                               letterSpacing: 1.2,
@@ -355,7 +355,7 @@ class _PauseOverlayState extends State<PauseOverlay> {
                           label: Text(
                             _selectedButtonIndex == 1 ? '► VOLTAR AO MENU' : 'VOLTAR AO MENU',
                             style: TextStyle(
-                              fontFamily: 'Courier',
+                              fontFamily: 'Rajdhani',
                               fontSize: 13,
                               fontWeight: FontWeight.bold,
                               letterSpacing: 1.1,

@@ -93,7 +93,7 @@ class _WeaponSelectionOverlayState extends State<WeaponSelectionOverlay> {
                       Text(
                         'SELECT STARTING WEAPON',
                         style: TextStyle(
-                          fontFamily: 'Courier',
+                          fontFamily: 'Rajdhani',
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
                           letterSpacing: 3,
@@ -179,7 +179,7 @@ class _WeaponSelectionOverlayState extends State<WeaponSelectionOverlay> {
                                   Text(
                                     weapon['name'],
                                     style: TextStyle(
-                                      fontFamily: 'Courier',
+                                      fontFamily: 'Rajdhani',
                                       fontSize: 17,
                                       fontWeight: FontWeight.bold,
                                       color: isSelected ? Colors.white : Colors.white70,

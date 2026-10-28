@@ -95,7 +95,7 @@ class _MenuOverlayState extends State<MenuOverlay> {
                   const Text(
                     'ASTEROIDS',
                     style: TextStyle(
-                      fontFamily: 'Courier',
+                      fontFamily: 'Rajdhani',
                       fontSize: 48,
                       fontWeight: FontWeight.bold,
                       letterSpacing: 8,
@@ -112,7 +112,7 @@ class _MenuOverlayState extends State<MenuOverlay> {
                   Text(
                     'MULTIPLATFORM EDITION',
                     style: TextStyle(
-                      fontFamily: 'Courier',
+                      fontFamily: 'Rajdhani',
                       fontSize: 13,
                       letterSpacing: 4,
                       color: Colors.cyanAccent.withOpacity(0.8),
@@ -143,7 +143,7 @@ class _MenuOverlayState extends State<MenuOverlay> {
                     const SizedBox(height: 25),
                     TextField(
                       controller: _usernameController,
-                      style: const TextStyle(color: Colors.white, fontFamily: 'Courier', fontSize: 14),
+                      style: const TextStyle(color: Colors.white, fontFamily: 'Rajdhani', fontSize: 14),
                       decoration: InputDecoration(
                         hintText: 'ENTER PILOT CALLSIGN',
                         hintStyle: const TextStyle(color: Colors.white24, fontSize: 14),
@@ -194,7 +194,7 @@ class _MenuOverlayState extends State<MenuOverlay> {
                     Text(
                       'WELCOME BACK, PILOT ${game.playerUsername?.toUpperCase()}!',
                       style: const TextStyle(
-                        fontFamily: 'Courier',
+                        fontFamily: 'Rajdhani',
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
                         letterSpacing: 1.5,

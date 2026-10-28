@@ -156,7 +156,7 @@ class _LeaderboardOverlayState extends State<LeaderboardOverlay> {
                               Text(
                                 'RANKING DA FEIRA',
                                 style: TextStyle(
-                                  fontFamily: 'Courier',
+                                  fontFamily: 'Rajdhani',
                                   fontSize: 24,
                                   fontWeight: FontWeight.bold,
                                   letterSpacing: 2.5,
@@ -166,7 +166,7 @@ class _LeaderboardOverlayState extends State<LeaderboardOverlay> {
                               Text(
                                 'MULHERES NA CIÊNCIA • TOP PILOTOS',
                                 style: TextStyle(
-                                  fontFamily: 'Courier',
+                                  fontFamily: 'Rajdhani',
                                   fontSize: 12,
                                   letterSpacing: 1.5,
                                   color: Colors.cyanAccent,
@@ -210,7 +210,7 @@ class _LeaderboardOverlayState extends State<LeaderboardOverlay> {
                           child: Text(
                             'POS',
                             style: TextStyle(
-                              fontFamily: 'Courier',
+                              fontFamily: 'Rajdhani',
                               fontSize: 13,
                               color: Colors.white54,
                               fontWeight: FontWeight.bold,
@@ -222,7 +222,7 @@ class _LeaderboardOverlayState extends State<LeaderboardOverlay> {
                           child: Text(
                             'PILOTO',
                             style: TextStyle(
-                              fontFamily: 'Courier',
+                              fontFamily: 'Rajdhani',
                               fontSize: 13,
                               color: Colors.white54,
                               fontWeight: FontWeight.bold,
@@ -234,7 +234,7 @@ class _LeaderboardOverlayState extends State<LeaderboardOverlay> {
                           child: Text(
                             'CIENTISTA',
                             style: TextStyle(
-                              fontFamily: 'Courier',
+                              fontFamily: 'Rajdhani',
                               fontSize: 13,
                               color: Colors.white54,
                               fontWeight: FontWeight.bold,
@@ -244,7 +244,7 @@ class _LeaderboardOverlayState extends State<LeaderboardOverlay> {
                         Text(
                           'PONTOS',
                           style: TextStyle(
-                            fontFamily: 'Courier',
+                            fontFamily: 'Rajdhani',
                             fontSize: 13,
                             color: Colors.white54,
                             fontWeight: FontWeight.bold,
@@ -272,7 +272,7 @@ class _LeaderboardOverlayState extends State<LeaderboardOverlay> {
                               'Nenhum recorde ainda.\nSeja a primeira a jogar!',
                               textAlign: TextAlign.center,
                               style: TextStyle(
-                                fontFamily: 'Courier',
+                                fontFamily: 'Rajdhani',
                                 color: Colors.white38,
                                 fontSize: 13,
                               ),
@@ -312,7 +312,7 @@ class _LeaderboardOverlayState extends State<LeaderboardOverlay> {
                                     child: Text(
                                       '#${index + 1}',
                                       style: TextStyle(
-                                        fontFamily: 'Courier',
+                                        fontFamily: 'Rajdhani',
                                         fontSize: 15,
                                         fontWeight: FontWeight.bold,
                                         color: index == 0
@@ -332,7 +332,7 @@ class _LeaderboardOverlayState extends State<LeaderboardOverlay> {
                                     child: Text(
                                       username.toUpperCase(),
                                       style: TextStyle(
-                                        fontFamily: 'Courier',
+                                        fontFamily: 'Rajdhani',
                                         fontSize: 15,
                                         fontWeight: isCurrent ? FontWeight.bold : FontWeight.w600,
                                         color: isCurrent ? Colors.cyanAccent : Colors.white,
@@ -348,7 +348,7 @@ class _LeaderboardOverlayState extends State<LeaderboardOverlay> {
                                     child: Text(
                                       scientist,
                                       style: const TextStyle(
-                                        fontFamily: 'Courier',
+                                        fontFamily: 'Rajdhani',
                                         fontSize: 13,
                                         color: Colors.white70,
                                       ),
@@ -361,7 +361,7 @@ class _LeaderboardOverlayState extends State<LeaderboardOverlay> {
                                   Text(
                                     '$score',
                                     style: const TextStyle(
-                                      fontFamily: 'Courier',
+                                      fontFamily: 'Rajdhani',
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
                                       color: Colors.white,
@@ -394,7 +394,7 @@ class _LeaderboardOverlayState extends State<LeaderboardOverlay> {
                           label: Text(
                             _selectedButtonIndex == 0 ? '► PRÓXIMO PILOTO 🚀' : 'PRÓXIMO PILOTO 🚀',
                             style: TextStyle(
-                              fontFamily: 'Courier',
+                              fontFamily: 'Rajdhani',
                               fontSize: 15,
                               fontWeight: FontWeight.bold,
                               letterSpacing: 1.2,
@@ -447,7 +447,7 @@ class _LeaderboardOverlayState extends State<LeaderboardOverlay> {
                           child: Text(
                             _selectedButtonIndex == 1 ? '► CIENTISTAS' : 'CIENTISTAS',
                             style: TextStyle(
-                              fontFamily: 'Courier',
+                              fontFamily: 'Rajdhani',
                               fontSize: 14,
                               fontWeight: _selectedButtonIndex == 1 ? FontWeight.bold : FontWeight.normal,
                               letterSpacing: 1,
@@ -478,7 +478,7 @@ class _LeaderboardOverlayState extends State<LeaderboardOverlay> {
                           Text(
                             '◄ / ►: ESCOLHER BOTÃO  •  [ENTER / ESPAÇO]: CONFIRMAR  •  [TAB]: HOJE / GERAL  •  ▲ / ▼: ROLAR  •  [ESC]: VOLTAR',
                             style: TextStyle(
-                              fontFamily: 'Courier',
+                              fontFamily: 'Rajdhani',
                               fontSize: 12,
                               fontWeight: FontWeight.bold,
                               color: Colors.white70,
@@ -521,7 +521,7 @@ class _LeaderboardOverlayState extends State<LeaderboardOverlay> {
         child: Text(
           label,
           style: TextStyle(
-            fontFamily: 'Courier',
+            fontFamily: 'Rajdhani',
             fontSize: 13,
             fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
             color: isSelected ? Colors.cyanAccent : Colors.white70,

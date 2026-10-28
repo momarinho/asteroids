@@ -51,7 +51,7 @@ class ShopOverlay extends StatelessWidget {
                           Text(
                             'UPGRADE SHOP',
                             style: TextStyle(
-                              fontFamily: 'Courier',
+                              fontFamily: 'Rajdhani',
                               fontSize: 28,
                               fontWeight: FontWeight.bold,
                               letterSpacing: 2,
@@ -76,7 +76,7 @@ class ShopOverlay extends StatelessWidget {
                             Text(
                               '${credits}c',
                               style: const TextStyle(
-                                fontFamily: 'Courier',
+                                fontFamily: 'Rajdhani',
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white,
@@ -183,7 +183,7 @@ class ShopOverlay extends StatelessWidget {
                         },
                         style: TextButton.styleFrom(
                           foregroundColor: Colors.white30,
-                          textStyle: const TextStyle(fontSize: 10, fontFamily: 'Courier'),
+                          textStyle: const TextStyle(fontSize: 10, fontFamily: 'Rajdhani'),
                         ),
                         child: const Text('ADD CREDITS (CHEAT)'),
                       ),

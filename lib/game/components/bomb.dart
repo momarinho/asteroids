@@ -4,6 +4,7 @@ import 'package:flame/collisions.dart';
 import 'package:flutter/material.dart';
 import 'package:asteroids/constants.dart';
 import 'package:asteroids/game/asteroids_game.dart';
+import 'package:asteroids/game/glow.dart';
 import 'asteroid.dart';
 
 class BombComponent extends PositionComponent with HasGameReference<AsteroidsGame>, CollisionCallbacks {
@@ -89,18 +90,10 @@ class BombComponent extends PositionComponent with HasGameReference<AsteroidsGam
   void render(Canvas canvas) {
     canvas.translate(radius, radius);
 
-    // Filled red body
-    final fillPaint = Paint()
-      ..color = Colors.redAccent
-      ..style = PaintingStyle.fill;
-    canvas.drawCircle(Offset.zero, radius, fillPaint);
-
-    // Orange outline
-    final strokePaint = Paint()
-      ..color = Colors.amberAccent
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = GameConstants.lineWidth;
-    canvas.drawCircle(Offset.zero, radius, strokePaint);
+    // Bomba incandescente: orbe vermelha com núcleo quente e pulso rápido
+    final pulse = 0.85 + 0.15 * math.sin(fuseTimer * 30.0);
+    Glow.orb(canvas, Offset.zero, radius * pulse, Colors.redAccent, intensity: 1.2);
+    Glow.strokeCircle(canvas, Offset.zero, radius, Colors.amberAccent, width: GameConstants.lineWidth, intensity: 0.8);
   }
 }
 
@@ -189,20 +182,26 @@ class BombExplosionComponent extends PositionComponent with HasGameReference<Ast
 
     canvas.translate(maxRadius, maxRadius);
 
-    // Outer ring (red-orange)
-    final outerPaint = Paint()
-      ..color = Color.fromARGB(alpha, 255, (255 * 0.4).toInt(), 0)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = math.max(1.0, GameConstants.lineWidth * (1.0 - progress) * 3);
-    canvas.drawCircle(Offset.zero, radius, outerPaint);
+    // Outer ring (red-orange) com halo neon
+    Glow.strokeCircle(
+      canvas,
+      Offset.zero,
+      radius,
+      Color.fromARGB(alpha, 255, (255 * 0.4).toInt(), 0),
+      width: math.max(1.0, GameConstants.lineWidth * (1.0 - progress) * 3),
+      intensity: 1.0 - progress,
+    );
 
     // Inner ring (yellow)
     if (radius > 10.0) {
-      final innerPaint = Paint()
-        ..color = Color.fromARGB(alpha, 255, 255, 0)
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = math.max(1.0, GameConstants.lineWidth * (1.0 - progress) * 2);
-      canvas.drawCircle(Offset.zero, radius * 0.6, innerPaint);
+      Glow.strokeCircle(
+        canvas,
+        Offset.zero,
+        radius * 0.6,
+        Color.fromARGB(alpha, 255, 255, 0),
+        width: math.max(1.0, GameConstants.lineWidth * (1.0 - progress) * 2),
+        intensity: 1.0 - progress,
+      );
     }
   }
 }

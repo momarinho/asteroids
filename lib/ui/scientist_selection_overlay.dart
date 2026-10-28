@@ -278,14 +278,20 @@ class _ScientistSelectionOverlayState extends State<ScientistSelectionOverlay> w
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                const Text(
-                                  'ESCOLHA SUA CIENTISTA',
-                                  style: TextStyle(
-                                    fontFamily: 'Courier',
-                                    fontSize: 30,
-                                    fontWeight: FontWeight.bold,
-                                    letterSpacing: 4,
-                                    color: Colors.white,
+                                const FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  child: Text(
+                                    'ESCOLHA SUA CIENTISTA',
+                                    style: TextStyle(
+                                      fontFamily: 'Orbitron',
+                                      fontVariations: [FontVariation('wght', 800)],
+                                      fontSize: 26,
+                                      letterSpacing: 3,
+                                      color: Colors.white,
+                                      shadows: [
+                                        Shadow(color: Color(0x8800E5FF), blurRadius: 16),
+                                      ],
+                                    ),
                                   ),
                                 ),
                                 const SizedBox(height: 3),
@@ -325,7 +331,7 @@ class _ScientistSelectionOverlayState extends State<ScientistSelectionOverlay> w
                                 Text(
                                   '${_countdownSeconds}s',
                                   style: TextStyle(
-                                    fontFamily: 'Courier',
+                                    fontFamily: 'Rajdhani',
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
                                     letterSpacing: 1.2,
@@ -420,7 +426,7 @@ class _ScientistSelectionOverlayState extends State<ScientistSelectionOverlay> w
                                           Text(
                                             'CURIOSIDADE CIENTÍFICA • ',
                                             style: TextStyle(
-                                              fontFamily: 'Courier',
+                                              fontFamily: 'Rajdhani',
                                               fontSize: 12,
                                               fontWeight: FontWeight.bold,
                                               color: selected.primaryColor,
@@ -430,7 +436,7 @@ class _ScientistSelectionOverlayState extends State<ScientistSelectionOverlay> w
                                           Text(
                                             selected.name.toUpperCase(),
                                             style: const TextStyle(
-                                              fontFamily: 'Courier',
+                                              fontFamily: 'Rajdhani',
                                               fontSize: 12,
                                               fontWeight: FontWeight.bold,
                                               color: Colors.white,
@@ -441,7 +447,7 @@ class _ScientistSelectionOverlayState extends State<ScientistSelectionOverlay> w
                                           Text(
                                             '(${selected.role})',
                                             style: TextStyle(
-                                              fontFamily: 'Courier',
+                                              fontFamily: 'Rajdhani',
                                               fontSize: 11,
                                               color: selected.accentColor,
                                             ),
@@ -482,7 +488,7 @@ class _ScientistSelectionOverlayState extends State<ScientistSelectionOverlay> w
                                           Text(
                                             selected.specialAbilityName,
                                             style: TextStyle(
-                                              fontFamily: 'Courier',
+                                              fontFamily: 'Rajdhani',
                                               fontSize: 11,
                                               fontWeight: FontWeight.bold,
                                               color: selected.primaryColor,
@@ -494,7 +500,7 @@ class _ScientistSelectionOverlayState extends State<ScientistSelectionOverlay> w
                                       const Text(
                                         'Tecla E (1 uso)',
                                         style: TextStyle(
-                                          fontFamily: 'Courier',
+                                          fontFamily: 'Rajdhani',
                                           fontSize: 9.5,
                                           color: Colors.white54,
                                         ),
@@ -528,7 +534,7 @@ class _ScientistSelectionOverlayState extends State<ScientistSelectionOverlay> w
                               Text(
                                 '◄ / ► (A/D): NAVEGAR  •  [ESPAÇO / ENTER]: DECOLAR  •  [ESC]: VOLTAR',
                                 style: TextStyle(
-                                  fontFamily: 'Courier',
+                                  fontFamily: 'Rajdhani',
                                   fontSize: 12.5,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.white70,
@@ -639,7 +645,7 @@ class _ScientistSelectionOverlayState extends State<ScientistSelectionOverlay> w
                             Text(
                               isSelected ? 'AO VIVO' : 'STANDBY',
                               style: TextStyle(
-                                fontFamily: 'Courier',
+                                fontFamily: 'Rajdhani',
                                 fontSize: 9.5,
                                 fontWeight: FontWeight.bold,
                                 color: isSelected ? Colors.white : Colors.white54,
@@ -690,7 +696,7 @@ class _ScientistSelectionOverlayState extends State<ScientistSelectionOverlay> w
                       Text(
                         scientist.name,
                         style: const TextStyle(
-                          fontFamily: 'Courier',
+                          fontFamily: 'Rajdhani',
                           fontSize: 17,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
@@ -739,7 +745,7 @@ class _ScientistSelectionOverlayState extends State<ScientistSelectionOverlay> w
                       Text(
                         'BIOGRAFIA & LEGADO',
                         style: TextStyle(
-                          fontFamily: 'Courier',
+                          fontFamily: 'Rajdhani',
                           fontSize: 11,
                           fontWeight: FontWeight.bold,
                           color: scientist.primaryColor,
@@ -785,7 +791,7 @@ class _ScientistSelectionOverlayState extends State<ScientistSelectionOverlay> w
                         child: Text(
                           scientist.weaponName,
                           style: const TextStyle(
-                            fontFamily: 'Courier',
+                            fontFamily: 'Rajdhani',
                             fontSize: 13,
                             fontWeight: FontWeight.bold,
                             color: Colors.amberAccent,
@@ -810,7 +816,7 @@ class _ScientistSelectionOverlayState extends State<ScientistSelectionOverlay> w
                             Text(
                               'Especial [E]',
                               style: TextStyle(
-                                fontFamily: 'Courier',
+                                fontFamily: 'Rajdhani',
                                 fontSize: 9.5,
                                 fontWeight: FontWeight.bold,
                                 color: scientist.primaryColor,
@@ -863,7 +869,7 @@ class _ScientistSelectionOverlayState extends State<ScientistSelectionOverlay> w
                     Text(
                       isSelected ? 'DECOLAR (ESPAÇO)' : 'SELECIONAR',
                       style: TextStyle(
-                        fontFamily: 'Courier',
+                        fontFamily: 'Rajdhani',
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
                         letterSpacing: 1.1,
@@ -887,7 +893,7 @@ class _ScientistSelectionOverlayState extends State<ScientistSelectionOverlay> w
         Text(
           '$label ',
           style: const TextStyle(
-            fontFamily: 'Courier',
+            fontFamily: 'Rajdhani',
             fontSize: 11,
             fontWeight: FontWeight.bold,
             color: Colors.white54,

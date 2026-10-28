@@ -4,6 +4,7 @@ import 'package:flame/collisions.dart';
 import 'package:flutter/material.dart';
 import 'package:asteroids/constants.dart';
 import 'package:asteroids/game/asteroids_game.dart';
+import 'package:asteroids/game/glow.dart';
 import 'drop.dart';
 
 class AsteroidComponent extends PositionComponent with HasGameReference<AsteroidsGame>, CollisionCallbacks {
@@ -119,10 +120,6 @@ class AsteroidComponent extends PositionComponent with HasGameReference<Asteroid
     canvas.translate(radius, radius);
 
     final isFlashing = hitFlashTimer > 0;
-    final paint = Paint()
-      ..color = isFlashing ? Colors.redAccent : Colors.white
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = isFlashing ? GameConstants.lineWidth * 1.8 : GameConstants.lineWidth;
 
     if (isFlashing) {
       final fillPaint = Paint()
@@ -159,7 +156,14 @@ class AsteroidComponent extends PositionComponent with HasGameReference<Asteroid
     }
     path.close();
 
-    canvas.drawPath(path, paint);
+    // Contorno neon: branco-azulado frio normalmente, vermelho ao tomar dano.
+    Glow.strokePath(
+      canvas,
+      path,
+      isFlashing ? Colors.redAccent : const Color(0xFFDDEBFF),
+      width: isFlashing ? GameConstants.lineWidth * 1.8 : GameConstants.lineWidth,
+      intensity: isFlashing ? 1.6 : 0.9,
+    );
   }
 
   void split() {
