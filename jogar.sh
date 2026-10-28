@@ -23,10 +23,18 @@ trap "kill $SERVER_PID 2>/dev/null || true" EXIT
 sleep 1
 
 echo "Abrindo o jogo..."
-if command -v xdg-open >/dev/null 2>&1; then
+if command -v google-chrome >/dev/null 2>&1; then
+    google-chrome --app="http://localhost:8080" >/dev/null 2>&1 &
+elif command -v chromium >/dev/null 2>&1; then
+    chromium --app="http://localhost:8080" >/dev/null 2>&1 &
+elif command -v chromium-browser >/dev/null 2>&1; then
+    chromium-browser --app="http://localhost:8080" >/dev/null 2>&1 &
+elif command -v microsoft-edge >/dev/null 2>&1; then
+    microsoft-edge --app="http://localhost:8080" >/dev/null 2>&1 &
+elif command -v brave-browser >/dev/null 2>&1; then
+    brave-browser --app="http://localhost:8080" >/dev/null 2>&1 &
+elif command -v xdg-open >/dev/null 2>&1; then
     xdg-open "http://localhost:8080"
-elif command -v google-chrome >/dev/null 2>&1; then
-    google-chrome --app="http://localhost:8080"
 fi
 
 echo "Jogo rodando em: http://localhost:8080"
