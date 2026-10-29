@@ -8578,7 +8578,7 @@ agi:function agi(){},
 agj:function agj(){},
 agk:function agk(){},
 a1l(){return new A.td("Laser Fot\xf4nico",0.3,25,8,50)},
-aj6(){return new A.vC("Tiro Dispersor",0.5,55,12,25)},
+aj6(){return new A.vC("Tiro Dispersor",0.52,55,11,16)},
 aen(){return new A.v3("Laser Veloz",0.15,12,6,18)},
 a1m(){return new A.tg("Lan\xe7a-Bombas",1.45,135,18,120)},
 o0:function o0(){},
@@ -44576,7 +44576,7 @@ g=new A.P(h)
 h[1]=e
 h[0]=d
 g.ao(l)
-s.ck(A.JN(q,18,0.75,c,3.2,g))}}a5.lu(A.b([B.cs,B.az,B.f],p),36,6,240,3,80,r)
+s.ck(A.JN(q,12,0.6,c,2.8,g))}}a5.lu(A.b([B.cs,B.az,B.f],p),36,6,240,3,80,r)
 break
 case"margaret_hamilton":s.rx=3
 for(s=a5.ok,j=0;j<16;++j){i=j*0.39269908169872414
@@ -44628,7 +44628,7 @@ p[1]=a1[1]
 p[0]=a1[0]
 k.j0(l)
 p=a0.p1
-if(Math.sqrt(k.gfo())<=p+45)if(a0.CG(100,q))a5.Lh(q,B.j.cH(p*16))}break
+if(Math.sqrt(k.gfo())<=p+45)if(a0.CG(100,q))a5.Lh(q,B.j.cH(p*5))}break
 case"peggy_whitson":s.rx=3
 s=new A.P(new Float32Array(2))
 s.av(r)
@@ -44637,7 +44637,7 @@ break}},
 Xd(a){var s,r,q=this
 if(q.X!==B.ae)return
 q.cY=a
-if(a){s=q.e6+=3000
+if(a){s=q.e6+=1000
 if(!q.dD){r=q.d7
 s=r>0&&s>r}else s=!1
 if(s)q.dD=!0
@@ -44831,29 +44831,29 @@ e7(){var s=this.dL$
 return s==null?this.kv():s}}
 A.Rx.prototype={}
 A.y7.prototype={
-aZ(a){var s,r,q,p=this
-p.j1(a)
-s=p.gaj().X
+aZ(a){var s,r,q,p,o=this
+o.j1(a)
+s=o.gaj().X
 if(s!==B.ae)return
-if(J.bL(p.gaj().ok.gdf().fR(0,t.dp))>=24)return
-p.ay+=a
-s=p.ch+=a
+o.ay+=a
+s=o.ch+=a
 if(s<50){r=s/50
 q=3.2-r
-p.cx=0.55+r*0.3}else if(s<105){r=(s-50)/55
+o.cx=0.55+r*0.3}else if(s<105){r=(s-50)/55
 q=2.2-r*0.9
-p.cx=0.85+r*0.4}else if(s<150){r=(s-105)/45
+o.cx=0.85+r*0.4}else if(s<150){r=(s-105)/45
 q=1.3-r*0.6
-p.cx=1.25+r*0.5}else{r=B.c.c5((s-150)/30,0,1)
+o.cx=1.25+r*0.5}else{r=B.c.c5((s-150)/30,0,1)
 q=0.7-r*0.44
-p.cx=1.75+r*0.9}if(p.ay>q){p.ay=0
-p.Uv()
-if(p.ch>=150)s=B.E.ci()<0.65
+o.cx=1.75+r*0.9}if(o.ay>q){o.ay=0
+p=J.bL(o.gaj().ok.gdf().fR(0,t.dp))
+if(p<38){o.Uv()
+if(o.ch>=150)s=B.E.ci()<0.65&&p<36
 else s=!1
-if(s)p.Uv()}},
+if(s)o.Uv()}}},
 Uv(){var s,r,q,p,o,n,m,l,k,j,i=this
 if(i.gaj().X!==B.ae)return
-if(J.bL(i.gaj().ok.gdf().fR(0,t.dp))>=24)return
+if(J.bL(i.gaj().ok.gdf().fR(0,t.dp))>=38)return
 s=B.E.ki(4)
 r=B.E.ci()
 switch(s){case 0:q=new A.P(new Float32Array(2))
@@ -44946,7 +44946,7 @@ if(Math.sqrt(d.Jy(h))<=n+g)if(i.CG(m,h)){++k
 f=q.dL$
 if(f==null){e=q.e7()
 e.toString
-f=q.dL$=l.a(e)}f.Lh(h,B.j.cH(g*16))}}if(k>=2){p=q.gaj()
+f=q.dL$=l.a(e)}f.Lh(h,B.j.cH(g*5))}}if(k>=2){p=q.gaj()
 o=new A.P(new Float32Array(2))
 o.aO(0,-32)
 o=d.M(0,o)
@@ -45001,7 +45001,7 @@ s.a0()}if((n.p3-=a)<=0)n.f9()},
 m6(a,b){var s=this,r="asteroid_split.wav"
 s.xG(a,b)
 if(b instanceof A.i_){if(b.CG(s.p4,s.ax.e)){s.gaj().ca(r)
-s.gaj().Lh(b.ax.e,B.j.cH(b.p1*16))}else s.gaj().ca(r)
+s.gaj().Lh(b.ax.e,B.j.cH(b.p1*5))}else s.gaj().ca(r)
 s.f9()}},
 eX(a){var s,r=this.p1
 a.a.translate(r,r)
@@ -45180,22 +45180,22 @@ if(this.gaj().X!==B.ae)return
 if(b instanceof A.Bz)this.a9A()},
 a9A(){var s,r,q,p=this
 p.gaj().ca("powerup.wav")
-switch(p.p1.a){case 0:p.gaj().e6+=350;++p.gaj().jq
-p.gaj().jJ(p.ax.e,"+350 AMOSTRA LUNAR!",B.l,15)
+switch(p.p1.a){case 0:p.gaj().e6+=100;++p.gaj().jq
+p.gaj().jJ(p.ax.e,"+100 AMOSTRA LUNAR!",B.l,15)
 s=B.l
 break
-case 1:p.gaj().e6+=750;++p.gaj().jq
-p.gaj().jJ(p.ax.e,"+750 H\xc9LIO-3 RARO!",B.M,16)
+case 1:p.gaj().e6+=250;++p.gaj().jq
+p.gaj().jJ(p.ax.e,"+250 H\xc9LIO-3 RARO!",B.M,16)
 s=B.M
 break
-case 2:p.gaj().e6+=1500;++p.gaj().jq
+case 2:p.gaj().e6+=500;++p.gaj().jq
 r=p.gaj()
 r.bb=r.aQ=0.2
 r.d6=5
 r=p.gaj()
 q=new A.P(new Float32Array(2))
 q.aO(0,-35)
-r.q4(p.ax.e,"+1500 MAT\xc9RIA ESCURA! \ud83c\udf0c",B.f3,17.5,q)
+r.q4(p.ax.e,"+500 MAT\xc9RIA ESCURA! \ud83c\udf0c",B.f3,17.5,q)
 s=B.f3
 break
 case 3:r=p.gaj().C
@@ -45206,10 +45206,10 @@ s=B.ix
 break
 case 4:r=p.ax.e
 if(p.gaj().dT<3){++p.gaj().dT
-p.gaj().jJ(r,"+1 VIDA!",B.cs,15)}else{p.gaj().e6+=300
-p.gaj().jJ(r,"+300 REPARO!",B.cs,15)}s=B.cs
+p.gaj().jJ(r,"+1 VIDA!",B.cs,15)}else{p.gaj().e6+=100
+p.gaj().jJ(r,"+100 REPARO!",B.cs,15)}s=B.cs
 break
-case 5:p.gaj().e6+=3000
+case 5:p.gaj().e6+=1500
 p.gaj().jq+=2
 if(p.gaj().dT<3)++p.gaj().dT
 else{r=p.gaj().C
@@ -45220,7 +45220,7 @@ r.d6=8
 r=p.gaj()
 q=new A.P(new Float32Array(2))
 q.aO(0,-40)
-r.q4(p.ax.e,"+3000 POEIRA DO COMETA! \u2604\ufe0f",B.az,18,q)
+r.q4(p.ax.e,"+1500 POEIRA DO COMETA! \u2604\ufe0f",B.az,18,q)
 s=B.az
 break
 default:s=null}p.gaj().lu(A.b([s,B.f],t._),18,4.5,160,2,60,p.ax.e)
@@ -45960,18 +45960,18 @@ m=new A.P(n)
 n[1]=l[1]
 n[0]=l[0]
 m.ao(f)
-i=A.JN(null,this.e,0.6,j,4,m)
+i=A.JN(null,this.e,0.52,j,3.5,m)
 m=a.dL$
 if(m==null){h=a.e7()
 h.toString
 n=a.dL$=q.a(h)}else n=m
 n.ok.ck(i)}return!0},
 zY(){var s=this,r=s.f
-if(r===2){s.b=0.4
+if(r===2){s.b=0.44
 s.c=40
-s.e=32}else if(r===3){s.b=0.3
+s.e=20}else if(r===3){s.b=0.36
 s.c=25
-s.e=40}}}
+s.e=24}}}
 A.v3.prototype={
 B8(a){var s=a.giN().R(0,500),r=a.ax.e.M(0,a.giN().R(0,20)),q=A.JN(null,this.e,0.8,r,3,s)
 a.gaj().ok.ck(q)
@@ -46203,8 +46203,8 @@ p=A.w(10,B.f.l()>>>16&255,B.f.l()>>>8&255,B.f.l()&255)
 m=A.ai(8)
 q.push(A.aI(f,B.Ir,B.n,f,f,new A.ay(p,f,A.ba(B.aq,1),m,f,f,B.u),f,f,f,B.HH,f,f,f))
 return A.k0(f,A.kq(B.F,A.e8(A.vv(A.jN(A.jH(A.aI(f,A.bN(q,B.p,B.o,B.B),B.n,f,f,new A.ay(a1,f,a3,a2,a4,f,B.u),f,f,f,B.I_,f,f,580),a0),B.V),B.HP),f,f)),B.am,!1,f,f,f,f,f,f,f,f,f,f,f,f,f,new A.apd(g),f,f,f)},
-acf(a,b){if(b||a>=25e3)return"COMANDANTE DA FROTA C\xd3SMICA \ud83d\udc51"
-else if(a>=12e3)return"PESQUISADOR(A) SENIOR DO ESPA\xc7O \ud83e\ude90"
+acf(a,b){if(b||a>=2e4)return"COMANDANTE DA FROTA C\xd3SMICA \ud83d\udc51"
+else if(a>=1e4)return"PESQUISADOR(A) SENIOR DO ESPA\xc7O \ud83e\ude90"
 else return"CADETE ESPACIAL DA FEIRA \ud83d\ude80"}}
 A.ape.prototype={
 $2(a,b){var s
@@ -97610,7 +97610,7 @@ B.Ir=new A.i8(B.bC,B.Sh,null)
 B.Jj=new A.bI(984494,"MaterialIcons",!1)
 B.JB=new A.ck(B.Jj,20,B.bq,null,null)
 B.Ys=new A.m(!0,B.bq,null,"Rajdhani",null,null,12.5,B.q,null,1,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null)
-B.a_k=new A.bm("\ud83c\udfc5 MEDALHA DE HONRA: SOBREVIVENTE ESPACIAL (+3000 PTS B\xd4NUS!)",null,B.Ys,null,null,null,null,null,null)
+B.a_k=new A.bm("\ud83c\udfc5 MEDALHA DE HONRA: SOBREVIVENTE ESPACIAL (+1000 PTS B\xd4NUS!)",null,B.Ys,null,null,null,null,null,null)
 B.Nb=s([B.JB,B.ah,B.a_k],t.p)
 B.Sc=new A.dB(B.Y,B.o,B.B,B.p,null,B.ai,null,0,B.Nb,null)
 B.Is=new A.i8(B.bC,B.Sc,null)

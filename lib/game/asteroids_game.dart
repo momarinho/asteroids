@@ -778,10 +778,10 @@ class AsteroidsGame extends FlameGame with HasCollisionDetection, KeyboardEvents
             final dir = Vector2(math.cos(ang), math.sin(ang));
             final bullet = BulletComponent(
               position: player.position + dir * (player.radius + 2.0),
-              radius: 3.2,
+              radius: 2.8,
               velocity: dir * wave.speed,
-              lifeTimer: 0.75,
-              damage: 18.0,
+              lifeTimer: 0.60,
+              damage: 12.0,
               color: wave.color,
             );
             world.add(bullet);
@@ -835,7 +835,7 @@ class AsteroidsGame extends FlameGame with HasCollisionDetection, KeyboardEvents
           if (perpDist <= ast.radius + 45.0) {
             final destroyed = ast.takeDamage(100.0, ast.position);
             if (destroyed) {
-              onAsteroidDestroyed(ast.position, (ast.radius * 16).toInt());
+              onAsteroidDestroyed(ast.position, (ast.radius * 5).toInt());
             }
           }
         }
@@ -902,7 +902,7 @@ class AsteroidsGame extends FlameGame with HasCollisionDetection, KeyboardEvents
 
     missionSurvived = survived;
     if (survived) {
-      score += 3000; // Full 3-minute survival bonus (calibrated for fair play)
+      score += 1000; // Bônus de sobrevivência de 3 minutos completos
       if (!topRecordBeaten && topLeaderScore > 0 && score > topLeaderScore) {
         topRecordBeaten = true;
       }

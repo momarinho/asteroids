@@ -78,10 +78,10 @@ class SpreadShot extends Weapon {
   SpreadShot()
       : super(
           name: "Tiro Dispersor",
-          cooldown: 0.5,
+          cooldown: 0.52,
           recoil: 55.0,
-          muzzleFlashSize: 12.0,
-          damage: 25.0,
+          muzzleFlashSize: 11.0,
+          damage: 16.0,
         );
 
   @override
@@ -101,9 +101,9 @@ class SpreadShot extends Weapon {
 
       final bullet = BulletComponent(
         position: player.position + player.forward * player.radius,
-        radius: 4.0,
+        radius: 3.5,
         velocity: direction * baseSpeed,
-        lifeTimer: 0.6,
+        lifeTimer: 0.52,
         damage: damage,
       );
       player.game.world.add(bullet);
@@ -114,13 +114,13 @@ class SpreadShot extends Weapon {
   @override
   void applyUpgradeStats() {
     if (level == 2) {
-      cooldown = 0.4;
+      cooldown = 0.44;
       recoil = 40.0;
-      damage = 32.0;
+      damage = 20.0;
     } else if (level == 3) {
-      cooldown = 0.3;
+      cooldown = 0.36;
       recoil = 25.0;
-      damage = 40.0;
+      damage = 24.0;
     }
   }
 }

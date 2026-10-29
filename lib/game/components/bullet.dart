@@ -68,7 +68,7 @@ class BulletComponent extends PositionComponent with HasGameReference<AsteroidsG
       final destroyed = other.takeDamage(damage, position);
       if (destroyed) {
         game.playSfx('asteroid_split.wav');
-        game.onAsteroidDestroyed(other.position, (other.radius * 16).toInt());
+        game.onAsteroidDestroyed(other.position, (other.radius * 5).toInt());
       } else {
         game.playSfx('asteroid_split.wav');
       }

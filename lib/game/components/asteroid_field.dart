@@ -22,12 +22,7 @@ class AsteroidField extends Component with HasGameReference<AsteroidsGame> {
       return;
     }
 
-    // Limite máximo de meteoros ativos simultaneamente para manter performance a 60 FPS
-    final activeAsteroids = game.world.children.whereType<AsteroidComponent>().length;
-    if (activeAsteroids >= 24) {
-      return;
-    }
-
+    // Sempre avança o tempo de jogo e dificuldade progressiva
     spawnTimer += dt;
     difficultyTimer += dt;
 
@@ -56,18 +51,22 @@ class AsteroidField extends Component with HasGameReference<AsteroidsGame> {
 
     if (spawnTimer > spawnInterval) {
       spawnTimer = 0.0;
-      _spawnAsteroid();
-
-      // Na tempestade final, alta frequência de spawns duplos!
-      if (difficultyTimer >= 150.0 && math.Random().nextDouble() < 0.65) {
+      final activeAsteroids = game.world.children.whereType<AsteroidComponent>().length;
+      // Permite até 38 meteoros simultâneos na tela (intenso e sem engasgos)
+      if (activeAsteroids < 38) {
         _spawnAsteroid();
+
+        // Na tempestade final, alta frequência de spawns duplos se houver espaço
+        if (difficultyTimer >= 150.0 && math.Random().nextDouble() < 0.65 && activeAsteroids < 36) {
+          _spawnAsteroid();
+        }
       }
     }
   }
 
   void _spawnAsteroid() {
     if (game.state != GameState.playing) return;
-    if (game.world.children.whereType<AsteroidComponent>().length >= 24) return;
+    if (game.world.children.whereType<AsteroidComponent>().length >= 38) return;
 
     final random = math.Random();
     final screenWidth = GameConstants.screenWidth;

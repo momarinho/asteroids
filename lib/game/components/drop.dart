@@ -92,11 +92,11 @@ class DropComponent extends PositionComponent with HasGameReference<AsteroidsGam
     Color particleColor;
     switch (type) {
       case DropType.lunarSample:
-        game.score += 350;
+        game.score += 100;
         game.samplesCollected++;
         game.spawnFloatingText(
           position,
-          "+350 AMOSTRA LUNAR!",
+          "+100 AMOSTRA LUNAR!",
           color: Colors.cyanAccent,
           fontSize: 15.0,
         );
@@ -104,11 +104,11 @@ class DropComponent extends PositionComponent with HasGameReference<AsteroidsGam
         break;
 
       case DropType.rareHelium:
-        game.score += 750;
+        game.score += 250;
         game.samplesCollected++;
         game.spawnFloatingText(
           position,
-          "+750 HÉLIO-3 RARO!",
+          "+250 HÉLIO-3 RARO!",
           color: Colors.amberAccent,
           fontSize: 16.0,
         );
@@ -116,12 +116,12 @@ class DropComponent extends PositionComponent with HasGameReference<AsteroidsGam
         break;
 
       case DropType.darkMatter:
-        game.score += 1500;
+        game.score += 500;
         game.samplesCollected++;
         game.triggerScreenShake(duration: 0.2, intensity: 5.0);
         game.spawnFloatingText(
           position,
-          "+1500 MATÉRIA ESCURA! 🌌",
+          "+500 MATÉRIA ESCURA! 🌌",
           color: const Color(0xFFE040FB),
           fontSize: 17.5,
           velocity: Vector2(0, -35),
@@ -150,10 +150,10 @@ class DropComponent extends PositionComponent with HasGameReference<AsteroidsGam
             fontSize: 15.0,
           );
         } else {
-          game.score += 300;
+          game.score += 100;
           game.spawnFloatingText(
             position,
-            "+300 REPARO!",
+            "+100 REPARO!",
             color: const Color(0xFF00E676),
             fontSize: 15.0,
           );
@@ -162,7 +162,7 @@ class DropComponent extends PositionComponent with HasGameReference<AsteroidsGam
         break;
 
       case DropType.cometDust:
-        game.score += 3000;
+        game.score += 1500;
         game.samplesCollected += 2;
         if (game.lives < 3) {
           game.lives += 1;
@@ -172,7 +172,7 @@ class DropComponent extends PositionComponent with HasGameReference<AsteroidsGam
         game.triggerScreenShake(duration: 0.35, intensity: 8.0);
         game.spawnFloatingText(
           position,
-          "+3000 POEIRA DO COMETA! ☄️",
+          "+1500 POEIRA DO COMETA! ☄️",
           color: const Color(0xFF00E5FF),
           fontSize: 18.0,
           velocity: Vector2(0, -40),

@@ -25,7 +25,7 @@ void main() {
       expect(asteroids.isEmpty, isTrue);
     });
 
-    test('AsteroidField caps active asteroids to 24 to preserve 60 FPS performance', () {
+    test('AsteroidField caps active asteroids to preserve 60 FPS performance without stalling gameplay', () {
       final game = AsteroidsGame();
       final field = AsteroidField();
       game.world.add(field);
@@ -38,7 +38,7 @@ void main() {
       }
 
       final asteroids = game.world.children.whereType<AsteroidComponent>();
-      expect(asteroids.length <= 24, isTrue);
+      expect(asteroids.length <= 38, isTrue);
     });
 
     test('changeState to non-playing states cleans up all asteroids and spawners', () {
