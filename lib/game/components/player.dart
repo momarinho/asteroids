@@ -176,32 +176,57 @@ class PlayerComponent extends PositionComponent with HasGameReference<AsteroidsG
       accelerate(dt, stick.length);
       isThrusting = true;
     } else {
-      // Standard Keyboard Input Handling
+      // Standard Keyboard Input Handling (with HardwareKeyboard fallback to eliminate matrix ghosting)
       double rotateDirection = 0.0;
-      if (keys.contains(LogicalKeyboardKey.arrowLeft) || keys.contains(LogicalKeyboardKey.keyA)) {
+      final isLeft = keys.contains(LogicalKeyboardKey.arrowLeft) ||
+          keys.contains(LogicalKeyboardKey.keyA) ||
+          HardwareKeyboard.instance.isLogicalKeyPressed(LogicalKeyboardKey.arrowLeft) ||
+          HardwareKeyboard.instance.isLogicalKeyPressed(LogicalKeyboardKey.keyA);
+
+      final isRight = keys.contains(LogicalKeyboardKey.arrowRight) ||
+          keys.contains(LogicalKeyboardKey.keyD) ||
+          HardwareKeyboard.instance.isLogicalKeyPressed(LogicalKeyboardKey.arrowRight) ||
+          HardwareKeyboard.instance.isLogicalKeyPressed(LogicalKeyboardKey.keyD);
+
+      if (isLeft) {
         rotateDirection -= 1.0;
       }
-      if (keys.contains(LogicalKeyboardKey.arrowRight) || keys.contains(LogicalKeyboardKey.keyD)) {
+      if (isRight) {
         rotateDirection += 1.0;
       }
       if (rotateDirection != 0.0) {
         rotate(dt, rotateDirection);
       }
 
-      if (keys.contains(LogicalKeyboardKey.arrowUp) || keys.contains(LogicalKeyboardKey.keyW)) {
+      final isUp = keys.contains(LogicalKeyboardKey.arrowUp) ||
+          keys.contains(LogicalKeyboardKey.keyW) ||
+          HardwareKeyboard.instance.isLogicalKeyPressed(LogicalKeyboardKey.arrowUp) ||
+          HardwareKeyboard.instance.isLogicalKeyPressed(LogicalKeyboardKey.keyW);
+
+      if (isUp) {
         accelerate(dt, 1.0);
         isThrusting = true;
       } else {
         isThrusting = false;
       }
-      if (keys.contains(LogicalKeyboardKey.arrowDown) || keys.contains(LogicalKeyboardKey.keyS)) {
+
+      final isDown = keys.contains(LogicalKeyboardKey.arrowDown) ||
+          keys.contains(LogicalKeyboardKey.keyS) ||
+          HardwareKeyboard.instance.isLogicalKeyPressed(LogicalKeyboardKey.arrowDown) ||
+          HardwareKeyboard.instance.isLogicalKeyPressed(LogicalKeyboardKey.keyS);
+
+      if (isDown) {
         accelerate(dt, -1.0);
       }
     }
 
-    if (keys.contains(LogicalKeyboardKey.shiftLeft) ||
+    final isDash = keys.contains(LogicalKeyboardKey.shiftLeft) ||
         keys.contains(LogicalKeyboardKey.shiftRight) ||
-        game.mobileDashPressed) {
+        HardwareKeyboard.instance.isLogicalKeyPressed(LogicalKeyboardKey.shiftLeft) ||
+        HardwareKeyboard.instance.isLogicalKeyPressed(LogicalKeyboardKey.shiftRight) ||
+        game.mobileDashPressed;
+
+    if (isDash) {
       dash();
       game.mobileDashPressed = false;
     }
@@ -211,11 +236,36 @@ class PlayerComponent extends PositionComponent with HasGameReference<AsteroidsG
     position += velocity * dt;
     wrapAround();
 
-    if (keys.contains(LogicalKeyboardKey.space) || game.mobileShootPressed) {
+    // Disparo multi-tecla: Espaço, Z, X, C, Ctrl, Numpad 0 ou Enter
+    // Isso resolve completamente qualquer conflito de ghosting em teclados escolares
+    final isShoot = keys.contains(LogicalKeyboardKey.space) ||
+        keys.contains(LogicalKeyboardKey.keyZ) ||
+        keys.contains(LogicalKeyboardKey.keyX) ||
+        keys.contains(LogicalKeyboardKey.keyC) ||
+        keys.contains(LogicalKeyboardKey.controlLeft) ||
+        keys.contains(LogicalKeyboardKey.controlRight) ||
+        keys.contains(LogicalKeyboardKey.numpad0) ||
+        keys.contains(LogicalKeyboardKey.enter) ||
+        keys.contains(LogicalKeyboardKey.numpadEnter) ||
+        HardwareKeyboard.instance.isLogicalKeyPressed(LogicalKeyboardKey.space) ||
+        HardwareKeyboard.instance.isLogicalKeyPressed(LogicalKeyboardKey.keyZ) ||
+        HardwareKeyboard.instance.isLogicalKeyPressed(LogicalKeyboardKey.keyX) ||
+        HardwareKeyboard.instance.isLogicalKeyPressed(LogicalKeyboardKey.keyC) ||
+        HardwareKeyboard.instance.isLogicalKeyPressed(LogicalKeyboardKey.controlLeft) ||
+        HardwareKeyboard.instance.isLogicalKeyPressed(LogicalKeyboardKey.controlRight) ||
+        HardwareKeyboard.instance.isLogicalKeyPressed(LogicalKeyboardKey.numpad0) ||
+        HardwareKeyboard.instance.isLogicalKeyPressed(LogicalKeyboardKey.enter) ||
+        HardwareKeyboard.instance.isLogicalKeyPressed(LogicalKeyboardKey.numpadEnter) ||
+        game.mobileShootPressed;
+
+    if (isShoot) {
       shoot();
     }
 
-    if (keys.contains(LogicalKeyboardKey.keyE)) {
+    final isSpecial = keys.contains(LogicalKeyboardKey.keyE) ||
+        HardwareKeyboard.instance.isLogicalKeyPressed(LogicalKeyboardKey.keyE);
+
+    if (isSpecial) {
       game.triggerSpecial();
     }
 

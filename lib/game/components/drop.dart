@@ -192,6 +192,7 @@ class DropComponent extends PositionComponent with HasGameReference<AsteroidsGam
       maxSpeed: 160.0,
     );
 
+    game.checkRunEvolution();
     removeFromParent();
   }
 

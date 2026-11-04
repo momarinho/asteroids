@@ -11,14 +11,15 @@ class BombComponent extends PositionComponent with HasGameReference<AsteroidsGam
   final Vector2 velocity;
   final double damage;
   double fuseTimer = 1.1; // Max flight time if no asteroid is hit
-  final double explosionRadius = 90.0; // Balanced: wide impact without trivializing the whole screen
+  final double explosionRadius;
   final double radius = 10.0;
   bool _hasExploded = false;
 
   BombComponent({
     required Vector2 position,
     required this.velocity,
-    this.damage = 120.0,
+    this.damage = 130.0,
+    this.explosionRadius = 95.0,
   }) {
     this.position = position;
     anchor = Anchor.center;
@@ -144,7 +145,7 @@ class BombExplosionComponent extends PositionComponent with HasGameReference<Ast
         final destroyed = asteroid.takeDamage(damage, asteroid.position);
         if (destroyed) {
           destroyedCount++;
-          game.onAsteroidDestroyed(asteroid.position, (asteroid.radius * 5).toInt());
+          game.onAsteroidDestroyed(asteroid.position, asteroid.scoreValue);
         }
       }
     }

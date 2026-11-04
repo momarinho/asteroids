@@ -19,6 +19,18 @@ class AsteroidComponent extends PositionComponent with HasGameReference<Asteroid
   late double hp;
   double hitFlashTimer = 0.0;
 
+  /// Pontuação calibrada para a Feira de Ciências:
+  /// Meteoros menores são mais velozes, têm hitbox menor e pontuam mais!
+  int get scoreValue {
+    if (radius <= GameConstants.asteroidMinRadius * 1.25) {
+      return 300; // Pequeno: alvo ágil e desafiador (+300 pts)
+    } else if (radius <= GameConstants.asteroidMinRadius * 2.2) {
+      return 150; // Médio: fragmento intermediário (+150 pts)
+    } else {
+      return 50;  // Grande: fácil de acertar, abertura (+50 pts)
+    }
+  }
+
   AsteroidComponent({
     required this.radius,
     required Vector2 position,

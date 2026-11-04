@@ -218,6 +218,54 @@ class _HudOverlayState extends State<HudOverlay> with SingleTickerProviderStateM
                       color: scientist.accentColor,
                     ),
                   ),
+                  const SizedBox(height: 3),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'ARMA: ',
+                        style: TextStyle(
+                          fontFamily: 'Rajdhani',
+                          fontSize: 10,
+                          color: Colors.white.withOpacity(0.7),
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+                        decoration: BoxDecoration(
+                          color: game.player.weapon.level >= 3
+                              ? Colors.amber.withOpacity(0.25)
+                              : (game.player.weapon.level == 2
+                                  ? Colors.cyanAccent.withOpacity(0.25)
+                                  : Colors.white10),
+                          borderRadius: BorderRadius.circular(4),
+                          border: Border.all(
+                            color: game.player.weapon.level >= 3
+                                ? Colors.amberAccent
+                                : (game.player.weapon.level == 2
+                                    ? Colors.cyanAccent
+                                    : Colors.white30),
+                            width: 1,
+                          ),
+                        ),
+                        child: Text(
+                          game.player.weapon.level >= 3
+                              ? 'NV 3 MÁX ★'
+                              : 'NV ${game.player.weapon.level}',
+                          style: TextStyle(
+                            fontFamily: 'Rajdhani',
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                            color: game.player.weapon.level >= 3
+                                ? Colors.amberAccent
+                                : (game.player.weapon.level == 2
+                                    ? Colors.cyanAccent
+                                    : Colors.white),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
 
                   // Item 2: Science Samples Collected Badge
                   const SizedBox(height: 8),
@@ -1218,12 +1266,22 @@ class _HudOverlayState extends State<HudOverlay> with SingleTickerProviderStateM
                               ),
                               const SizedBox(height: 5),
 
-                              // Dismiss Prompt
+                              // Dismiss Prompt & Controls Info
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
-                                    'Pressione qualquer botão para continuar ▶',
+                                    '🎮 SETAS/WASD: Pilotar | ESPAÇO/Z/CTRL: Atirar | E: Especial',
+                                    style: TextStyle(
+                                      fontFamily: 'Rajdhani',
+                                      fontSize: 10.0,
+                                      fontWeight: FontWeight.bold,
+                                      color: scientist.primaryColor,
+                                      letterSpacing: 0.8,
+                                    ),
+                                  ),
+                                  Text(
+                                    'Clique ou pressione qualquer tecla ▶',
                                     style: TextStyle(
                                       fontFamily: 'Rajdhani',
                                       fontSize: 9.5,

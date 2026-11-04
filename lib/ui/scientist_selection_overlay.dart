@@ -532,7 +532,7 @@ class _ScientistSelectionOverlayState extends State<ScientistSelectionOverlay> w
                               Icon(Icons.keyboard, color: Colors.cyanAccent, size: 18),
                               SizedBox(width: 8),
                               Text(
-                                '◄ / ► (A/D): NAVEGAR  •  [ESPAÇO / ENTER]: DECOLAR  •  [ESC]: VOLTAR',
+                                '◄ / ► (A/D): ESCOLHER  •  [ESPAÇO / ENTER]: DECOLAR  •  EM JOGO: [ESPAÇO / Z / CTRL]: ATIRAR',
                                 style: TextStyle(
                                   fontFamily: 'Rajdhani',
                                   fontSize: 12.5,
