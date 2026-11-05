@@ -9,6 +9,15 @@ fi
 # Configuration
 LOG_FILE="go-backend.log"
 
+# Auto-detect Chromium / Chrome if CHROME_EXECUTABLE is not set
+if [ -z "$CHROME_EXECUTABLE" ]; then
+    if command -v chromium >/dev/null 2>&1; then
+        export CHROME_EXECUTABLE=$(command -v chromium)
+    elif command -v google-chrome >/dev/null 2>&1; then
+        export CHROME_EXECUTABLE=$(command -v google-chrome)
+    fi
+fi
+
 echo "==========================================="
 echo "   ASTEROIDS MULTIPLATFORM LAUNCHER        "
 echo "==========================================="
